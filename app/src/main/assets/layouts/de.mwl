@@ -1,0 +1,13 @@
+# Deutsch (QWERTZ)
+id=de
+name=Deutsch
+locale=de_DE
+apostrophe=join
+row=q w e r t z u i o p ü
+row=a s d f g h j k l ö ä
+row=y x c v b n m ß
+long.a=ä á à â
+long.e=é è ê ë
+long.o=ö ó ò ô
+long.u=ü ú ù û
+long.s=ß š

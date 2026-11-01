@@ -1,0 +1,19 @@
+# English (QWERTY)
+id=en
+name=English
+locale=en_US
+apostrophe=join
+row=q w e r t y u i o p
+row=a s d f g h j k l
+row=z x c v b n m
+long.a=á à â ä ã å æ ā
+long.e=é è ê ë ē
+long.i=í ì î ï ī
+long.o=ó ò ô ö õ ø œ ō
+long.u=ú ù û ü ū
+long.c=ç ć č
+long.n=ñ ń
+long.s=ß š ś
+long.y=ý ÿ
+long.z=ž ź ż
+long.l=ł

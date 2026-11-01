@@ -1,0 +1,16 @@
+# Polski (QWERTY)
+id=pl
+name=Polski
+locale=pl_PL
+apostrophe=join
+row=q w e r t y u i o p
+row=a s d f g h j k l
+row=z x c v b n m
+long.a=ą
+long.c=ć
+long.e=ę
+long.l=ł
+long.n=ń
+long.o=ó
+long.s=ś
+long.z=ż ź

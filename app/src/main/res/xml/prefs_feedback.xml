@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <ListPreference android:key="sound_mode" android:title="@string/pref_sound_title" android:entries="@array/sound_names" android:entryValues="@array/sound_values" android:defaultValue="metro" app:useSimpleSummaryProvider="true" />
+    <Preference android:key="sound_pick" android:title="@string/pref_sound_pick_title" android:summary="@string/pref_sound_pick_summary" />
+    <SeekBarPreference android:key="sound_volume" android:title="@string/pref_sound_volume_title" android:defaultValue="60" android:max="100" app:min="0" app:seekBarIncrement="5" app:showSeekBarValue="true" />
+    <SwitchPreferenceCompat android:key="vibration" android:title="@string/pref_vibration_title" android:summary="@string/pref_vibration_summary" android:defaultValue="true" />
+    <SeekBarPreference android:key="vibration_intensity" android:title="@string/pref_vibration_intensity_title" android:defaultValue="50" android:max="100" app:min="1" app:seekBarIncrement="1" app:showSeekBarValue="true" />
+</PreferenceScreen>

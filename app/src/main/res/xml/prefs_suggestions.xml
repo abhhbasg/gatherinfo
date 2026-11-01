@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <SwitchPreferenceCompat android:key="suggestions" android:title="@string/pref_suggestions_title" android:summary="@string/pref_suggestions_summary" android:defaultValue="true" />
+    <SwitchPreferenceCompat android:key="autocorrect" android:title="@string/pref_autocorrect_title" android:summary="@string/pref_autocorrect_summary" android:defaultValue="true" />
+    <SwitchPreferenceCompat android:key="next_word" android:title="@string/pref_next_word_title" android:summary="@string/pref_next_word_summary" android:defaultValue="true" />
+    <SwitchPreferenceCompat android:key="phrase_completion" android:title="@string/pref_phrase_title" android:summary="@string/pref_phrase_summary" android:defaultValue="true" />
+    <SwitchPreferenceCompat android:key="block_offensive" android:title="@string/pref_block_title" android:summary="@string/pref_block_summary" android:defaultValue="true" />
+    <EditTextPreference android:key="custom_blocked" android:title="@string/pref_custom_blocked_title" android:summary="@string/pref_custom_blocked_summary" android:dialogMessage="@string/pref_custom_blocked_message" />
+    <PreferenceCategory android:title="@string/cat_learning">
+        <SwitchPreferenceCompat android:key="learn_personal" android:title="@string/pref_learn_title" android:summary="@string/pref_learn_summary" android:defaultValue="true" />
+        <Preference android:key="export_learned" android:title="@string/pref_export_learned_title" android:summary="@string/pref_export_learned_summary" />
+        <Preference android:key="clear_learned" android:title="@string/pref_clear_learned_title" android:summary="@string/pref_clear_learned_summary" />
+    </PreferenceCategory>
+</PreferenceScreen>

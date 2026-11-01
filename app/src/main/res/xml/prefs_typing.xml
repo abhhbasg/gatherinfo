@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <SwitchPreferenceCompat android:key="double_space_period" android:title="@string/pref_double_space_title" android:summary="@string/pref_double_space_summary" android:defaultValue="true" />
+    <SwitchPreferenceCompat android:key="long_press_symbols" android:title="@string/pref_long_press_title" android:summary="@string/pref_long_press_summary" android:defaultValue="true" />
+    <SeekBarPreference android:key="long_press_ms" android:title="@string/pref_long_press_ms_title" android:summary="@string/pref_long_press_ms_summary" android:defaultValue="200" android:max="800" app:min="50" app:seekBarIncrement="10" app:showSeekBarValue="true" />
+    <SwitchPreferenceCompat android:key="auto_caps" android:title="@string/pref_auto_caps_title" android:summary="@string/pref_auto_caps_summary" android:defaultValue="true" />
+    <SwitchPreferenceCompat android:key="swipe_typing" android:title="@string/pref_swipe_title" android:summary="@string/pref_swipe_summary" android:defaultValue="true" />
+    <SwitchPreferenceCompat android:key="space_cursor" android:title="@string/pref_space_cursor_title" android:summary="@string/pref_space_cursor_summary" android:defaultValue="true" />
+</PreferenceScreen>

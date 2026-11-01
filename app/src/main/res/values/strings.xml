@@ -1,0 +1,271 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">MetroWin Keyboard</string>
+    <string name="subtype_label">MetroWin Keyboard</string>
+    <string name="a11y_description">Lets the keyboard take its colour from the app under it. It reads no text and no window content; it only looks at a strip of the screen above the keys and keeps one average colour. Nothing is stored or sent anywhere.</string>
+    <string name="cat_setup">Set up</string>
+    <string name="cat_settings">Settings</string>
+    <string name="setup_enable_title">1. Turn the keyboard on</string>
+    <string name="setup_enable_summary">Opens the Android list of keyboards</string>
+    <string name="setup_select_title">2. Choose it as your keyboard</string>
+    <string name="setup_select_summary">Shows the keyboard picker</string>
+    <string name="setup_try_title">Try the keyboard</string>
+    <string name="setup_try_summary">A text box to type in</string>
+    <string name="setup_enabled">Turned on</string>
+    <string name="setup_disabled">Not turned on yet</string>
+    <string name="setup_active">Active keyboard</string>
+    <string name="setup_inactive">Not the active keyboard yet</string>
+    <string name="screen_languages">Languages and dictionaries</string>
+    <string name="screen_languages_summary">Layouts, word lists, your own languages</string>
+    <string name="screen_appearance">Appearance</string>
+    <string name="screen_appearance_summary">Themes, colours, your own picture</string>
+    <string name="screen_size">Size and layout</string>
+    <string name="screen_size_summary">Key height and width, number row</string>
+    <string name="screen_typing">Typing</string>
+    <string name="screen_typing_summary">Double space, long press, swipe typing</string>
+    <string name="screen_suggestions">Suggestions and learning</string>
+    <string name="screen_suggestions_summary">Correction, prediction, blocked words</string>
+    <string name="screen_feedback">Sound and vibration</string>
+    <string name="screen_feedback_summary">Key click, vibration strength</string>
+    <string name="screen_clipboard">Clipboard</string>
+    <string name="screen_clipboard_summary">History of text and pictures</string>
+    <string name="screen_gif">GIF</string>
+    <string name="screen_gif_summary">Choose where GIFs come from</string>
+    <string name="screen_voice">Voice typing</string>
+    <string name="screen_voice_summary">Dictation and transcription</string>
+    <string name="screen_launcher">MetroWin Launcher</string>
+    <string name="screen_launcher_summary">Follow the launcher\'s look</string>
+    <string name="screen_about">Privacy and about</string>
+    <string name="screen_about_summary">What stays on your phone</string>
+    <string name="pref_languages_title">Active languages</string>
+    <string name="pref_languages_summary">The globe key switches between them</string>
+    <string name="cat_dictionaries">Dictionaries and layouts</string>
+    <string name="pref_import_dictionary_title">Import a dictionary…</string>
+    <string name="pref_import_dictionary_summary">Any word list: one word per line, \"word count\" frequency lists, or Hunspell .dic files</string>
+    <string name="pref_remove_dictionary_title">Remove an imported dictionary…</string>
+    <string name="pref_remove_dictionary_summary">Goes back to the starter list of the language</string>
+    <string name="pref_import_layout_title">Import a keyboard layout…</string>
+    <string name="pref_import_layout_summary">A .mwl text file: add any language or arrangement</string>
+    <string name="pref_remove_layout_title">Remove an imported layout…</string>
+    <string name="pref_remove_layout_summary">Only layouts you imported can be removed</string>
+    <string name="dialog_pick_language">Which language is this for?</string>
+    <string name="dialog_pick_imported">Which one?</string>
+    <string name="nothing_to_remove">Nothing imported yet</string>
+    <string name="import_done_words">%1$d words imported</string>
+    <string name="import_failed">That file could not be used</string>
+    <string name="import_layout_done">Layout \"%1$s\" added</string>
+    <string name="removed">Removed</string>
+    <string name="pref_theme_style_title">Look</string>
+    <string name="pref_theme_mode_title">Dark or light</string>
+    <string name="pref_accent_title">Accent colour</string>
+    <string name="pref_accent_summary">The 20 Windows Phone colours, or your own</string>
+    <string name="pref_dynamic_title">Colours from the wallpaper</string>
+    <string name="pref_dynamic_summary">Modern Droid only, Android 12 or newer: use the system palette</string>
+    <string name="pref_oled_title">Pure black</string>
+    <string name="pref_oled_summary">Darkest background, saves battery on OLED screens</string>
+    <string name="cat_picture">Your picture</string>
+    <string name="pref_image_bg_title">Picture behind the keys</string>
+    <string name="pref_image_bg_summary">Use a photo as the keyboard background</string>
+    <string name="pref_image_pick_title">Choose a picture…</string>
+    <string name="pref_image_pick_summary">Stays on your phone</string>
+    <string name="pref_image_remove_title">Remove the picture</string>
+    <string name="pref_image_dim_title">Dim the picture</string>
+    <string name="pref_picture_accent_title">Accent colour from the picture</string>
+    <string name="pref_picture_accent_summary">Takes the most vivid colour of the picture</string>
+    <string name="cat_adaptive">Follow the app</string>
+    <string name="pref_adaptive_title">Keyboard colour follows the app below</string>
+    <string name="pref_adaptive_summary">Samples a strip of the screen above the keys (chat, website…). Needs an accessibility service, Android 11 or newer. It reads no text.</string>
+    <string name="adaptive_dialog_title">Turn on the colour service</string>
+    <string name="adaptive_dialog_text">Android needs you to turn on \"MetroWin Keyboard\" in the accessibility settings. The service only takes screenshots of the strip above the keyboard to pick one colour; it reads no text and sends nothing.</string>
+    <string name="adaptive_open">Open settings</string>
+    <string name="adaptive_old_android">This needs Android 11 or newer</string>
+    <string name="accent_dialog_title">Accent colour</string>
+    <string name="accent_custom">Custom colour…</string>
+    <string name="accent_custom_hint">Colour as #RRGGBB</string>
+    <string name="accent_invalid">That is not a colour</string>
+    <string name="accent_reset">Back to the theme colour</string>
+    <string name="picture_saved">Picture saved</string>
+    <string name="picture_failed">That picture could not be used</string>
+    <string name="pref_key_height_title">Key height (portrait, %)</string>
+    <string name="pref_key_height_land_title">Key height (landscape, %)</string>
+    <string name="pref_width_title">Keyboard width (%)</string>
+    <string name="pref_width_summary">Narrower is easier with one hand</string>
+    <string name="pref_align_title">Position when narrower</string>
+    <string name="pref_gap_title">Space between keys (dp)</string>
+    <string name="pref_number_row_title">Number row</string>
+    <string name="pref_number_row_summary">Show the digits above the letters</string>
+    <string name="pref_hints_title">Digit hints on the letters</string>
+    <string name="pref_hints_summary">When the number row is hidden, a long press on the top row types the digit</string>
+    <string name="pref_double_space_title">Double space types a full stop</string>
+    <string name="pref_double_space_summary">Two quick spaces become \". \"</string>
+    <string name="pref_long_press_title">Hold a key for symbols</string>
+    <string name="pref_long_press_summary">Accents, digits and symbols appear above the key</string>
+    <string name="pref_long_press_ms_title">Press-and-hold time (ms)</string>
+    <string name="pref_long_press_ms_summary">Default 200</string>
+    <string name="pref_auto_caps_title">Capital at the start of a sentence</string>
+    <string name="pref_auto_caps_summary">Shift turns on by itself</string>
+    <string name="pref_swipe_title">Swipe typing</string>
+    <string name="pref_swipe_summary">Slide over the letters to write a word</string>
+    <string name="pref_space_cursor_title">Slide on the space bar to move the cursor</string>
+    <string name="pref_suggestions_title">Suggestions</string>
+    <string name="pref_suggestions_summary">Show words above the keys</string>
+    <string name="pref_autocorrect_title">Automatic correction</string>
+    <string name="pref_autocorrect_summary">Fixes typos when you end a word. Backspace brings back what you typed.</string>
+    <string name="pref_next_word_title">Predict the next word</string>
+    <string name="pref_next_word_summary">Suggests what you are likely to write next</string>
+    <string name="pref_phrase_title">Complete the phrase</string>
+    <string name="pref_phrase_summary">Offers the next few words when you often write them together</string>
+    <string name="pref_block_title">Block offensive words</string>
+    <string name="pref_block_summary">Never suggested, corrected to or learned</string>
+    <string name="pref_custom_blocked_title">Your blocked words</string>
+    <string name="pref_custom_blocked_summary">Add words you never want suggested</string>
+    <string name="pref_custom_blocked_message">One word per line or separated by commas</string>
+    <string name="cat_learning">Learning</string>
+    <string name="pref_learn_title">Learn from what I write</string>
+    <string name="pref_learn_summary">Words and habits are kept only on this phone. Never in password fields.</string>
+    <string name="pref_export_learned_title">Export what was learned…</string>
+    <string name="pref_export_learned_summary">Saves a text file you can read or keep</string>
+    <string name="pref_clear_learned_title">Forget everything learned</string>
+    <string name="pref_clear_learned_summary">Deletes the learned words and habits</string>
+    <string name="clear_learned_confirm">Delete everything the keyboard learned from you?</string>
+    <string name="cleared">Done</string>
+    <string name="export_done">Saved</string>
+    <string name="pref_sound_title">Key sound</string>
+    <string name="pref_sound_pick_title">Choose your own sound…</string>
+    <string name="pref_sound_pick_summary">A short audio file for \"Your own sound\"</string>
+    <string name="pref_sound_volume_title">Sound volume</string>
+    <string name="pref_vibration_title">Vibration</string>
+    <string name="pref_vibration_summary">A tick when you press a key</string>
+    <string name="pref_vibration_intensity_title">Vibration strength</string>
+    <string name="sound_saved">Sound saved</string>
+    <string name="pref_clipboard_title">Clipboard history</string>
+    <string name="pref_clipboard_summary">Keeps what you copy, on this phone only</string>
+    <string name="pref_clipboard_max_title">How many items to keep</string>
+    <string name="pref_clipboard_max_summary">Pinned items are never dropped</string>
+    <string name="pref_clipboard_images_title">Save pictures too</string>
+    <string name="pref_clipboard_images_summary">Copied photos appear in the clipboard and can be pasted</string>
+    <string name="pref_clipboard_clear_title">Clear the history</string>
+    <string name="pref_clipboard_clear_summary">Pinned items stay</string>
+    <string name="clipboard_title">Clipboard</string>
+    <string name="clipboard_empty">Nothing copied yet</string>
+    <string name="clipboard_no_images">This app does not accept pictures</string>
+    <string name="pref_gif_source_title">Where GIFs come from</string>
+    <string name="pref_gif_key_title">API key</string>
+    <string name="pref_gif_key_summary">Needed for GIPHY and Tenor. Get a free key from their developer sites.</string>
+    <string name="pref_gif_key_message">Paste the key. It stays on this phone.</string>
+    <string name="pref_gif_folder_title">GIF folder…</string>
+    <string name="pref_gif_folder_summary">For \"A folder on this phone\": the GIFs you saved</string>
+    <string name="cat_gif_custom">Your own service</string>
+    <string name="pref_gif_custom_url_title">Address</string>
+    <string name="pref_gif_custom_url_summary">https address with {query}, {key}, {limit} and {lang}</string>
+    <string name="pref_gif_custom_list_title">Where the results are in the answer</string>
+    <string name="pref_gif_custom_preview_title">Small picture, inside each result</string>
+    <string name="pref_gif_custom_full_title">Full GIF, inside each result</string>
+    <string name="pref_gif_link_title">Send the link when pictures are not accepted</string>
+    <string name="pref_gif_link_summary">Many chats turn the link into the GIF</string>
+    <string name="gif_needs_key">Add an API key in Settings → GIF. Tap here.</string>
+    <string name="gif_needs_folder">Choose a GIF folder in Settings → GIF. Tap here.</string>
+    <string name="gif_needs_url">Add the address of your service in Settings → GIF. Tap here.</string>
+    <string name="gif_loading">Loading…</string>
+    <string name="gif_none">No GIFs found</string>
+    <string name="gif_error">Could not load GIFs</string>
+    <string name="gif_not_supported">This app does not accept GIFs</string>
+    <string name="gif_search_prefix">GIF:</string>
+    <string name="gif_folder_saved">Folder saved</string>
+    <string name="pref_voice_permission_title">Allow the microphone</string>
+    <string name="pref_voice_permission_summary">Needed for voice typing</string>
+    <string name="pref_voice_continuous_title">Keep listening</string>
+    <string name="pref_voice_continuous_summary">Transcribe long speech until you tap the microphone again</string>
+    <string name="pref_voice_offline_title">On this phone only</string>
+    <string name="pref_voice_offline_summary">Prefer recognition without the internet, if the language is downloaded</string>
+    <string name="voice_listening">Listening…</string>
+    <string name="voice_permission">Allow the microphone to use voice typing</string>
+    <string name="voice_unavailable">No speech recogniser on this phone</string>
+    <string name="voice_error">Voice error %1$d</string>
+    <string name="pref_launcher_status_title">MetroWin Launcher</string>
+    <string name="launcher_found">Found on this phone</string>
+    <string name="launcher_missing">Not installed</string>
+    <string name="pref_launcher_sync_title">Follow the launcher\'s look</string>
+    <string name="pref_launcher_sync_summary">Takes the style, dark/light and accent the launcher sends</string>
+    <string name="pref_launcher_import_title">Import a launcher theme file…</string>
+    <string name="pref_launcher_import_summary">The \"theme\" the launcher exports from its settings</string>
+    <string name="pref_launcher_open_title">Open MetroWin Launcher</string>
+    <string name="theme_imported">Theme applied</string>
+    <string name="theme_invalid">That is not a MetroWin theme file</string>
+    <string name="about_privacy_title">Privacy</string>
+    <string name="about_privacy_text">No analytics, no ads, no trackers. What you type, what the keyboard learns and your clipboard stay on this phone and are excluded from backups. The internet is used only to fetch GIFs from the source you chose, when you open the GIF panel; the microphone only for voice typing.</string>
+    <string name="about_version_title">Version</string>
+    <string name="about_license_title">License</string>
+    <string name="about_license_text">Free software, GNU GPL v3 or later. Not affiliated with Microsoft; Windows Phone is a trademark of Microsoft Corporation.</string>
+    <string name="test_hint">Type here to try the keyboard</string>
+    <string name="test_title">Try the keyboard</string>
+    <string name="ok">OK</string>
+    <string name="cancel">Cancel</string>
+    <string name="pref_space_cursor_summary">Hold and slide left or right on the space bar</string>
+    <string-array name="theme_style_names">
+        <item>Classic (flat Windows Phone)</item>
+        <item>Modern Glass</item>
+        <item>Modern Droid</item>
+    </string-array>
+    <string-array name="theme_style_values">
+        <item>classic</item>
+        <item>glass</item>
+        <item>droid</item>
+    </string-array>
+    <string-array name="theme_mode_names">
+        <item>Follow the system</item>
+        <item>Dark</item>
+        <item>Light</item>
+    </string-array>
+    <string-array name="theme_mode_values">
+        <item>system</item>
+        <item>dark</item>
+        <item>light</item>
+    </string-array>
+    <string-array name="align_names">
+        <item>Left</item>
+        <item>Centre</item>
+        <item>Right</item>
+    </string-array>
+    <string-array name="align_values">
+        <item>left</item>
+        <item>center</item>
+        <item>right</item>
+    </string-array>
+    <string-array name="sound_names">
+        <item>Windows Phone style click</item>
+        <item>Android\'s own sound</item>
+        <item>Your own sound</item>
+        <item>Off</item>
+    </string-array>
+    <string-array name="sound_values">
+        <item>metro</item>
+        <item>system</item>
+        <item>custom</item>
+        <item>off</item>
+    </string-array>
+    <string-array name="gif_source_names">
+        <item>GIPHY</item>
+        <item>Tenor</item>
+        <item>A folder on this phone</item>
+        <item>Your own service</item>
+    </string-array>
+    <string-array name="gif_source_values">
+        <item>giphy</item>
+        <item>tenor</item>
+        <item>folder</item>
+        <item>custom</item>
+    </string-array>
+    <string-array name="gif_chips">
+        <item>Trending</item>
+        <item>Thanks</item>
+        <item>Haha</item>
+        <item>Love</item>
+        <item>Wow</item>
+        <item>Yes</item>
+        <item>No</item>
+        <item>Sad</item>
+        <item>Party</item>
+        <item>Good morning</item>
+    </string-array>
+</resources>

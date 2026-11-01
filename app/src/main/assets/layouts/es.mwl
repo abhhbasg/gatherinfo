@@ -1,0 +1,15 @@
+# Español (QWERTY + ñ)
+id=es
+name=Español
+locale=es_ES
+apostrophe=join
+row=q w e r t y u i o p
+row=a s d f g h j k l ñ
+row=z x c v b n m
+long.a=á à ä â
+long.e=é è ë ê
+long.i=í ì ï î
+long.o=ó ò ö ô
+long.u=ú ü ù û
+long.n=ñ ń
+long.c=ç

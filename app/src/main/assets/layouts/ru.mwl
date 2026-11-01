@@ -1,0 +1,11 @@
+# Русский (ЙЦУКЕН)
+id=ru
+name=Русский
+locale=ru_RU
+apostrophe=join
+row=й ц у к е н г ш щ з х
+row=ф ы в а п р о л д ж э
+row=я ч с м и т ь б ю ъ
+long.е=ё
+long.ь=ъ
+long.ъ=ь

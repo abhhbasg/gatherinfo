@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<paths>
+    <!-- GIFs prepared to be sent -->
+    <cache-path name="gif_share" path="gif_share/" />
+    <!-- Pictures saved in the clipboard history -->
+    <files-path name="clipboard" path="clipboard/" />
+</paths>

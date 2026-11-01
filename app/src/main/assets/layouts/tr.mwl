@@ -1,0 +1,15 @@
+# Türkçe (Q)
+id=tr
+name=Türkçe
+locale=tr_TR
+apostrophe=join
+row=q w e r t y u ı o p ğ ü
+row=a s d f g h j k l ş i
+row=z x c v b n m ö ç
+long.a=â
+long.i=î
+long.u=û
+long.g=ğ
+long.s=ş
+long.c=ç
+long.o=ö

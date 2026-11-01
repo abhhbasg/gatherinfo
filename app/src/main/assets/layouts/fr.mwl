@@ -1,0 +1,15 @@
+# Français (AZERTY)
+id=fr
+name=Français
+locale=fr_FR
+apostrophe=break
+row=a z e r t y u i o p
+row=q s d f g h j k l m
+row=w x c v b n
+long.a=à â á ä æ ã
+long.e=é è ê ë
+long.i=î ï í ì
+long.o=ô ö ó ò œ
+long.u=ù û ü ú
+long.c=ç
+long.y=ÿ ý

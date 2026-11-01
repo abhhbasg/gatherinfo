@@ -1,0 +1,837 @@
+package com.metrowin.keyboard.ime
+
+import android.content.ClipData
+import android.content.ClipboardManager
+import android.content.Context
+import android.content.Intent
+import android.content.SharedPreferences
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
+import android.inputmethodservice.InputMethodService
+import android.os.Handler
+import android.os.Looper
+import android.os.SystemClock
+import android.text.InputType
+import android.view.KeyEvent
+import android.view.View
+import android.view.ViewGroup
+import android.view.inputmethod.EditorInfo
+import android.view.inputmethod.InputMethodManager
+import android.view.inputmethod.InputMethodSubtype
+import android.widget.FrameLayout
+import android.widget.LinearLayout
+import android.widget.Toast
+import com.metrowin.keyboard.K
+import com.metrowin.keyboard.KeyboardApp
+import com.metrowin.keyboard.R
+import com.metrowin.keyboard.clipboard.ClipItem
+import com.metrowin.keyboard.engine.LanguageEngine
+import com.metrowin.keyboard.engine.SuggestOptions
+import com.metrowin.keyboard.engine.SwipePoint
+import com.metrowin.keyboard.engine.Text
+import com.metrowin.keyboard.engine.WordSuggestions
+import com.metrowin.keyboard.feedback.Feedback
+import com.metrowin.keyboard.gif.GifItem
+import com.metrowin.keyboard.gif.GifRepository
+import com.metrowin.keyboard.integration.LauncherLink
+import com.metrowin.keyboard.layout.Key
+import com.metrowin.keyboard.layout.KeyType
+import com.metrowin.keyboard.layout.KeyboardBuilder
+import com.metrowin.keyboard.layout.LanguageLayout
+import com.metrowin.keyboard.layout.Page
+import com.metrowin.keyboard.service.AdaptiveColor
+import com.metrowin.keyboard.settings.HelperActivity
+import com.metrowin.keyboard.settings.SettingsActivity
+import com.metrowin.keyboard.theme.KeyboardColors
+import com.metrowin.keyboard.theme.KeyboardTheme
+import com.metrowin.keyboard.ui.ClipboardPanel
+import com.metrowin.keyboard.ui.EmojiPanel
+import com.metrowin.keyboard.ui.GifPanel
+import com.metrowin.keyboard.ui.Icon
+import com.metrowin.keyboard.ui.ImageLoader
+import com.metrowin.keyboard.ui.KeyboardListener
+import com.metrowin.keyboard.ui.KeyboardView
+import com.metrowin.keyboard.ui.Slot
+import com.metrowin.keyboard.ui.SuggestionBar
+import com.metrowin.keyboard.ui.Tool
+import com.metrowin.keyboard.voice.VoiceInput
+import java.io.File
+import java.util.Locale
+import java.util.concurrent.Executors
+
+/**
+ * The MetroWin keyboard. This class owns the text logic: what is being typed (the composing word), when a word ends, what is
+ * corrected, learned and suggested, and it connects the keys, the bar and the panels to the app being typed in.
+ */
+open class MetroWinIME : InputMethodService(), KeyboardListener, SuggestionBar.Listener {
+    private enum class Field { TEXT, PASSWORD, EMAIL, URI, NUMBER, PHONE, NONE }
+    private enum class Panel { NONE, EMOJI, CLIPBOARD, GIF }
+
+    private class Correction(val typed: String, val corrected: String, val delimiter: String)
+    private class SwipeResult(val word: String, val inserted: String)
+
+    private lateinit var app: KeyboardApp
+    private lateinit var feedback: Feedback
+    private lateinit var images: ImageLoader
+    private lateinit var gifRepo: GifRepository
+    private lateinit var voice: VoiceInput
+    private val main = Handler(Looper.getMainLooper())
+    private val pool = Executors.newSingleThreadExecutor()
+
+    /** Where suggestions and swipes are computed. Tests replace it with one that runs at once. */
+    internal var worker: java.util.concurrent.Executor = pool
+    private val prefs get() = app.prefs
+
+    // views
+    private var root: LinearLayout? = null
+    private var bar: SuggestionBar? = null
+    private var strip: FrameLayout? = null
+    private var frame: FrameLayout? = null
+    private var keyboard: KeyboardView? = null
+    private var emoji: EmojiPanel? = null
+    private var clipboardPanel: ClipboardPanel? = null
+    private var gifPanel: GifPanel? = null
+    private var colors: KeyboardColors? = null
+
+    // state
+    private var engine: LanguageEngine? = null
+    private var page = Page.LETTERS
+    private var panel = Panel.NONE
+    private var shift = 0
+    private var lastShiftTap = 0L
+    private var field = Field.NONE
+    private var predictionOn = false
+    private var learningOn = false
+    private var inLauncher = false
+    private var gifSearching = false
+    private val gifQuery = StringBuilder()
+    private val composing = StringBuilder()
+    private var prevWord: String? = null
+    private var prevWord2: String? = null
+    private var latest: WordSuggestions? = null
+    private var suggestSeq = 0
+    private var lastCorrection: Correction? = null
+    private var autoSpace = false
+    private var lastSwipe: SwipeResult? = null
+    private var lastSpaceTime = 0L
+    private var bgBitmap: Bitmap? = null
+    private var bgStamp = -1L
+    private var refreshPending = false
+
+    private val prefsListener = SharedPreferences.OnSharedPreferenceChangeListener { _, key ->
+        if (key == K.EMOJI_RECENT) return@OnSharedPreferenceChangeListener
+        if (key == K.CUSTOM_BLOCKED) app.reloadEngines()
+        scheduleRefresh()
+    }
+    private val adaptiveListener: () -> Unit = { if (prefs.adaptiveColor) scheduleRefresh() }
+    private val clipListener = ClipboardManager.OnPrimaryClipChangedListener { captureClip() }
+
+    internal val keyboardView get() = keyboard
+    internal val suggestionBar get() = bar
+    internal val shiftState get() = shift
+
+    // --- lifecycle --------------------------------------------------------------------------------------------------
+
+    override fun onCreate() {
+        super.onCreate()
+        app = KeyboardApp.of(this)
+        feedback = Feedback(this, prefs)
+        images = ImageLoader(this)
+        gifRepo = GifRepository(this, prefs)
+        voice = VoiceInput(this, prefs, voiceCallbacks)
+        prefs.sp.registerOnSharedPreferenceChangeListener(prefsListener)
+        AdaptiveColor.add(adaptiveListener)
+        (getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager).addPrimaryClipChangedListener(clipListener)
+    }
+
+    override fun onDestroy() {
+        prefs.sp.unregisterOnSharedPreferenceChangeListener(prefsListener)
+        AdaptiveColor.remove(adaptiveListener)
+        (getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager).removePrimaryClipChangedListener(clipListener)
+        voice.stop()
+        app.saveAll()
+        feedback.release(); gifRepo.shutdown(); images.shutdown(); pool.shutdownNow()
+        super.onDestroy()
+    }
+
+    override fun onEvaluateFullscreenMode() = false
+
+    override fun onCreateInputView(): View {
+        val ctx = this
+        val kb = KeyboardView(ctx).also { it.listener = this }
+        val bar = SuggestionBar(ctx).also { it.listener = this }
+        val emoji = EmojiPanel(ctx).also { it.listener = emojiListener }
+        val clip = ClipboardPanel(ctx, app.clipboard, images).also { it.listener = clipListener2 }
+        val gif = GifPanel(ctx, gifRepo, images).also { it.listener = gifListener }
+        val frame = FrameLayout(ctx)
+        frame.addView(kb, FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT))
+        for (p in listOf(emoji, clip, gif)) {
+            p.visibility = View.GONE
+            frame.addView(p, FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT))
+        }
+        val strip = FrameLayout(ctx).apply { visibility = View.GONE }
+        val root = LinearLayout(ctx).apply { orientation = LinearLayout.VERTICAL }
+        root.addView(bar, LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT))
+        root.addView(strip, LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, (resources.displayMetrics.density * 100).toInt()))
+        root.addView(frame, LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT))
+        root.viewTreeObserver.addOnGlobalLayoutListener {
+            val loc = IntArray(2); root.getLocationOnScreen(loc); AdaptiveColor.keyboardTop = loc[1]
+        }
+        this.root = root; this.bar = bar; this.strip = strip; this.frame = frame; this.keyboard = kb
+        this.emoji = emoji; this.clipboardPanel = clip; this.gifPanel = gif
+        applyAll()
+        return root
+    }
+
+    override fun onStartInput(attribute: EditorInfo?, restarting: Boolean) {
+        super.onStartInput(attribute, restarting)
+        composing.clear(); latest = null; lastCorrection = null; autoSpace = false; lastSwipe = null
+        classify(attribute)
+    }
+
+    override fun onStartInputView(info: EditorInfo?, restarting: Boolean) {
+        super.onStartInputView(info, restarting)
+        classify(info)
+        AdaptiveColor.keyboardShown = true
+        gifSearching = false; gifQuery.setLength(0)
+        showPanel(Panel.NONE)
+        page = if (field == Field.NUMBER || field == Field.PHONE) Page.NUMBERS else Page.LETTERS
+        applyAll()
+        bar?.closeTools()
+        refreshContext()
+        updateShiftFromCursor()
+        updateSuggestions()
+        captureClip()
+    }
+
+    override fun onFinishInputView(finishingInput: Boolean) {
+        super.onFinishInputView(finishingInput)
+        AdaptiveColor.keyboardShown = false
+        finishComposingQuietly()
+        voice.stop()
+        emoji?.dismissPopup()
+        app.saveAll()
+    }
+
+    override fun onFinishInput() {
+        super.onFinishInput()
+        finishComposingQuietly()
+    }
+
+    override fun onCurrentInputMethodSubtypeChanged(subtype: InputMethodSubtype?) {
+        super.onCurrentInputMethodSubtypeChanged(subtype)
+        val tag = subtype?.languageTag?.takeIf { it.isNotBlank() } ?: return
+        val layout = app.layouts.forLanguage(tag)
+        if (layout.id != prefs.currentLanguage && app.layouts.get(tag.substringBefore('-').lowercase()) != null) setLanguage(layout)
+    }
+
+    override fun onUpdateSelection(oldSelStart: Int, oldSelEnd: Int, newSelStart: Int, newSelEnd: Int, candidatesStart: Int, candidatesEnd: Int) {
+        super.onUpdateSelection(oldSelStart, oldSelEnd, newSelStart, newSelEnd, candidatesStart, candidatesEnd)
+        if (composing.isNotEmpty() && (newSelStart != candidatesEnd || newSelEnd != candidatesEnd)) {
+            // The cursor left the word being typed: it is a finished word now.
+            composing.clear(); currentInputConnection?.finishComposingText(); latest = null
+        }
+        if (composing.isEmpty()) {
+            main.removeCallbacks(contextRefresh)
+            main.postDelayed(contextRefresh, 60)
+        }
+    }
+
+    private val contextRefresh = Runnable { refreshContext(); updateSuggestions() }
+
+    private fun finishComposingQuietly() {
+        if (composing.isNotEmpty()) { composing.clear(); currentInputConnection?.finishComposingText() }
+    }
+
+    // --- field and settings -----------------------------------------------------------------------------------------
+
+    private fun classify(info: EditorInfo?) {
+        val t = info?.inputType ?: 0
+        val cls = t and InputType.TYPE_MASK_CLASS
+        val variation = t and InputType.TYPE_MASK_VARIATION
+        field = when (cls) {
+            InputType.TYPE_CLASS_NUMBER -> if (variation == InputType.TYPE_NUMBER_VARIATION_PASSWORD) Field.PASSWORD else Field.NUMBER
+            InputType.TYPE_CLASS_PHONE -> Field.PHONE
+            InputType.TYPE_CLASS_DATETIME -> Field.NUMBER
+            InputType.TYPE_CLASS_TEXT -> when (variation) {
+                InputType.TYPE_TEXT_VARIATION_PASSWORD, InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD, InputType.TYPE_TEXT_VARIATION_WEB_PASSWORD -> Field.PASSWORD
+                InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS, InputType.TYPE_TEXT_VARIATION_WEB_EMAIL_ADDRESS -> Field.EMAIL
+                InputType.TYPE_TEXT_VARIATION_URI -> Field.URI
+                else -> Field.TEXT
+            }
+            else -> Field.NONE
+        }
+        inLauncher = LauncherLink.isLauncher(info?.packageName)
+        val noSuggestions = t and InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS != 0
+        // In the launcher's search box a word is not a sentence: no completion, correction or learning there.
+        predictionOn = prefs.suggestions && field == Field.TEXT && !noSuggestions && !inLauncher
+        val noLearning = (info?.imeOptions ?: 0) and EditorInfo.IME_FLAG_NO_PERSONALIZED_LEARNING != 0
+        learningOn = prefs.learn && field == Field.TEXT && !noLearning && !inLauncher
+    }
+
+    private fun scheduleRefresh() {
+        if (refreshPending) return
+        refreshPending = true
+        main.postDelayed({ refreshPending = false; if (root != null) applyAll() }, 40)
+    }
+
+    private fun activeLayouts(): List<LanguageLayout> =
+        prefs.languages.mapNotNull { app.layouts.get(it) }.ifEmpty { listOf(app.layouts.forLanguage(Locale.getDefault().language)) }
+
+    private fun currentLayout(): LanguageLayout {
+        val active = activeLayouts()
+        val saved = prefs.currentLanguage
+        return active.firstOrNull { it.id == saved } ?: app.layouts.get(saved ?: "") ?: active.first()
+    }
+
+    private fun setLanguage(layout: LanguageLayout) {
+        finishWord(autocorrect = false)
+        prefs.currentLanguage = layout.id
+        engine = null
+        loadEngine(layout)
+        applyKeyboardPage()
+        updateSuggestions()
+    }
+
+    private fun loadEngine(layout: LanguageLayout) {
+        app.cachedEngine(layout.id)?.let { engine = it; return }
+        worker.execute {
+            val e = app.engine(layout.id)
+            main.post { if (currentLayout().id == layout.id) { engine = e; updateSuggestions() } }
+        }
+    }
+
+    private fun options() = SuggestOptions(
+        autocorrect = prefs.autocorrect, nextWord = prefs.nextWord, phrases = prefs.phrases,
+        blockOffensive = prefs.blockOffensive, usePersonal = learningOn || prefs.learn,
+    )
+
+    private fun backgroundBitmap(): Bitmap? {
+        if (!prefs.imageBackground) return null
+        val f = File(filesDir, "background.jpg")
+        if (!f.exists()) return null
+        if (f.lastModified() == bgStamp && bgBitmap != null) return bgBitmap
+        bgStamp = f.lastModified()
+        bgBitmap = runCatching { BitmapFactory.decodeFile(f.absolutePath) }.getOrNull()
+        return bgBitmap
+    }
+
+    /** Applies every setting to the views. Cheap enough to run on any change. */
+    private fun applyAll() {
+        val kb = keyboard ?: return
+        val picture = if (prefs.usePictureAccent && prefs.imageBackground) prefs.pictureAccent else 0
+        val c = KeyboardTheme.resolve(this, prefs, KeyboardTheme.isSystemDark(this), if (prefs.adaptiveColor) AdaptiveColor.color else null, picture)
+        colors = c
+        kb.setColors(c); bar?.setColors(c); emoji?.setColors(c); clipboardPanel?.setColors(c); gifPanel?.setColors(c)
+        root?.setBackgroundColor(c.background)
+        kb.setBackgroundImage(backgroundBitmap(), prefs.imageDim)
+        val land = resources.configuration.orientation == android.content.res.Configuration.ORIENTATION_LANDSCAPE
+        kb.setMetrics(if (land) prefs.keyHeightLand else prefs.keyHeight, prefs.keyGap, prefs.keyboardWidth, prefs.keyboardAlign)
+        kb.setBehavior(prefs.longPressSymbols, prefs.longPressMs, prefs.swipe && field == Field.TEXT, prefs.spaceCursor, prefs.keyHints)
+        clipboardPanel?.setImagesEnabled(prefs.clipboardImages)
+        feedback.prepare()
+        val layout = currentLayout()
+        if (engine?.layout?.id != layout.id) { engine = null; loadEngine(layout) }
+        applyKeyboardPage()
+        // Options that were switched off while the bar showed something.
+        if (!prefs.suggestions) bar?.setSlots(listOf(null, null, null))
+    }
+
+    private fun applyKeyboardPage() {
+        val kb = keyboard ?: return
+        val layout = currentLayout()
+        val multi = activeLayouts().size > 1 || shouldOfferSwitchingToNextInputMethod()
+        val p = when (page) {
+            Page.LETTERS -> KeyboardBuilder.letters(layout, prefs.numberRow, prefs.keyHints, multi)
+            Page.SYMBOLS_1, Page.SYMBOLS_2 -> KeyboardBuilder.symbols(page, prefs.numberRow)
+            Page.NUMBERS -> KeyboardBuilder.numbers(field == Field.PHONE)
+        }
+        kb.setPage(p)
+        kb.setLanguageName(layout.name)
+        kb.setShift(shift)
+        val action = currentInputEditorInfo?.imeOptions?.and(EditorInfo.IME_MASK_ACTION) ?: EditorInfo.IME_ACTION_NONE
+        val noAction = currentInputEditorInfo?.imeOptions?.and(EditorInfo.IME_FLAG_NO_ENTER_ACTION) != 0
+        kb.setEnterAction(
+            if (noAction) Icon.ENTER else when (action) {
+                EditorInfo.IME_ACTION_SEARCH -> Icon.SEARCH
+                EditorInfo.IME_ACTION_SEND -> Icon.SEND
+                EditorInfo.IME_ACTION_GO, EditorInfo.IME_ACTION_NEXT -> Icon.ARROW_RIGHT
+                EditorInfo.IME_ACTION_DONE -> Icon.CHECK
+                else -> Icon.ENTER
+            }, null,
+        )
+    }
+
+    // --- text context -----------------------------------------------------------------------------------------------
+
+    /** Reads the two words before the cursor (not the one being typed), for the next-word prediction. */
+    private fun refreshContext() {
+        val ic = currentInputConnection ?: return
+        if (field != Field.TEXT) { prevWord = null; prevWord2 = null; return }
+        val before = ic.getTextBeforeCursor(80, 0) ?: return
+        val join = currentLayout().joinApostrophe
+        val text = if (composing.isNotEmpty() && before.length >= composing.length) before.subSequence(0, before.length - composing.length) else before
+        // A word right against the cursor and not being typed is not a context (the user tapped in the middle of text).
+        val words = if (composing.isEmpty() && text.isNotEmpty() && text.last() != ' ' && text.last() != '\n') emptyList() else Text.previousWords(text, join, 2)
+        prevWord = words.getOrNull(0); prevWord2 = words.getOrNull(1)
+    }
+
+    private fun updateShiftFromCursor() {
+        if (!prefs.autoCaps || field != Field.TEXT || inLauncher || page != Page.LETTERS || shift == 2) return
+        val info = currentInputEditorInfo ?: return
+        val caps = currentInputConnection?.getCursorCapsMode(info.inputType) ?: 0
+        setShift(if (caps != 0) 1 else 0)
+    }
+
+    private fun setShift(state: Int) { shift = state; keyboard?.setShift(state) }
+
+    // --- keys -------------------------------------------------------------------------------------------------------
+
+    override fun onPress(key: Key) = feedback.press(key.type)
+
+    override fun onText(key: Key, text: String) {
+        lastSwipe = null
+        typeText(text)
+    }
+
+    override fun onPopupText(text: String) {
+        lastSwipe = null
+        typeText(text)
+    }
+
+    override fun onShiftLongPress() { setShift(if (shift == 2) 0 else 2) }
+
+    override fun onFunction(key: Key, repeat: Boolean) {
+        when (key.type) {
+            KeyType.SHIFT -> {
+                val now = SystemClock.uptimeMillis()
+                setShift(when { shift == 2 -> 0; shift == 1 && now - lastShiftTap < 350 -> 2; shift == 1 -> 0; else -> 1 })
+                lastShiftTap = now
+            }
+            KeyType.BACKSPACE -> { lastSwipe = null; backspace(repeat) }
+            KeyType.ENTER -> { lastSwipe = null; enter() }
+            KeyType.SPACE -> { lastSwipe = null; space() }
+            KeyType.SYMBOLS -> { finishWord(false); page = if (page == Page.LETTERS) Page.SYMBOLS_1 else Page.LETTERS; applyKeyboardPage() }
+            KeyType.SYMBOLS_PAGE -> { page = if (page == Page.SYMBOLS_1) Page.SYMBOLS_2 else Page.SYMBOLS_1; applyKeyboardPage() }
+            KeyType.EMOJI -> { finishWord(false); showPanel(Panel.EMOJI) }
+            KeyType.LANGUAGE -> switchLanguage()
+            KeyType.CHAR -> typeText(key.label)
+        }
+    }
+
+    private fun switchLanguage() {
+        val all = activeLayouts()
+        if (all.size <= 1) { switchToNextInputMethod(false); return }
+        val i = all.indexOfFirst { it.id == currentLayout().id }
+        setLanguage(all[(i + 1) % all.size])
+    }
+
+    override fun onCursorMove(steps: Int) {
+        finishWord(false)
+        val code = if (steps > 0) KeyEvent.KEYCODE_DPAD_RIGHT else KeyEvent.KEYCODE_DPAD_LEFT
+        repeat(kotlin.math.abs(steps)) { sendDownUpKeyEvents(code) }
+    }
+
+    // --- typing -----------------------------------------------------------------------------------------------------
+
+    private fun typeText(text: String) {
+        if (gifSearching) { typeIntoGifSearch(text); return }
+        val ic = currentInputConnection ?: return
+        lastCorrection = null
+        val layout = currentLayout()
+        val isWord = predictionOn && page == Page.LETTERS &&
+            (text.all { Text.isWordChar(it) } || (text.length == 1 && Text.isApostrophe(text[0]) && layout.joinApostrophe && composing.isNotEmpty()))
+        if (isWord) {
+            composing.append(text)
+            ic.setComposingText(composing, 1)
+            autoSpace = false
+            if (shift == 1) setShift(0)
+            updateSuggestions()
+        } else {
+            val apostropheBreak = text.length == 1 && Text.isApostrophe(text[0])
+            finishWord(autocorrect = !apostropheBreak, delimiter = text)
+            if (autoSpace && text.length == 1 && text[0] in ".,!?;:)]}") ic.deleteSurroundingText(1, 0)
+            autoSpace = false
+            ic.commitText(text, 1)
+            if (shift == 1) setShift(0)
+            if (text.length == 1 && text[0] in ".!?") updateShiftSoon()
+            refreshContext(); updateSuggestions()
+        }
+    }
+
+    private fun updateShiftSoon() = main.postDelayed({ updateShiftFromCursor() }, 30)
+
+    private fun space() {
+        if (gifSearching) { typeIntoGifSearch(" "); return }
+        val ic = currentInputConnection ?: return
+        val now = SystemClock.uptimeMillis()
+        if (composing.isNotEmpty()) {
+            finishWord(autocorrect = true, delimiter = " ")
+            ic.commitText(" ", 1)
+            lastSpaceTime = now
+        } else {
+            val before = ic.getTextBeforeCursor(3, 0)
+            if (prefs.doubleSpace && field == Field.TEXT && now - lastSpaceTime < 600 && before != null && before.length >= 2 &&
+                before.last() == ' ' && before[before.length - 2].let { it.isLetterOrDigit() || it == ')' || it == '"' }
+            ) {
+                ic.deleteSurroundingText(1, 0)
+                ic.commitText(". ", 1)
+                lastSpaceTime = 0
+            } else {
+                ic.commitText(" ", 1)
+                lastSpaceTime = now
+            }
+        }
+        autoSpace = false
+        refreshContext(); updateShiftFromCursor(); updateSuggestions()
+    }
+
+    private fun enter() {
+        if (gifSearching) { gifPanel?.run(gifQuery.toString().ifBlank { null }); exitGifSearch(); return }
+        val ic = currentInputConnection ?: return
+        finishWord(autocorrect = true, delimiter = "\n")
+        val info = currentInputEditorInfo
+        val action = (info?.imeOptions ?: 0) and EditorInfo.IME_MASK_ACTION
+        val noAction = (info?.imeOptions ?: 0) and EditorInfo.IME_FLAG_NO_ENTER_ACTION != 0
+        if (!noAction && action != EditorInfo.IME_ACTION_NONE && action != EditorInfo.IME_ACTION_UNSPECIFIED) ic.performEditorAction(action)
+        else sendDownUpKeyEvents(KeyEvent.KEYCODE_ENTER)
+        autoSpace = false
+        refreshContext(); updateShiftFromCursor(); updateSuggestions()
+    }
+
+    private fun backspace(repeat: Boolean) {
+        if (gifSearching) { if (gifQuery.isNotEmpty()) gifQuery.deleteCharAt(gifQuery.length - 1); showGifQuery(); return }
+        val ic = currentInputConnection ?: return
+        if (composing.isNotEmpty()) {
+            composing.setLength(composing.length - 1)
+            if (composing.isEmpty()) ic.commitText("", 1) else ic.setComposingText(composing, 1)
+            updateSuggestions()
+            return
+        }
+        val lc = lastCorrection
+        if (!repeat && lc != null) {
+            // The first backspace after an automatic correction gives back what the user typed.
+            val expected = lc.corrected + lc.delimiter
+            val before = ic.getTextBeforeCursor(expected.length, 0)?.toString()
+            if (before == expected) {
+                ic.beginBatchEdit()
+                ic.deleteSurroundingText(expected.length, 0)
+                composing.append(lc.typed)
+                ic.setComposingText(composing, 1)
+                ic.endBatchEdit()
+                lastCorrection = null
+                if (learningOn) engine?.user?.learn(null, lc.typed.lowercase())
+                updateSuggestions()
+                return
+            }
+        }
+        lastCorrection = null
+        autoSpace = false
+        sendDownUpKeyEvents(KeyEvent.KEYCODE_DEL)
+        main.postDelayed({ refreshContext(); updateSuggestions() }, 30)
+        updateShiftSoon()
+    }
+
+    // --- words ------------------------------------------------------------------------------------------------------
+
+    /** Ends the word being typed: applies the automatic correction if wanted, learns it, and commits it. */
+    private fun finishWord(autocorrect: Boolean, delimiter: String = "") {
+        if (composing.isEmpty()) return
+        val ic = currentInputConnection
+        val typed = composing.toString()
+        var final = typed
+        val s = latest
+        if (autocorrect && prefs.autocorrect && predictionOn && s != null && s.typed == typed && s.autocorrect != null) final = s.autocorrect
+        composing.setLength(0)
+        ic?.commitText(final, 1)
+        lastCorrection = if (final != typed) Correction(typed, final, delimiter) else null
+        learn(final)
+        latest = null
+    }
+
+    private fun learn(word: String) {
+        val w = word.lowercase()
+        if (learningOn && w.length >= 2 && w.none { it.isDigit() } && engine?.blocklist?.contains(w) != true) engine?.user?.learn(prevWord, w)
+        prevWord2 = prevWord; prevWord = w
+    }
+
+    private fun capitalise(w: String) = if (shift != 0) w.replaceFirstChar { it.titlecase(currentLayout().locale) } else w
+
+    private fun updateSuggestions() {
+        val b = bar ?: return
+        val eng = engine
+        if (gifSearching) return
+        if (eng == null || !predictionOn) { b.setSlots(listOf(null, null, null)); return }
+        val typed = composing.toString()
+        val seq = ++suggestSeq
+        val opts = options()
+        val p1 = prevWord; val p2 = prevWord2
+        worker.execute {
+            if (seq != suggestSeq) return@execute
+            if (typed.isNotEmpty()) {
+                val r = eng.suggester.forTyped(typed, p1, opts)
+                main.post { if (seq == suggestSeq) { latest = r; showWordSlots(r) } }
+            } else {
+                val next = eng.suggester.nextWords(p1, p2, 3, opts)
+                val phrase = eng.suggester.phrase(p1, opts)
+                main.post { if (seq == suggestSeq) { latest = null; showNextSlots(next, phrase) } }
+            }
+        }
+    }
+
+    private fun showWordSlots(r: WordSuggestions) {
+        val others = r.candidates.filter { it != r.autocorrect && !it.equals(r.typed, true) }
+        val slots: List<Slot?> = if (r.autocorrect != null) {
+            listOf(Slot(r.typed, literal = true), Slot(r.autocorrect, best = true), others.getOrNull(0)?.let { Slot(it) })
+        } else {
+            listOf(others.getOrNull(0)?.let { Slot(it) }, Slot(r.typed, literal = !r.typedIsKnown, best = r.typedIsKnown), others.getOrNull(1)?.let { Slot(it) })
+        }
+        bar?.setSlots(slots)
+    }
+
+    private fun showNextSlots(next: List<String>, phrase: String?) {
+        val n = next.map { capitalise(it) }
+        bar?.setSlots(listOf(n.getOrNull(1)?.let { Slot(it) }, n.getOrNull(0)?.let { Slot(it, best = true) }, phrase?.let { Slot(capitalise(it), phrase = true) } ?: n.getOrNull(2)?.let { Slot(it) }))
+    }
+
+    override fun onSlot(slot: Slot) {
+        val ic = currentInputConnection ?: return
+        val swipe = lastSwipe
+        if (swipe != null && !slot.literal) {
+            // Replace the word just drawn with another reading of the same swipe.
+            val back = swipe.inserted.length
+            ic.deleteSurroundingText(back, 0)
+            val text = if (swipe.inserted.first().isUpperCase()) slot.text.replaceFirstChar { it.titlecase(currentLayout().locale) } else slot.text
+            ic.commitText("$text ", 1)
+            lastSwipe = SwipeResult(slot.text, "$text ")
+            learn(slot.text)
+            return
+        }
+        val hadComposing = composing.isNotEmpty()
+        if (hadComposing) { composing.setLength(0) }
+        // The word takes the capitals of what was typed; a phrase is added as it is.
+        val typed = latest?.typed
+        val text = if (typed != null && hadComposing && !slot.phrase) Text.matchCase(typed, slot.text, currentLayout().locale) else slot.text
+        ic.commitText("$text ", 1)
+        autoSpace = true
+        lastCorrection = null
+        text.split(' ').filter { it.isNotEmpty() }.forEach { learn(it) }
+        latest = null
+        refreshContext(); updateShiftFromCursor(); updateSuggestions()
+    }
+
+    // --- swipe typing -----------------------------------------------------------------------------------------------
+
+    override fun onSwipe(path: List<SwipePoint>) {
+        val eng = engine ?: return
+        val kb = keyboard ?: return
+        if (field != Field.TEXT || page != Page.LETTERS) return
+        val centers = kb.letterCenters()
+        val keyW = kb.keyWidth()
+        val shiftOn = shift != 0
+        val pts = path.toList()
+        worker.execute {
+            val words = eng.swipe.decode(pts, centers, keyW, 4)
+            main.post { if (words.isNotEmpty()) commitSwipe(words, shiftOn) }
+        }
+    }
+
+    private fun commitSwipe(words: List<String>, capital: Boolean) {
+        val ic = currentInputConnection ?: return
+        finishWord(autocorrect = true)
+        val before = ic.getTextBeforeCursor(1, 0)
+        // A word drawn straight after another word or a letter starts after a space.
+        val lead = if (!before.isNullOrEmpty() && before.last().let { it.isLetterOrDigit() || it in ".,!?;:" }) " " else ""
+        val best = if (capital) words[0].replaceFirstChar { it.titlecase(currentLayout().locale) } else words[0]
+        val inserted = "$best "
+        ic.commitText(lead + inserted, 1)
+        if (shift == 1) setShift(0)
+        lastSwipe = SwipeResult(words[0], inserted)
+        lastCorrection = null
+        autoSpace = false
+        learn(words[0])
+        val alt = words.drop(1)
+        bar?.setSlots(listOf(alt.getOrNull(1)?.let { Slot(it) }, Slot(best, best = true), alt.getOrNull(0)?.let { Slot(it) }))
+        refreshContext()
+    }
+
+    // --- bar tools --------------------------------------------------------------------------------------------------
+
+    override fun onTool(tool: Tool) {
+        when (tool) {
+            Tool.CLIPBOARD -> { finishWord(false); showPanel(Panel.CLIPBOARD) }
+            Tool.GIF -> { finishWord(false); showPanel(Panel.GIF) }
+            Tool.EMOJI -> { finishWord(false); showPanel(Panel.EMOJI) }
+            Tool.MIC -> toggleVoice()
+            Tool.SETTINGS -> startActivity(Intent(this, SettingsActivity::class.java).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
+        }
+        if (tool != Tool.MIC) bar?.closeTools()
+    }
+
+    private fun showPanel(p: Panel) {
+        panel = p
+        if (p != Panel.GIF) { exitGifSearch(); strip?.removeAllViews(); strip?.visibility = View.GONE }
+        keyboard?.visibility = if (p == Panel.NONE) View.VISIBLE else View.INVISIBLE
+        emoji?.visibility = if (p == Panel.EMOJI) View.VISIBLE else View.GONE
+        clipboardPanel?.visibility = if (p == Panel.CLIPBOARD) View.VISIBLE else View.GONE
+        gifPanel?.visibility = if (p == Panel.GIF) View.VISIBLE else View.GONE
+        when (p) {
+            Panel.EMOJI -> emoji?.open(prefs.emojiRecent)
+            Panel.CLIPBOARD -> clipboardPanel?.refresh()
+            Panel.GIF -> { gifPanel?.setLanguage(currentLayout().locale.language); gifPanel?.run(null) }
+            Panel.NONE -> {}
+        }
+        if (p == Panel.NONE) updateSuggestions()
+    }
+
+    // --- emoji ------------------------------------------------------------------------------------------------------
+
+    private val emojiListener = object : EmojiPanel.Listener {
+        override fun onEmoji(text: String) {
+            currentInputConnection?.commitText(text, 1)
+            prefs.emojiRecent = (listOf(text) + prefs.emojiRecent.filter { it != text }).take(32)
+            lastSwipe = null
+        }
+        override fun onBackspace() = sendDownUpKeyEvents(KeyEvent.KEYCODE_DEL)
+        override fun onBack() = showPanel(Panel.NONE)
+    }
+
+    // --- clipboard --------------------------------------------------------------------------------------------------
+
+    private val clipListener2 = object : ClipboardPanel.Listener {
+        override fun onPaste(item: ClipItem) {
+            val ic = currentInputConnection ?: return
+            if (!item.image) { ic.commitText(item.text.orEmpty(), 1); return }
+            val file = app.clipboard.imageFile(item) ?: return
+            if (!ContentSender.send(this@MetroWinIME, ic, currentInputEditorInfo, file, ContentSender.mimeOf(file), "image")) {
+                Toast.makeText(this@MetroWinIME, R.string.clipboard_no_images, Toast.LENGTH_SHORT).show()
+            }
+        }
+        override fun onAddImage() {
+            startActivity(Intent(this@MetroWinIME, HelperActivity::class.java).putExtra(HelperActivity.EXTRA_MODE, HelperActivity.MODE_CLIP_IMAGE).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
+        }
+        override fun onBack() = showPanel(Panel.NONE)
+    }
+
+    /** Takes what was just copied into the history (text and pictures), unless the field it came from is private. */
+    private fun captureClip() {
+        if (!prefs.clipboard || field == Field.PASSWORD) return
+        val cm = getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+        val clip: ClipData = runCatching { cm.primaryClip }.getOrNull() ?: return
+        if (clip.description?.extras?.getBoolean("android.content.extra.IS_SENSITIVE", false) == true) return
+        if (clip.itemCount == 0) return
+        val item = clip.getItemAt(0)
+        val desc = clip.description
+        val uri = item.uri
+        if (uri != null && desc.hasMimeType("image/*")) {
+            if (!prefs.clipboardImages) return
+            val mime = desc.getMimeType(0)
+            val ext = mime.substringAfter('/', "img").substringBefore('+')
+            worker.execute { runCatching { contentResolver.openInputStream(uri)?.let { app.clipboard.addImage(it, ext) } } }
+            return
+        }
+        val text = runCatching { item.coerceToText(this) }.getOrNull()?.toString().orEmpty()
+        if (text.isNotBlank()) app.clipboard.addText(text)
+    }
+
+    // --- GIF --------------------------------------------------------------------------------------------------------
+
+    private val gifListener = object : GifPanel.Listener {
+        override fun onGif(item: GifItem) = sendGif(item)
+        override fun onBack() = showPanel(Panel.NONE)
+        override fun onOpenSettings() { startActivity(Intent(this@MetroWinIME, SettingsActivity::class.java).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)) }
+        override fun onSearch() = enterGifSearch()
+    }
+
+    private fun sendGif(item: GifItem) {
+        val info = currentInputEditorInfo
+        val canSend = ContentSender.supports(info, "image/gif")
+        if (!canSend) {
+            // The app takes no pictures: give the link instead, which most chats turn into the GIF.
+            if (prefs.gifLinkFallback && item.fullUrl.startsWith("https://")) { currentInputConnection?.commitText(item.fullUrl + " ", 1); exitGifSearch(); showPanel(Panel.NONE) }
+            else Toast.makeText(this, R.string.gif_not_supported, Toast.LENGTH_SHORT).show()
+            return
+        }
+        gifRepo.prepare(item) { r ->
+            r.onSuccess { f ->
+                if (ContentSender.send(this, currentInputConnection, currentInputEditorInfo, f, "image/gif", item.title.ifBlank { "GIF" })) { exitGifSearch(); showPanel(Panel.NONE) }
+                else Toast.makeText(this, R.string.gif_not_supported, Toast.LENGTH_SHORT).show()
+            }.onFailure { Toast.makeText(this, R.string.gif_error, Toast.LENGTH_SHORT).show() }
+        }
+    }
+
+    /** The search is typed with the keyboard itself: the panel becomes a strip above the keys and the bar shows the words typed. */
+    private fun enterGifSearch() {
+        val p = gifPanel ?: return
+        gifSearching = true
+        gifQuery.setLength(0)
+        (p.parent as? ViewGroup)?.removeView(p)
+        p.visibility = View.VISIBLE
+        p.setStrip(true)
+        strip?.removeAllViews(); strip?.addView(p, FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT)); strip?.visibility = View.VISIBLE
+        keyboard?.visibility = View.VISIBLE
+        gifPanel?.visibility = View.VISIBLE
+        showGifQuery()
+    }
+
+    private fun exitGifSearch() {
+        if (!gifSearching) return
+        gifSearching = false
+        bar?.setStatus(null)
+        val p = gifPanel ?: return
+        (p.parent as? ViewGroup)?.removeView(p)
+        p.setStrip(false)
+        frame?.addView(p, FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT))
+        strip?.visibility = View.GONE
+    }
+
+    private val gifSearchRun = Runnable { gifPanel?.run(gifQuery.toString().ifBlank { null }) }
+
+    private fun typeIntoGifSearch(text: String) {
+        gifQuery.append(text)
+        showGifQuery()
+        main.removeCallbacks(gifSearchRun)
+        main.postDelayed(gifSearchRun, 600)
+    }
+
+    private fun showGifQuery() {
+        bar?.setStatus(getString(R.string.gif_search_prefix) + " " + gifQuery.toString().ifEmpty { "…" })
+        main.removeCallbacks(gifSearchRun)
+        main.postDelayed(gifSearchRun, 600)
+    }
+
+    // --- voice ------------------------------------------------------------------------------------------------------
+
+    private fun toggleVoice() {
+        if (voice.isActive) voice.stop() else { finishWord(false); voice.start(currentLayout().locale.toLanguageTag()) }
+    }
+
+    private val voiceCallbacks = object : VoiceInput.Callbacks {
+        override fun onListening(on: Boolean) {
+            bar?.setVoiceActive(on)
+            bar?.setStatus(if (on) getString(R.string.voice_listening) else null)
+        }
+        override fun onPartial(text: String) { bar?.setStatus(text) }
+        override fun onResult(text: String) {
+            val ic = currentInputConnection ?: return
+            val t = if (shift != 0 || text.firstOrNull()?.isLowerCase() == true && isSentenceStart()) text.replaceFirstChar { it.titlecase(currentLayout().locale) } else text
+            val before = ic.getTextBeforeCursor(1, 0)
+            val lead = if (!before.isNullOrEmpty() && !before.last().isWhitespace()) " " else ""
+            ic.commitText("$lead$t ", 1)
+            if (shift == 1) setShift(0)
+            refreshContext(); updateShiftFromCursor()
+            bar?.setStatus(if (voice.isActive) getString(R.string.voice_listening) else null)
+        }
+        override fun onNeedPermission() {
+            Toast.makeText(this@MetroWinIME, R.string.voice_permission, Toast.LENGTH_LONG).show()
+            startActivity(Intent(this@MetroWinIME, HelperActivity::class.java).putExtra(HelperActivity.EXTRA_MODE, HelperActivity.MODE_MIC).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
+        }
+        override fun onUnavailable() { Toast.makeText(this@MetroWinIME, R.string.voice_unavailable, Toast.LENGTH_LONG).show() }
+        override fun onError(code: Int) { Toast.makeText(this@MetroWinIME, getString(R.string.voice_error, code), Toast.LENGTH_SHORT).show() }
+    }
+
+    private fun isSentenceStart(): Boolean {
+        val info = currentInputEditorInfo ?: return false
+        return (currentInputConnection?.getCursorCapsMode(info.inputType) ?: 0) != 0
+    }
+}

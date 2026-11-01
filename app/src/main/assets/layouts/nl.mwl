@@ -1,0 +1,14 @@
+# Nederlands (QWERTY)
+id=nl
+name=Nederlands
+locale=nl_NL
+apostrophe=join
+row=q w e r t y u i o p
+row=a s d f g h j k l
+row=z x c v b n m
+long.a=á à ä â
+long.e=é è ë ê
+long.i=í ï î ì
+long.o=ó ö ô ò
+long.u=ú ü û ù
+long.c=ç

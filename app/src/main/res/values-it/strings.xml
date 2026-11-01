@@ -1,0 +1,271 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">MetroWin Keyboard</string>
+    <string name="subtype_label">MetroWin Keyboard</string>
+    <string name="a11y_description">Permette alla tastiera di prendere il colore dell\'app sottostante. Non legge testo né contenuti delle finestre: guarda solo una striscia di schermo sopra i tasti e ne tiene un colore medio. Nulla viene salvato o inviato.</string>
+    <string name="cat_setup">Configurazione</string>
+    <string name="cat_settings">Impostazioni</string>
+    <string name="setup_enable_title">1. Attiva la tastiera</string>
+    <string name="setup_enable_summary">Apre l\'elenco delle tastiere di Android</string>
+    <string name="setup_select_title">2. Scegli questa tastiera</string>
+    <string name="setup_select_summary">Mostra il selettore delle tastiere</string>
+    <string name="setup_try_title">Prova la tastiera</string>
+    <string name="setup_try_summary">Un campo di testo in cui scrivere</string>
+    <string name="setup_enabled">Attivata</string>
+    <string name="setup_disabled">Non ancora attivata</string>
+    <string name="setup_active">Tastiera attiva</string>
+    <string name="setup_inactive">Non è ancora la tastiera attiva</string>
+    <string name="screen_languages">Lingue e vocabolari</string>
+    <string name="screen_languages_summary">Layout, liste di parole, lingue tue</string>
+    <string name="screen_appearance">Aspetto</string>
+    <string name="screen_appearance_summary">Temi, colori, la tua immagine</string>
+    <string name="screen_size">Dimensioni e disposizione</string>
+    <string name="screen_size_summary">Altezza e larghezza dei tasti, riga dei numeri</string>
+    <string name="screen_typing">Digitazione</string>
+    <string name="screen_typing_summary">Doppio spazio, tocco prolungato, scorrimento</string>
+    <string name="screen_suggestions">Suggerimenti e apprendimento</string>
+    <string name="screen_suggestions_summary">Correzione, predizione, parole bloccate</string>
+    <string name="screen_feedback">Suono e vibrazione</string>
+    <string name="screen_feedback_summary">Suono dei tasti, intensità della vibrazione</string>
+    <string name="screen_clipboard">Appunti</string>
+    <string name="screen_clipboard_summary">Cronologia di testi e immagini</string>
+    <string name="screen_gif">GIF</string>
+    <string name="screen_gif_summary">Scegli da dove arrivano le GIF</string>
+    <string name="screen_voice">Digitazione vocale</string>
+    <string name="screen_voice_summary">Dettatura e trascrizione</string>
+    <string name="screen_launcher">MetroWin Launcher</string>
+    <string name="screen_launcher_summary">Segui l\'aspetto del launcher</string>
+    <string name="screen_about">Privacy e informazioni</string>
+    <string name="screen_about_summary">Cosa resta sul tuo telefono</string>
+    <string name="pref_languages_title">Lingue attive</string>
+    <string name="pref_languages_summary">Il tasto globo passa dall\'una all\'altra</string>
+    <string name="cat_dictionaries">Vocabolari e layout</string>
+    <string name="pref_import_dictionary_title">Importa un vocabolario…</string>
+    <string name="pref_import_dictionary_summary">Qualsiasi lista di parole: una per riga, liste di frequenza \"parola numero\" o file Hunspell .dic</string>
+    <string name="pref_remove_dictionary_title">Rimuovi un vocabolario importato…</string>
+    <string name="pref_remove_dictionary_summary">Torna alla lista iniziale della lingua</string>
+    <string name="pref_import_layout_title">Importa un layout di tastiera…</string>
+    <string name="pref_import_layout_summary">Un file di testo .mwl: aggiungi qualsiasi lingua o disposizione</string>
+    <string name="pref_remove_layout_title">Rimuovi un layout importato…</string>
+    <string name="pref_remove_layout_summary">Si possono rimuovere solo i layout importati</string>
+    <string name="dialog_pick_language">Per quale lingua?</string>
+    <string name="dialog_pick_imported">Quale?</string>
+    <string name="nothing_to_remove">Non c\'è ancora nulla di importato</string>
+    <string name="import_done_words">%1$d parole importate</string>
+    <string name="import_failed">Impossibile usare quel file</string>
+    <string name="import_layout_done">Layout \"%1$s\" aggiunto</string>
+    <string name="removed">Rimosso</string>
+    <string name="pref_theme_style_title">Stile</string>
+    <string name="pref_theme_mode_title">Scuro o chiaro</string>
+    <string name="pref_accent_title">Colore principale</string>
+    <string name="pref_accent_summary">I 20 colori di Windows Phone, o uno tuo</string>
+    <string name="pref_dynamic_title">Colori dallo sfondo</string>
+    <string name="pref_dynamic_summary">Solo Modern Droid, Android 12 o successivo: usa la tavolozza di sistema</string>
+    <string name="pref_oled_title">Nero puro</string>
+    <string name="pref_oled_summary">Sfondo il più scuro possibile, risparmia batteria sugli schermi OLED</string>
+    <string name="cat_picture">La tua immagine</string>
+    <string name="pref_image_bg_title">Immagine dietro i tasti</string>
+    <string name="pref_image_bg_summary">Usa una foto come sfondo della tastiera</string>
+    <string name="pref_image_pick_title">Scegli un\'immagine…</string>
+    <string name="pref_image_pick_summary">Resta sul tuo telefono</string>
+    <string name="pref_image_remove_title">Rimuovi l\'immagine</string>
+    <string name="pref_image_dim_title">Oscura l\'immagine</string>
+    <string name="pref_picture_accent_title">Colore principale dall\'immagine</string>
+    <string name="pref_picture_accent_summary">Prende il colore più vivo dell\'immagine</string>
+    <string name="cat_adaptive">Segui l\'app</string>
+    <string name="pref_adaptive_title">Il colore segue l\'app sottostante</string>
+    <string name="pref_adaptive_summary">Campiona una striscia di schermo sopra i tasti (chat, sito…). Richiede un servizio di accessibilità, Android 11 o successivo. Non legge testo.</string>
+    <string name="adaptive_dialog_title">Attiva il servizio colore</string>
+    <string name="adaptive_dialog_text">Android richiede di attivare \"MetroWin Keyboard\" nelle impostazioni di accessibilità. Il servizio fa solo istantanee della striscia sopra la tastiera per scegliere un colore; non legge testo e non invia nulla.</string>
+    <string name="adaptive_open">Apri impostazioni</string>
+    <string name="adaptive_old_android">Serve Android 11 o successivo</string>
+    <string name="accent_dialog_title">Colore principale</string>
+    <string name="accent_custom">Colore personalizzato…</string>
+    <string name="accent_custom_hint">Colore come #RRGGBB</string>
+    <string name="accent_invalid">Non è un colore valido</string>
+    <string name="accent_reset">Torna al colore del tema</string>
+    <string name="picture_saved">Immagine salvata</string>
+    <string name="picture_failed">Impossibile usare quell\'immagine</string>
+    <string name="pref_key_height_title">Altezza dei tasti (verticale, %)</string>
+    <string name="pref_key_height_land_title">Altezza dei tasti (orizzontale, %)</string>
+    <string name="pref_width_title">Larghezza della tastiera (%)</string>
+    <string name="pref_width_summary">Più stretta è più comoda con una mano</string>
+    <string name="pref_align_title">Posizione quando è più stretta</string>
+    <string name="pref_gap_title">Spazio tra i tasti (dp)</string>
+    <string name="pref_number_row_title">Riga dei numeri</string>
+    <string name="pref_number_row_summary">Mostra le cifre sopra le lettere</string>
+    <string name="pref_hints_title">Cifre sui tasti delle lettere</string>
+    <string name="pref_hints_summary">Con la riga dei numeri nascosta, il tocco prolungato sulla prima riga scrive la cifra</string>
+    <string name="pref_double_space_title">Doppio spazio scrive il punto</string>
+    <string name="pref_double_space_summary">Due spazi veloci diventano \". \"</string>
+    <string name="pref_long_press_title">Tieni premuto per i simboli</string>
+    <string name="pref_long_press_summary">Accenti, cifre e simboli compaiono sopra il tasto</string>
+    <string name="pref_long_press_ms_title">Durata del tocco prolungato (ms)</string>
+    <string name="pref_long_press_ms_summary">Predefinito 200</string>
+    <string name="pref_auto_caps_title">Maiuscola a inizio frase</string>
+    <string name="pref_auto_caps_summary">Il maiuscolo si attiva da solo</string>
+    <string name="pref_swipe_title">Digitazione a scorrimento</string>
+    <string name="pref_swipe_summary">Scorri sulle lettere per scrivere una parola</string>
+    <string name="pref_space_cursor_title">Scorri sulla barra spaziatrice per muovere il cursore</string>
+    <string name="pref_suggestions_title">Suggerimenti</string>
+    <string name="pref_suggestions_summary">Mostra parole sopra i tasti</string>
+    <string name="pref_autocorrect_title">Correzione automatica</string>
+    <string name="pref_autocorrect_summary">Corregge i refusi a fine parola. Backspace restituisce ciò che avevi scritto.</string>
+    <string name="pref_next_word_title">Prevedi la parola successiva</string>
+    <string name="pref_next_word_summary">Suggerisce cosa scriverai dopo</string>
+    <string name="pref_phrase_title">Completa la frase</string>
+    <string name="pref_phrase_summary">Propone le parole seguenti quando le scrivi spesso insieme</string>
+    <string name="pref_block_title">Blocca le parole offensive</string>
+    <string name="pref_block_summary">Mai suggerite, usate come correzione o apprese</string>
+    <string name="pref_custom_blocked_title">Le tue parole bloccate</string>
+    <string name="pref_custom_blocked_summary">Aggiungi parole che non vuoi mai vedere suggerite</string>
+    <string name="pref_custom_blocked_message">Una parola per riga o separate da virgole</string>
+    <string name="cat_learning">Apprendimento</string>
+    <string name="pref_learn_title">Impara da ciò che scrivo</string>
+    <string name="pref_learn_summary">Parole e abitudini restano solo su questo telefono. Mai nei campi password.</string>
+    <string name="pref_export_learned_title">Esporta ciò che è stato appreso…</string>
+    <string name="pref_export_learned_summary">Salva un file di testo che puoi leggere o conservare</string>
+    <string name="pref_clear_learned_title">Dimentica tutto ciò che è stato appreso</string>
+    <string name="pref_clear_learned_summary">Cancella parole e abitudini apprese</string>
+    <string name="clear_learned_confirm">Cancellare tutto ciò che la tastiera ha imparato da te?</string>
+    <string name="cleared">Fatto</string>
+    <string name="export_done">Salvato</string>
+    <string name="pref_sound_title">Suono dei tasti</string>
+    <string name="pref_sound_pick_title">Scegli un tuo suono…</string>
+    <string name="pref_sound_pick_summary">Un breve file audio per \"Un tuo suono\"</string>
+    <string name="pref_sound_volume_title">Volume del suono</string>
+    <string name="pref_vibration_title">Vibrazione</string>
+    <string name="pref_vibration_summary">Un impulso quando premi un tasto</string>
+    <string name="pref_vibration_intensity_title">Intensità della vibrazione</string>
+    <string name="sound_saved">Suono salvato</string>
+    <string name="pref_clipboard_title">Cronologia degli appunti</string>
+    <string name="pref_clipboard_summary">Conserva ciò che copi, solo su questo telefono</string>
+    <string name="pref_clipboard_max_title">Quanti elementi conservare</string>
+    <string name="pref_clipboard_max_summary">Gli elementi fissati non vengono mai eliminati</string>
+    <string name="pref_clipboard_images_title">Salva anche le immagini</string>
+    <string name="pref_clipboard_images_summary">Le foto copiate compaiono negli appunti e si possono incollare</string>
+    <string name="pref_clipboard_clear_title">Svuota la cronologia</string>
+    <string name="pref_clipboard_clear_summary">Gli elementi fissati restano</string>
+    <string name="clipboard_title">Appunti</string>
+    <string name="clipboard_empty">Nulla di copiato finora</string>
+    <string name="clipboard_no_images">Questa app non accetta immagini</string>
+    <string name="pref_gif_source_title">Da dove arrivano le GIF</string>
+    <string name="pref_gif_key_title">Chiave API</string>
+    <string name="pref_gif_key_summary">Serve per GIPHY e Tenor. Ottieni una chiave gratuita dai loro siti per sviluppatori.</string>
+    <string name="pref_gif_key_message">Incolla la chiave. Resta su questo telefono.</string>
+    <string name="pref_gif_folder_title">Cartella di GIF…</string>
+    <string name="pref_gif_folder_summary">Per \"Una cartella del telefono\": le GIF che hai salvato</string>
+    <string name="cat_gif_custom">Un servizio tuo</string>
+    <string name="pref_gif_custom_url_title">Indirizzo</string>
+    <string name="pref_gif_custom_url_summary">Indirizzo https con {query}, {key}, {limit} e {lang}</string>
+    <string name="pref_gif_custom_list_title">Dove sono i risultati nella risposta</string>
+    <string name="pref_gif_custom_preview_title">Immagine piccola, in ogni risultato</string>
+    <string name="pref_gif_custom_full_title">GIF completa, in ogni risultato</string>
+    <string name="pref_gif_link_title">Invia il link se le immagini non sono accettate</string>
+    <string name="pref_gif_link_summary">Molte chat trasformano il link nella GIF</string>
+    <string name="gif_needs_key">Aggiungi una chiave API in Impostazioni → GIF. Tocca qui.</string>
+    <string name="gif_needs_folder">Scegli una cartella di GIF in Impostazioni → GIF. Tocca qui.</string>
+    <string name="gif_needs_url">Aggiungi l\'indirizzo del tuo servizio in Impostazioni → GIF. Tocca qui.</string>
+    <string name="gif_loading">Caricamento…</string>
+    <string name="gif_none">Nessuna GIF trovata</string>
+    <string name="gif_error">Impossibile caricare le GIF</string>
+    <string name="gif_not_supported">Questa app non accetta GIF</string>
+    <string name="gif_search_prefix">GIF:</string>
+    <string name="gif_folder_saved">Cartella salvata</string>
+    <string name="pref_voice_permission_title">Consenti il microfono</string>
+    <string name="pref_voice_permission_summary">Necessario per la digitazione vocale</string>
+    <string name="pref_voice_continuous_title">Continua ad ascoltare</string>
+    <string name="pref_voice_continuous_summary">Trascrive un discorso lungo finché non tocchi di nuovo il microfono</string>
+    <string name="pref_voice_offline_title">Solo su questo telefono</string>
+    <string name="pref_voice_offline_summary">Preferisce il riconoscimento senza internet, se la lingua è scaricata</string>
+    <string name="voice_listening">In ascolto…</string>
+    <string name="voice_permission">Consenti il microfono per usare la digitazione vocale</string>
+    <string name="voice_unavailable">Nessun riconoscimento vocale su questo telefono</string>
+    <string name="voice_error">Errore vocale %1$d</string>
+    <string name="pref_launcher_status_title">MetroWin Launcher</string>
+    <string name="launcher_found">Presente su questo telefono</string>
+    <string name="launcher_missing">Non installato</string>
+    <string name="pref_launcher_sync_title">Segui l\'aspetto del launcher</string>
+    <string name="pref_launcher_sync_summary">Prende stile, scuro/chiaro e colore che il launcher invia</string>
+    <string name="pref_launcher_import_title">Importa un file tema del launcher…</string>
+    <string name="pref_launcher_import_summary">Il \"tema\" che il launcher esporta dalle sue impostazioni</string>
+    <string name="pref_launcher_open_title">Apri MetroWin Launcher</string>
+    <string name="theme_imported">Tema applicato</string>
+    <string name="theme_invalid">Non è un file tema MetroWin</string>
+    <string name="about_privacy_title">Privacy</string>
+    <string name="about_privacy_text">Nessuna analisi, nessuna pubblicità, nessun tracker. Ciò che scrivi, ciò che la tastiera impara e i tuoi appunti restano su questo telefono e sono esclusi dai backup. Internet serve solo per scaricare le GIF dalla fonte che hai scelto, quando apri il pannello GIF; il microfono solo per la digitazione vocale.</string>
+    <string name="about_version_title">Versione</string>
+    <string name="about_license_title">Licenza</string>
+    <string name="about_license_text">Software libero, GNU GPL v3 o successiva. Non affiliato a Microsoft; Windows Phone è un marchio di Microsoft Corporation.</string>
+    <string name="test_hint">Scrivi qui per provare la tastiera</string>
+    <string name="test_title">Prova la tastiera</string>
+    <string name="ok">OK</string>
+    <string name="cancel">Annulla</string>
+    <string name="pref_space_cursor_summary">Tieni premuto e scorri a sinistra o destra sulla barra spaziatrice</string>
+    <string-array name="theme_style_names">
+        <item>Classic (Windows Phone piatto)</item>
+        <item>Modern Glass</item>
+        <item>Modern Droid</item>
+    </string-array>
+    <string-array name="theme_style_values">
+        <item>classic</item>
+        <item>glass</item>
+        <item>droid</item>
+    </string-array>
+    <string-array name="theme_mode_names">
+        <item>Segui il sistema</item>
+        <item>Scuro</item>
+        <item>Chiaro</item>
+    </string-array>
+    <string-array name="theme_mode_values">
+        <item>system</item>
+        <item>dark</item>
+        <item>light</item>
+    </string-array>
+    <string-array name="align_names">
+        <item>Sinistra</item>
+        <item>Centro</item>
+        <item>Destra</item>
+    </string-array>
+    <string-array name="align_values">
+        <item>left</item>
+        <item>center</item>
+        <item>right</item>
+    </string-array>
+    <string-array name="sound_names">
+        <item>Click in stile Windows Phone</item>
+        <item>Suono di Android</item>
+        <item>Un tuo suono</item>
+        <item>Disattivato</item>
+    </string-array>
+    <string-array name="sound_values">
+        <item>metro</item>
+        <item>system</item>
+        <item>custom</item>
+        <item>off</item>
+    </string-array>
+    <string-array name="gif_source_names">
+        <item>GIPHY</item>
+        <item>Tenor</item>
+        <item>Una cartella del telefono</item>
+        <item>Un servizio tuo</item>
+    </string-array>
+    <string-array name="gif_source_values">
+        <item>giphy</item>
+        <item>tenor</item>
+        <item>folder</item>
+        <item>custom</item>
+    </string-array>
+    <string-array name="gif_chips">
+        <item>Di tendenza</item>
+        <item>Grazie</item>
+        <item>Ahah</item>
+        <item>Amore</item>
+        <item>Wow</item>
+        <item>Sì</item>
+        <item>No</item>
+        <item>Triste</item>
+        <item>Festa</item>
+        <item>Buongiorno</item>
+    </string-array>
+</resources>

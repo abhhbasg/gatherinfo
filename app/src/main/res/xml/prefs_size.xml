@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <SeekBarPreference android:key="key_height" android:title="@string/pref_key_height_title" android:defaultValue="100" android:max="140" app:min="60" app:seekBarIncrement="5" app:showSeekBarValue="true" />
+    <SeekBarPreference android:key="key_height_land" android:title="@string/pref_key_height_land_title" android:defaultValue="100" android:max="140" app:min="60" app:seekBarIncrement="5" app:showSeekBarValue="true" />
+    <SeekBarPreference android:key="keyboard_width" android:title="@string/pref_width_title" android:summary="@string/pref_width_summary" android:defaultValue="100" android:max="100" app:min="55" app:seekBarIncrement="5" app:showSeekBarValue="true" />
+    <ListPreference android:key="keyboard_align" android:title="@string/pref_align_title" android:entries="@array/align_names" android:entryValues="@array/align_values" android:defaultValue="center" app:useSimpleSummaryProvider="true" />
+    <SeekBarPreference android:key="key_gap" android:title="@string/pref_gap_title" android:defaultValue="3" android:max="10" app:min="0" app:showSeekBarValue="true" />
+    <SwitchPreferenceCompat android:key="number_row" android:title="@string/pref_number_row_title" android:summary="@string/pref_number_row_summary" android:defaultValue="true" />
+    <SwitchPreferenceCompat android:key="key_hints" android:title="@string/pref_hints_title" android:summary="@string/pref_hints_summary" android:defaultValue="true" />
+</PreferenceScreen>

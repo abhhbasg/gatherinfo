@@ -1,0 +1,21 @@
+# Čeština (QWERTZ)
+id=cs
+name=Čeština
+locale=cs_CZ
+apostrophe=join
+row=q w e r t z u i o p
+row=a s d f g h j k l
+row=y x c v b n m
+long.a=á
+long.c=č
+long.d=ď
+long.e=é ě
+long.i=í
+long.n=ň
+long.o=ó
+long.r=ř
+long.s=š
+long.t=ť
+long.u=ú ů
+long.y=ý
+long.z=ž

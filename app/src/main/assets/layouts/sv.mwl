@@ -1,0 +1,13 @@
+# Svenska (QWERTY)
+id=sv
+name=Svenska
+locale=sv_SE
+apostrophe=join
+row=q w e r t y u i o p å
+row=a s d f g h j k l ö ä
+row=z x c v b n m
+long.a=á à â
+long.e=é è ê
+long.u=ü ú
+long.o=ö ø
+long.ä=æ

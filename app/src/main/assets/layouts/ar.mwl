@@ -1,0 +1,12 @@
+# العربية
+id=ar
+name=العربية
+locale=ar
+apostrophe=join
+row=ض ص ث ق ف غ ع ه خ ح ج د
+row=ش س ي ب ل ا ت ن م ك ط
+row=ئ ء ؤ ر لا ى ة و ز ظ
+long.ا=أ إ آ ء
+long.ي=ى ئ
+long.و=ؤ
+long.ه=ة

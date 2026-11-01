@@ -1,0 +1,16 @@
+# Ελληνικά
+id=el
+name=Ελληνικά
+locale=el_GR
+apostrophe=join
+row=ε ρ τ υ θ ι ο π
+row=α σ δ φ γ η ξ κ λ
+row=ζ χ ψ ω β ν μ
+long.α=ά
+long.ε=έ
+long.η=ή
+long.ι=ί ϊ ΐ
+long.ο=ό
+long.υ=ύ ϋ ΰ
+long.ω=ώ
+long.σ=ς

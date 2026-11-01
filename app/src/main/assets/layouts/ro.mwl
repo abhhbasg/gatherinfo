@@ -1,0 +1,12 @@
+# Română (QWERTY)
+id=ro
+name=Română
+locale=ro_RO
+apostrophe=join
+row=q w e r t y u i o p ă
+row=a s d f g h j k l ș ț
+row=z x c v b n m î â
+long.a=ă â
+long.i=î
+long.s=ș
+long.t=ț

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="metro_cyan">#1BA1E2</color>
+    <color name="ic_background">#1BA1E2</color>
+
+    <style name="Theme.MetroWinKeyboard" parent="Theme.AppCompat.DayNight.DarkActionBar">
+        <item name="colorPrimary">@color/metro_cyan</item>
+        <item name="colorPrimaryDark">#0F6E9C</item>
+        <item name="colorAccent">@color/metro_cyan</item>
+    </style>
+
+    <style name="Theme.MetroWinKeyboard.Transparent" parent="Theme.AppCompat.DayNight.NoActionBar">
+        <item name="android:windowIsTranslucent">true</item>
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowAnimationStyle">@null</item>
+        <item name="android:backgroundDimEnabled">false</item>
+    </style>
+</resources>

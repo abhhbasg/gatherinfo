@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <!-- Voice typing only. Asked when you tap the microphone, never at install. -->
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
+    <!-- Key vibration. -->
+    <uses-permission android:name="android.permission.VIBRATE" />
+    <!-- Only to fetch GIFs from the source you chose, when you open the GIF panel. Nothing else uses the network. -->
+    <uses-permission android:name="android.permission.INTERNET" />
+
+    <queries>
+        <package android:name="com.metrowin.launcher" />
+        <intent><action android:name="android.speech.RecognitionService" /></intent>
+    </queries>
+
+    <application
+        android:name=".KeyboardApp"
+        android:allowBackup="false"
+        android:dataExtractionRules="@xml/data_extraction_rules"
+        android:fullBackupContent="false"
+        android:icon="@mipmap/ic_launcher"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:label="@string/app_name"
+        android:supportsRtl="true"
+        android:theme="@style/Theme.MetroWinKeyboard"
+        tools:targetApi="35">
+
+        <service
+            android:name=".ime.MetroWinIME"
+            android:exported="true"
+            android:label="@string/app_name"
+            android:permission="android.permission.BIND_INPUT_METHOD">
+            <intent-filter>
+                <action android:name="android.view.InputMethod" />
+            </intent-filter>
+            <meta-data android:name="android.view.im" android:resource="@xml/method" />
+        </service>
+
+        <activity
+            android:name=".settings.SettingsActivity"
+            android:exported="true"
+            android:label="@string/app_name">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <activity android:name=".settings.TestActivity" android:exported="false" android:windowSoftInputMode="stateAlwaysVisible|adjustResize" />
+
+        <!-- Transparent helper: asks for the microphone and picks a picture, because a keyboard cannot show those dialogs itself. -->
+        <activity
+            android:name=".settings.HelperActivity"
+            android:excludeFromRecents="true"
+            android:exported="false"
+            android:theme="@style/Theme.MetroWinKeyboard.Transparent" />
+
+        <!-- Optional: lets the keyboard take the colour of the app under it. Turned on by the user in the accessibility settings. -->
+        <service
+            android:name=".service.ScreenColorService"
+            android:exported="true"
+            android:label="@string/app_name"
+            android:permission="android.permission.BIND_ACCESSIBILITY_SERVICE">
+            <intent-filter>
+                <action android:name="android.accessibilityservice.AccessibilityService" />
+            </intent-filter>
+            <meta-data android:name="android.accessibilityservice" android:resource="@xml/accessibility_service" />
+        </service>
+
+        <!-- MetroWin Launcher sends its look here when the user changes it (see docs/LAUNCHER_INTEGRATION.md). -->
+        <receiver android:name=".integration.ThemeSyncReceiver" android:exported="true">
+            <intent-filter>
+                <action android:name="com.metrowin.keyboard.action.APPLY_THEME" />
+            </intent-filter>
+        </receiver>
+
+        <!-- GIFs and clipboard pictures handed to the app being typed in. -->
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="${applicationId}.files"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data android:name="android.support.FILE_PROVIDER_PATHS" android:resource="@xml/file_paths" />
+        </provider>
+    </application>
+</manifest>

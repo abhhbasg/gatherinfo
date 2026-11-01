@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <SwitchPreferenceCompat android:key="clipboard" android:title="@string/pref_clipboard_title" android:summary="@string/pref_clipboard_summary" android:defaultValue="true" />
+    <SeekBarPreference android:key="clipboard_max" android:title="@string/pref_clipboard_max_title" android:summary="@string/pref_clipboard_max_summary" android:defaultValue="20" android:max="200" app:min="5" app:seekBarIncrement="5" app:showSeekBarValue="true" />
+    <SwitchPreferenceCompat android:key="clipboard_images" android:title="@string/pref_clipboard_images_title" android:summary="@string/pref_clipboard_images_summary" android:defaultValue="true" />
+    <Preference android:key="clipboard_clear" android:title="@string/pref_clipboard_clear_title" android:summary="@string/pref_clipboard_clear_summary" />
+</PreferenceScreen>

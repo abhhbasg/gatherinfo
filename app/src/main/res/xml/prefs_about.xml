@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <Preference android:key="about_privacy" android:title="@string/about_privacy_title" android:summary="@string/about_privacy_text" android:selectable="false" />
+    <Preference android:key="about_version" android:title="@string/about_version_title" android:selectable="false" />
+    <Preference android:key="about_license" android:title="@string/about_license_title" android:summary="@string/about_license_text" android:selectable="false" />
+</PreferenceScreen>

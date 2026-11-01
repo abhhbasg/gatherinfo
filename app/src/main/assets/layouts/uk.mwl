@@ -1,0 +1,10 @@
+# Українська
+id=uk
+name=Українська
+locale=uk_UA
+apostrophe=join
+row=й ц у к е н г ш щ з х ї
+row=ф і в а п р о л д ж є
+row=я ч с м и т ь б ю ґ
+long.г=ґ
+long.ь=ъ
