@@ -72,4 +72,23 @@ class TranslateTest {
         assertEquals("Auto", TranslateLanguages.name("auto"))
         assertEquals("Italiano", TranslateLanguages.name("it", java.util.Locale.ITALIAN))
     }
+
+    @Test fun onlyDeeplCanTellTheRemainingCharacters() {
+        val r = Providers.usageRequest(Provider.DEEPL, "abc:fx")!!
+        assertEquals("https://api-free.deepl.com/v2/usage", r.url)
+        assertEquals("DeepL-Auth-Key abc:fx", r.headers["Authorization"])
+        assertTrue(Providers.usageRequest(Provider.DEEPL, "abc")!!.url.startsWith("https://api.deepl.com/"))
+        for (p in Provider.entries.filter { it != Provider.DEEPL }) assertNull(Providers.usageRequest(p, "k"))
+    }
+
+    @Test fun usageIsReadAndRemainingWorkedOut() {
+        val u = Providers.parseUsage("""{"character_count":180118,"character_limit":500000}""")
+        assertEquals(180118L, u.used); assertEquals(500000L, u.limit); assertEquals(319882L, u.remaining)
+        // A plan with no cap reports an enormous limit: shown as "no limit".
+        val pro = Providers.parseUsage("""{"character_count":42,"character_limit":1000000000000}""")
+        assertEquals(0L, pro.limit); assertEquals(-1L, pro.remaining)
+        // Over the limit never shows a negative number.
+        assertEquals(0L, Providers.parseUsage("""{"character_count":600,"character_limit":500}""").remaining)
+        assertThrows(TranslationException::class.java) { Providers.parseUsage("nope") }
+    }
 }

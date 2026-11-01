@@ -347,14 +347,45 @@ class AboutFragment : BaseFragment(R.xml.prefs_about, R.string.screen_about) {
 }
 
 class TranslateFragment : BaseFragment(R.xml.prefs_translate, R.string.screen_translate) {
+    private val translator by lazy { com.metrowin.keyboard.translate.Translator(app.prefs) }
+
     override fun setup() {
-        findPreference<Preference>("translate_provider")?.setOnPreferenceChangeListener { _, v -> showFor(v as String); true }
+        findPreference<Preference>("translate_provider")?.setOnPreferenceChangeListener { _, v ->
+            showFor(v as String); view?.post { checkUsage() }; true
+        }
+        findPreference<Preference>("translate_key")?.setOnPreferenceChangeListener { _, _ -> view?.post { checkUsage() }; true }
+        click("translate_usage") { checkUsage() }
         showFor(app.prefs.translateProvider)
     }
+
+    override fun onResume() { super.onResume(); checkUsage() }
 
     private fun showFor(code: String) {
         val p = com.metrowin.keyboard.translate.Provider.from(code)
         findPreference<Preference>("translate_key")?.isVisible = p.needsKey || p == com.metrowin.keyboard.translate.Provider.LIBRE
         findPreference<Preference>("translate_url")?.isVisible = p.needsUrl
+        // Only DeepL tells how much of the plan is left.
+        findPreference<Preference>("translate_usage")?.isVisible = com.metrowin.keyboard.translate.Providers.usageRequest(p, "x") != null
     }
+
+    /** Asks the service how much of the free plan is left and shows it. Only DeepL offers this. */
+    private fun checkUsage() {
+        val pref = findPreference<Preference>("translate_usage") ?: return
+        if (!pref.isVisible) return
+        if (app.prefs.translateKey.isBlank()) { pref.summary = getString(R.string.pref_translate_usage_summary); return }
+        pref.summary = getString(R.string.usage_checking)
+        translator.usage { r ->
+            if (!isAdded || r == null) return@usage
+            val nf = java.text.NumberFormat.getIntegerInstance()
+            pref.summary = r.fold(
+                onSuccess = { u ->
+                    if (u.limit > 0) getString(R.string.usage_result, nf.format(u.used), nf.format(u.limit), nf.format(u.remaining))
+                    else getString(R.string.usage_unlimited, nf.format(u.used))
+                },
+                onFailure = { e -> getString(if (e.message?.contains("403") == true) R.string.usage_bad_key else R.string.usage_error) },
+            )
+        }
+    }
+
+    override fun onDestroyView() { translator.shutdown(); super.onDestroyView() }
 }

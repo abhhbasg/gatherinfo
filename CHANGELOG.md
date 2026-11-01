@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.2.1
+
+- **Translation:** with DeepL, *Settings → Translation* shows how many characters are used and left in your plan (only DeepL offers this).
+- **The globe key can be hidden** (*Settings → Size and layout*) to widen the space bar. With several languages on, hold the space bar to change language.
+
 ## 0.2.0
 
 - **Fix:** the bottom row of keys was hidden behind the navigation bar (or the launcher's own navigation bar) on Android 15. The keyboard now keeps clear of it, with an "extra space at the bottom" setting as a safety net.

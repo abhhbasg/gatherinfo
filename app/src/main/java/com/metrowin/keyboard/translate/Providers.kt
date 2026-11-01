@@ -20,6 +20,11 @@ class HttpRequest(val method: String, val url: String, val body: ByteArray? = nu
 
 class TranslationException(message: String) : Exception(message)
 
+/** How much of a plan has been used. [limit] is 0 when the plan has no cap. */
+data class Usage(val used: Long, val limit: Long) {
+    val remaining get() = if (limit > 0) (limit - used).coerceAtLeast(0) else -1L
+}
+
 data class Translated(val text: String, val detectedLanguage: String?)
 
 /**
@@ -58,6 +63,19 @@ object Providers {
         )
         Provider.MYMEMORY -> HttpRequest("GET", "https://api.mymemory.translated.net/get?q=${enc(text)}&langpair=${enc(if (source == AUTO) "Autodetect" else source)}%7C${enc(target)}")
     }
+
+    /** The request that tells how much of the plan is left, for the services that offer one (only DeepL does), or null. */
+    fun usageRequest(p: Provider, key: String): HttpRequest? = when (p) {
+        Provider.DEEPL -> HttpRequest("GET", "https://${if (key.endsWith(":fx")) "api-free.deepl.com" else "api.deepl.com"}/v2/usage", headers = mapOf("Authorization" to "DeepL-Auth-Key $key"))
+        else -> null
+    }
+
+    fun parseUsage(body: String): Usage = try {
+        val o = JSONObject(body)
+        val limit = o.optLong("character_limit", 0)
+        // A plan with no cap reports a limit too big to mean anything.
+        Usage(o.getLong("character_count"), if (limit >= 1_000_000_000_000L) 0 else limit)
+    } catch (e: Exception) { throw TranslationException("Unreadable answer") }
 
     /** DeepL wants a region for a few languages. */
     fun deeplTarget(code: String): String = when (code.lowercase(Locale.ROOT)) {

@@ -4,5 +4,6 @@
     <ListPreference android:key="translate_provider" android:title="@string/pref_translate_provider_title" android:entries="@array/translate_provider_names" android:entryValues="@array/translate_provider_values" android:defaultValue="google" app:useSimpleSummaryProvider="true" />
     <EditTextPreference android:key="translate_key" android:title="@string/pref_translate_key_title" android:summary="@string/pref_translate_key_summary" />
     <EditTextPreference android:key="translate_url" android:title="@string/pref_translate_url_title" android:summary="@string/pref_translate_url_summary" />
+    <Preference android:key="translate_usage" android:title="@string/pref_translate_usage_title" android:summary="@string/pref_translate_usage_summary" />
     <Preference android:key="translate_note" android:title="@string/pref_translate_note_title" android:summary="@string/pref_translate_note_text" android:selectable="false" />
 </PreferenceScreen>

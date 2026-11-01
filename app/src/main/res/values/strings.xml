@@ -277,7 +277,7 @@
     <string name="tut_welcome_title">Welcome</string>
     <string name="tut_welcome_body">MetroWin Keyboard brings the Windows Phone keyboard to Android: flat keys, big light type, and the same colours as MetroWin Launcher. This short tour shows what it can do. You can open it again from the three dots in the keyboard (the ? button) or from the settings.</string>
     <string name="tut_basics_title">Typing</string>
-    <string name="tut_basics_body">Tap the arrow for a capital; tap it twice (or hold it) to lock capitals. \"?123\" switches to numbers and symbols, and \"=\&lt;\" to more of them. The smiley opens emoji and the globe changes language. Press Enter for the action of the field (search, send, next…).</string>
+    <string name="tut_basics_body">Tap the arrow for a capital; tap it twice (or hold it) to lock capitals. \"?123\" switches to numbers and symbols, and \"=\&lt;\" to more of them. The smiley opens emoji and the globe changes language (hide the globe in the settings to widen the space bar; then hold the space bar to change language). Press Enter for the action of the field (search, send, next…).</string>
     <string name="tut_hold_title">Hold for more</string>
     <string name="tut_hold_body">Hold a key and a bar appears above it with accents, digits and symbols. Slide your finger to one of them and let go. If you let go without sliding, you get the normal letter. How long to hold is in Settings → Typing (200 ms to start).</string>
     <string name="tut_swipe_title">Swipe to type</string>
@@ -295,7 +295,7 @@
     <string name="tut_gif_title">GIF</string>
     <string name="tut_gif_body">Open GIF from the toolbox. Tap one to send it. Use the search button and type with the keyboard to look for others. You choose where GIFs come from in Settings → GIF: GIPHY or Tenor (with your own free key), a folder on your phone, or your own service.</string>
     <string name="tut_translate_title">Translate</string>
-    <string name="tut_translate_body">Open Translate from the toolbox. It takes the selected text, or everything in the field, and translates it. Tap the language names to change them, the arrows to swap. \"Clipboard\" translates what you just copied, handy for messages you received. Then replace the text, insert the translation after it, or copy it. Google is used by default; you can change the service in Settings → Translate. The text is sent to the service only when you translate.</string>
+    <string name="tut_translate_body">Open Translate from the toolbox. It takes the selected text, or everything in the field, and translates it. Tap the language names to change them, the arrows to swap. \"Clipboard\" translates what you just copied, handy for messages you received. Then replace the text, insert the translation after it, or copy it. Google is used by default; you can change the service in Settings → Translate, where DeepL also shows how many characters are left in your plan. The text is sent to the service only when you translate.</string>
     <string name="tut_voice_title">Voice typing</string>
     <string name="tut_voice_body">Tap the microphone in the toolbox and speak: the words appear as you talk. With \"Keep listening\" on (Settings → Voice) it keeps transcribing until you tap the microphone again. The first time Android asks to allow the microphone.</string>
     <string name="tut_looks_title">Looks and colours</string>
@@ -366,4 +366,13 @@
     <string-array name="translate_provider_values"><item>google</item><item>google_cloud</item><item>deepl</item><item>libre</item><item>mymemory</item></string-array>
     <string-array name="quick_tool_names"><item>Clipboard</item><item>Translate</item><item>GIF</item><item>Emoji</item><item>Voice</item><item>Help</item><item>Settings</item></string-array>
     <string-array name="quick_tool_values"><item>clipboard</item><item>translate</item><item>gif</item><item>emoji</item><item>mic</item><item>help</item><item>settings</item></string-array>
+    <string name="pref_language_key_title">Show the globe key</string>
+    <string name="pref_language_key_summary">Hide it to widen the space bar. With several languages, hold the space bar to change language.</string>
+    <string name="pref_translate_usage_title">Characters left in your plan</string>
+    <string name="pref_translate_usage_summary">Add your key to see it. Only DeepL tells this.</string>
+    <string name="usage_checking">Checking…</string>
+    <string name="usage_result">%1$s used of %2$s · %3$s left</string>
+    <string name="usage_unlimited">%1$s used (no limit on this plan)</string>
+    <string name="usage_bad_key">DeepL does not accept this key</string>
+    <string name="usage_error">Could not check. Tap to try again.</string>
 </resources>

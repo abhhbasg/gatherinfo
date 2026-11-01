@@ -70,6 +70,7 @@ object K {
     const val SOUND_FILE = "sound_file_set"
     const val BG_IMAGE_SET = "bg_image_set"
     const val QUICK_TOOL = "quick_tool"
+    const val LANGUAGE_KEY = "language_key"
     const val KEY_PREVIEW = "key_preview"
     const val BOTTOM_PADDING = "bottom_padding"
     const val ONBOARDING_DONE = "onboarding_done"
@@ -120,6 +121,7 @@ class Prefs(context: Context) {
     val keyboardAlign get() = s(K.KEYBOARD_ALIGN, "center")
     val numberRow get() = b(K.NUMBER_ROW, false)
     val quickTool get() = s(K.QUICK_TOOL, "clipboard")
+    val languageKey get() = b(K.LANGUAGE_KEY, true)
     val keyPreview get() = b(K.KEY_PREVIEW, true)
     val bottomPadding get() = i(K.BOTTOM_PADDING, 0)
     val onboardingDone get() = b(K.ONBOARDING_DONE, false)

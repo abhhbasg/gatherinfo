@@ -48,6 +48,17 @@ class TutorialTest {
         assertEquals(listOf("q", "1"), page.keys.first { it.label == "q" }.popups.take(2))
     }
 
+    @Test fun hidingTheGlobeGivesTheRoomToTheSpaceBar() {
+        val app = ApplicationProvider.getApplicationContext<KeyboardApp>()
+        val it = app.layouts.get("it")!!
+        fun bottom(multi: Boolean) = KeyboardBuilder.letters(it, false, true, multi).rows.last()
+        val withGlobe = bottom(true); val without = bottom(false)
+        assertTrue(withGlobe.any { k -> k.type == com.metrowin.keyboard.layout.KeyType.LANGUAGE })
+        assertTrue(without.none { k -> k.type == com.metrowin.keyboard.layout.KeyType.LANGUAGE })
+        fun space(r: List<com.metrowin.keyboard.layout.Key>) = r.first { k -> k.type == com.metrowin.keyboard.layout.KeyType.SPACE }.weight
+        assertTrue(space(without) > space(withGlobe))
+    }
+
     @Test fun everyScreenOfTheSettingsIsListed() {
         // The settings index points to fragments by name; a typo would crash only when the screen is opened.
         val app = ApplicationProvider.getApplicationContext<KeyboardApp>()

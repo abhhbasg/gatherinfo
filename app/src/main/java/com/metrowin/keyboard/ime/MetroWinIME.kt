@@ -371,7 +371,9 @@ open class MetroWinIME : InputMethodService(), KeyboardListener, SuggestionBar.L
     private fun applyKeyboardPage() {
         val kb = keyboard ?: return
         val layout = currentLayout()
-        val multi = activeLayouts().size > 1 || shouldOfferSwitchingToNextInputMethod()
+        val several = activeLayouts().size > 1
+        // The globe can be hidden to give the space bar its room; then holding the space bar changes language.
+        val multi = (several || shouldOfferSwitchingToNextInputMethod()) && prefs.languageKey
         val p = when (page) {
             Page.LETTERS -> KeyboardBuilder.letters(layout, prefs.numberRow, prefs.keyHints, multi)
             Page.SYMBOLS_1, Page.SYMBOLS_2 -> KeyboardBuilder.symbols(page, prefs.numberRow)
@@ -379,6 +381,7 @@ open class MetroWinIME : InputMethodService(), KeyboardListener, SuggestionBar.L
         }
         kb.setPage(p)
         kb.setLanguageName(layout.name)
+        kb.setSpaceLanguageSwitch(several && !prefs.languageKey)
         kb.setShift(shift)
         val action = currentInputEditorInfo?.imeOptions?.and(EditorInfo.IME_MASK_ACTION) ?: EditorInfo.IME_ACTION_NONE
         val noAction = currentInputEditorInfo?.imeOptions?.and(EditorInfo.IME_FLAG_NO_ENTER_ACTION) != 0

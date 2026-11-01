@@ -277,7 +277,7 @@
     <string name="tut_welcome_title">Benvenuto</string>
     <string name="tut_welcome_body">MetroWin Keyboard porta su Android la tastiera di Windows Phone: tasti piatti, caratteri grandi e leggeri e gli stessi colori di MetroWin Launcher. Questo breve giro mostra cosa sa fare. Puoi riaprirlo dai tre puntini della tastiera (il tasto ?) o dalle impostazioni.</string>
     <string name="tut_basics_title">Scrivere</string>
-    <string name="tut_basics_body">Tocca la freccia per una maiuscola; toccala due volte (o tienila premuta) per bloccare il maiuscolo. \"?123\" passa a numeri e simboli, \"=\&lt;\" ad altri ancora. La faccina apre le emoji e il globo cambia lingua. Invio esegue l\'azione del campo (cerca, invia, avanti…).</string>
+    <string name="tut_basics_body">Tocca la freccia per una maiuscola; toccala due volte (o tienila premuta) per bloccare il maiuscolo. \"?123\" passa a numeri e simboli, \"=\&lt;\" ad altri ancora. La faccina apre le emoji e il globo cambia lingua (nascondi il globo nelle impostazioni per allargare la barra spaziatrice; allora tieni premuta la barra spaziatrice per cambiare lingua). Invio esegue l\'azione del campo (cerca, invia, avanti…).</string>
     <string name="tut_hold_title">Tieni premuto per altro</string>
     <string name="tut_hold_body">Tieni premuto un tasto e sopra compare una barra con accenti, cifre e simboli. Fai scorrere il dito su uno e rilascia. Se rilasci senza scorrere ottieni la lettera normale. Quanto tenere premuto si regola in Impostazioni → Digitazione (200 ms all\'inizio).</string>
     <string name="tut_swipe_title">Scrivi scorrendo</string>
@@ -295,7 +295,7 @@
     <string name="tut_gif_title">GIF</string>
     <string name="tut_gif_body">Apri GIF dalla cassetta degli strumenti. Toccane una per inviarla. Con il pulsante di ricerca scrivi con la tastiera per cercarne altre. La fonte si sceglie in Impostazioni → GIF: GIPHY o Tenor (con una tua chiave gratuita), una cartella del telefono o un tuo servizio.</string>
     <string name="tut_translate_title">Traduci</string>
-    <string name="tut_translate_body">Apri Traduci dalla cassetta degli strumenti. Prende il testo selezionato, o tutto quello del campo, e lo traduce. Tocca i nomi delle lingue per cambiarle, le frecce per scambiarle. \"Appunti\" traduce ciò che hai appena copiato, utile per i messaggi ricevuti. Poi sostituisci il testo, inserisci la traduzione dopo o copiala. Di default usa Google; il servizio si cambia in Impostazioni → Traduzione. Il testo viene inviato al servizio solo quando traduci.</string>
+    <string name="tut_translate_body">Apri Traduci dalla cassetta degli strumenti. Prende il testo selezionato, o tutto quello del campo, e lo traduce. Tocca i nomi delle lingue per cambiarle, le frecce per scambiarle. \"Appunti\" traduce ciò che hai appena copiato, utile per i messaggi ricevuti. Poi sostituisci il testo, inserisci la traduzione dopo o copiala. Di default usa Google; il servizio si cambia in Impostazioni → Traduzione, dove DeepL mostra anche quanti caratteri restano nel tuo piano. Il testo viene inviato al servizio solo quando traduci.</string>
     <string name="tut_voice_title">Digitazione vocale</string>
     <string name="tut_voice_body">Tocca il microfono nella cassetta degli strumenti e parla: le parole compaiono mentre parli. Con \"Continua ad ascoltare\" attivo (Impostazioni → Voce) continua a trascrivere finché non tocchi di nuovo il microfono. La prima volta Android chiede di consentire il microfono.</string>
     <string name="tut_looks_title">Aspetto e colori</string>
@@ -366,4 +366,13 @@
     <string-array name="translate_provider_values"><item>google</item><item>google_cloud</item><item>deepl</item><item>libre</item><item>mymemory</item></string-array>
     <string-array name="quick_tool_names"><item>Appunti</item><item>Traduci</item><item>GIF</item><item>Emoji</item><item>Voce</item><item>Aiuto</item><item>Impostazioni</item></string-array>
     <string-array name="quick_tool_values"><item>clipboard</item><item>translate</item><item>gif</item><item>emoji</item><item>mic</item><item>help</item><item>settings</item></string-array>
+    <string name="pref_language_key_title">Mostra il tasto mondo</string>
+    <string name="pref_language_key_summary">Nascondilo per allargare la barra spaziatrice. Con più lingue, tieni premuta la barra spaziatrice per cambiare lingua.</string>
+    <string name="pref_translate_usage_title">Caratteri rimasti nel tuo piano</string>
+    <string name="pref_translate_usage_summary">Aggiungi la chiave per vederli. Lo dice solo DeepL.</string>
+    <string name="usage_checking">Controllo in corso…</string>
+    <string name="usage_result">%1$s usati su %2$s · %3$s rimasti</string>
+    <string name="usage_unlimited">%1$s usati (nessun limite in questo piano)</string>
+    <string name="usage_bad_key">DeepL non accetta questa chiave</string>
+    <string name="usage_error">Impossibile controllare. Tocca per riprovare.</string>
 </resources>

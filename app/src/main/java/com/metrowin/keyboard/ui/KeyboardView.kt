@@ -71,6 +71,7 @@ class KeyboardView(context: Context) : View(context) {
     private var spaceCursorEnabled = true
     private var showHints = true
     private var preview = true
+    private var spaceSwitchesLanguage = false
 
     private val keyPaint = Paint(Paint.ANTI_ALIAS_FLAG)
     private val strokePaint = Paint(Paint.ANTI_ALIAS_FLAG).apply { style = Paint.Style.STROKE }
@@ -111,6 +112,7 @@ class KeyboardView(context: Context) : View(context) {
         this.longPressEnabled = longPress; this.longPressMs = longPressMs.toLong(); this.swipeEnabled = swipe
         this.spaceCursorEnabled = spaceCursor; this.showHints = hints; invalidate()
     }
+    fun setSpaceLanguageSwitch(on: Boolean) { spaceSwitchesLanguage = on }
     fun setMetrics(heightPct: Int, gapDp: Int, widthPct: Int, align: String) {
         if (this.heightPct == heightPct && this.gapDp == gapDp.toFloat() && this.widthPct == widthPct && this.align == align) return
         this.heightPct = heightPct; this.gapDp = gapDp.toFloat(); this.widthPct = widthPct; this.align = align
@@ -368,6 +370,7 @@ class KeyboardView(context: Context) : View(context) {
     private fun canLongPress(key: Key) = when (key.type) {
         KeyType.CHAR -> longPressEnabled && key.popups.isNotEmpty()
         KeyType.SHIFT -> true
+        KeyType.SPACE -> spaceSwitchesLanguage
         else -> false
     }
 
@@ -378,6 +381,7 @@ class KeyboardView(context: Context) : View(context) {
             if (k !== p.startKey) return
             p.longFired = true
             if (k.type == KeyType.SHIFT) { listener?.onShiftLongPress(); return }
+            if (k.type == KeyType.SPACE) { performHapticFeedback(android.view.HapticFeedbackConstants.LONG_PRESS); listener?.onFunction(Key(KeyType.LANGUAGE), false); return }
             p.popupKey = k; p.popupIndex = 0
             performHapticFeedback(android.view.HapticFeedbackConstants.LONG_PRESS)
             invalidate()

@@ -43,6 +43,18 @@ class Translator(private val prefs: Prefs) {
         }
     }
 
+    /** How much of the plan is left, or null when the chosen service cannot tell. Runs off the main thread; [done] on the main one. */
+    fun usage(done: (Result<Usage>?) -> Unit) {
+        val p = Provider.from(prefs.translateProvider)
+        val key = prefs.translateKey
+        val req = Providers.usageRequest(p, key)
+        if (req == null || key.isBlank()) { done(null); return }
+        io.execute {
+            val r = runCatching { Providers.parseUsage(Net.request(req.method, req.url, req.body, req.contentType, req.headers)) }
+            main.post { done(r) }
+        }
+    }
+
     fun cancel() { generation++ }
     fun shutdown() { generation++; io.shutdownNow() }
 }
