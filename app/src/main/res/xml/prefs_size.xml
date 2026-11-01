@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
+    <com.metrowin.keyboard.settings.KeyboardPreview android:key="size_preview" />
+    <Preference android:key="size_try" android:title="@string/pref_try_title" android:summary="@string/pref_try_summary" />
     <SeekBarPreference android:key="key_height" android:title="@string/pref_key_height_title" android:defaultValue="100" android:max="140" app:min="60" app:seekBarIncrement="5" app:showSeekBarValue="true" />
     <SeekBarPreference android:key="key_height_land" android:title="@string/pref_key_height_land_title" android:defaultValue="100" android:max="140" app:min="60" app:seekBarIncrement="5" app:showSeekBarValue="true" />
     <SeekBarPreference android:key="keyboard_width" android:title="@string/pref_width_title" android:summary="@string/pref_width_summary" android:defaultValue="100" android:max="100" app:min="55" app:seekBarIncrement="5" app:showSeekBarValue="true" />

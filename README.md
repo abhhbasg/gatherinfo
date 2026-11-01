@@ -37,7 +37,7 @@ Android 8.0 (API 26) or newer.
 **Tools**, one tap from the bar: the three dots open the toolbox, and a **quick button** goes straight to the clipboard (or any tool you choose), with a dot when something new was copied.
 - **Clipboard** history with a limit you choose, pinned items and **pictures**.
 - **Translate** the field, or what you just copied (handy for messages you received), between 40 languages. Google by default; Google Cloud, DeepL, LibreTranslate or MyMemory can be chosen.
-- **GIF** from a source you choose: GIPHY, Tenor (your own free key), a folder on the phone, or any JSON service you describe.
+- **GIF** from a source you choose: GIPHY, Tenor, Klipy or Imgur (your own free key; a button opens the page to get it), a folder on the phone, or any JSON service you describe, with a content level from G to R.
 - **Emoji** and **classic emoticons** (`:-)`, kaomoji), with skin tones.
 - **Voice typing**, also continuous transcription, optionally on-device only.
 
@@ -45,7 +45,7 @@ Android 8.0 (API 26) or newer.
 
 **Looks**: *Classic* (flat Windows Phone), *Modern Glass*, *Modern Droid* (Material You colours on Android 12+), dark / light / system, 20 Windows Phone colours or your own, pure black, a photo behind the keys (its colour becomes the accent), and, optionally, a keyboard that follows the colour of the app under it.
 
-**Size**: key height (portrait and landscape), keyboard width with left / centre / right position, key spacing, number row on or off.
+**Size**: a live preview, key height (portrait and landscape), keyboard width with left / centre / right position, key spacing, number row on or off.
 
 **Feedback**: a Windows Phone style click (synthesised, nothing of Microsoft's inside), Android's sound or your own file; vibration with adjustable strength.
 

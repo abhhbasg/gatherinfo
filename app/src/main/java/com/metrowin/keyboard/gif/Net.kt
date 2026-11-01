@@ -12,7 +12,8 @@ object Net {
     const val MAX_JSON = 2 * 1024 * 1024
     const val MAX_GIF = 15 * 1024 * 1024
 
-    fun getString(url: String): String = String(getBytes(url, MAX_JSON), Charsets.UTF_8)
+    fun getString(url: String, headers: Map<String, String> = emptyMap()): String =
+        if (headers.isEmpty()) String(getBytes(url, MAX_JSON), Charsets.UTF_8) else request("GET", url, null, null, headers)
 
     /** A request with a body and headers (translation services). The answer is read as text, with the same limits as the rest. */
     fun request(method: String, url: String, body: ByteArray?, contentType: String?, headers: Map<String, String> = emptyMap()): String {

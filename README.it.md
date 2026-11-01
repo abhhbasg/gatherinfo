@@ -31,7 +31,7 @@ Android 8.0 (API 26) o successivo.
 **Strumenti**, a un tocco dalla barra: i tre puntini aprono la cassetta degli strumenti e il **tasto rapido** porta dritto agli appunti (o a qualsiasi strumento scelto), con un puntino quando hai copiato qualcosa.
 - **Appunti** con limite a scelta, elementi fissati e **immagini**.
 - **Traduci** il campo, o ciò che hai appena copiato (utile per i messaggi ricevuti), tra 40 lingue. Di default Google; si possono scegliere Google Cloud, DeepL, LibreTranslate o MyMemory.
-- **GIF** da una fonte a scelta: GIPHY, Tenor (con una tua chiave gratuita), una cartella del telefono o un servizio JSON che descrivi tu.
+- **GIF** da una fonte a scelta: GIPHY, Tenor, Klipy o Imgur (con una tua chiave gratuita; un pulsante apre la pagina dove prenderla), una cartella del telefono o un servizio JSON che descrivi tu, con un livello dei contenuti da G a R.
 - **Emoji** ed **emoticon classiche** (`:-)`, kaomoji), con i toni della pelle.
 - **Digitazione vocale**, anche trascrizione continua, volendo solo sul telefono.
 
@@ -39,7 +39,7 @@ Android 8.0 (API 26) o successivo.
 
 **Aspetto**: *Classic* (Windows Phone piatto), *Modern Glass*, *Modern Droid* (colori Material You da Android 12), scuro / chiaro / sistema, 20 colori di Windows Phone o uno tuo, nero puro, una foto dietro i tasti (il suo colore diventa l'accento) e, volendo, una tastiera che segue il colore dell'app sotto.
 
-**Dimensioni**: altezza dei tasti (verticale e orizzontale), larghezza della tastiera con posizione sinistra / centro / destra, spazio tra i tasti, riga dei numeri.
+**Dimensioni**: anteprima dal vivo, altezza dei tasti (verticale e orizzontale), larghezza della tastiera con posizione sinistra / centro / destra, spazio tra i tasti, riga dei numeri.
 
 **Feedback**: click in stile Windows Phone (sintetizzato, niente di Microsoft), suono di Android o un tuo file; vibrazione con intensità regolabile.
 

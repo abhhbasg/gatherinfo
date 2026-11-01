@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.2.2
+
+- **GIF:** Klipy and Imgur join GIPHY and Tenor. Picking a service shows a button that opens the page where its free key is obtained.
+- **GIF content level:** choose from G to R (*Settings → GIF*); it is passed to each service in its own terms. Imgur has only a "mature" flag, shown at R.
+- **Size and layout:** a live preview of the keyboard at the top, which changes as you move the sliders, and a button to try the real keyboard.
+
 ## 0.2.1
 
 - **Translation:** with DeepL, *Settings → Translation* shows how many characters are used and left in your plan (only DeepL offers this).

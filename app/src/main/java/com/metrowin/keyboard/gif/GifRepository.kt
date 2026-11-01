@@ -17,7 +17,7 @@ class GifRepository(private val context: Context, private val prefs: Prefs) {
 
     /** What the user must still do before this source can work, or null when it is ready. */
     fun problem(): GifProblem? = when (GifSourceType.from(prefs.gifSource)) {
-        GifSourceType.GIPHY, GifSourceType.TENOR -> if (prefs.gifApiKey.isBlank()) GifProblem.NEEDS_KEY else null
+        GifSourceType.GIPHY, GifSourceType.TENOR, GifSourceType.KLIPY, GifSourceType.IMGUR -> if (prefs.gifApiKey.isBlank()) GifProblem.NEEDS_KEY else null
         GifSourceType.FOLDER -> if (prefs.gifFolder.isBlank()) GifProblem.NEEDS_FOLDER else null
         GifSourceType.CUSTOM -> if (!prefs.gifCustomUrl.startsWith("https://")) GifProblem.NEEDS_URL else null
     }
@@ -30,14 +30,18 @@ class GifRepository(private val context: Context, private val prefs: Prefs) {
     }
 
     private fun fetch(query: String, language: String): List<GifItem> = when (GifSourceType.from(prefs.gifSource)) {
-        GifSourceType.GIPHY -> GifSources.parseGiphy(Net.getString(GifSources.giphyUrl(prefs.gifApiKey, query, LIMIT, language)))
-        GifSourceType.TENOR -> GifSources.parseTenor(Net.getString(GifSources.tenorUrl(prefs.gifApiKey, query, LIMIT, language)))
+        GifSourceType.GIPHY -> GifSources.parseGiphy(Net.getString(GifSources.giphyUrl(prefs.gifApiKey, query, LIMIT, language, rating())))
+        GifSourceType.TENOR -> GifSources.parseTenor(Net.getString(GifSources.tenorUrl(prefs.gifApiKey, query, LIMIT, language, rating())))
+        GifSourceType.KLIPY -> GifSources.parseKlipy(Net.getString(GifSources.klipyUrl(prefs.gifApiKey, query, LIMIT, rating())))
+        GifSourceType.IMGUR -> GifSources.parseImgur(Net.getString(GifSources.imgurUrl(query), GifSources.imgurHeaders(prefs.gifApiKey)), rating().allowsMature)
         GifSourceType.CUSTOM -> GifSources.parseCustom(
-            Net.getString(GifSources.customUrl(prefs.gifCustomUrl, prefs.gifApiKey, query, LIMIT, language)),
+            Net.getString(GifSources.customUrl(prefs.gifCustomUrl, prefs.gifApiKey, query, LIMIT, language, rating())),
             prefs.gifCustomList, prefs.gifCustomPreview, prefs.gifCustomFull,
         )
         GifSourceType.FOLDER -> folder(query)
     }
+
+    private fun rating() = GifRating.from(prefs.gifRating)
 
     /** The .gif files of the folder the user picked, filtered by file name. */
     private fun folder(query: String): List<GifItem> {

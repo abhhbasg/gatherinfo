@@ -12,6 +12,6 @@ AndroidX (core, appcompat, preference, recyclerview), Apache License 2.0. Tests 
 
 ## Services (never contacted unless you use them)
 
-GIPHY, Tenor, Google Translate, Google Cloud Translation, DeepL, LibreTranslate and MyMemory are third-party services with their own terms; the keyboard only calls the one you choose, when you ask.
+GIPHY, Tenor, Klipy, Imgur, Google Translate, Google Cloud Translation, DeepL, LibreTranslate and MyMemory are third-party services with their own terms; the keyboard only calls the one you choose, when you ask.
 
 Windows Phone is a trademark of Microsoft Corporation. MetroWin Keyboard is an independent project, not affiliated with or endorsed by Microsoft or Google.

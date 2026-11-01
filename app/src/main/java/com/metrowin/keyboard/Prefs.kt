@@ -62,6 +62,7 @@ object K {
     const val GIF_CUSTOM_PREVIEW = "gif_custom_preview"
     const val GIF_CUSTOM_FULL = "gif_custom_full"
     const val GIF_LINK_FALLBACK = "gif_link_fallback"
+    const val GIF_RATING = "gif_rating"
 
     const val VOICE_CONTINUOUS = "voice_continuous"
     const val VOICE_OFFLINE = "voice_offline"
@@ -171,6 +172,7 @@ class Prefs(context: Context) {
     val gifCustomPreview get() = s(K.GIF_CUSTOM_PREVIEW, "images.fixed_width_small.url").trim()
     val gifCustomFull get() = s(K.GIF_CUSTOM_FULL, "images.original.url").trim()
     val gifLinkFallback get() = b(K.GIF_LINK_FALLBACK, true)
+    val gifRating get() = s(K.GIF_RATING, "pg-13")
 
     val voiceContinuous get() = b(K.VOICE_CONTINUOUS, false)
     val voiceOffline get() = b(K.VOICE_OFFLINE, false)

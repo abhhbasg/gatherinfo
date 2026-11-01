@@ -151,13 +151,13 @@
     <string name="clipboard_no_images">Questa app non accetta immagini</string>
     <string name="pref_gif_source_title">Da dove arrivano le GIF</string>
     <string name="pref_gif_key_title">Chiave API</string>
-    <string name="pref_gif_key_summary">Serve per GIPHY e Tenor. Ottieni una chiave gratuita dai loro siti per sviluppatori.</string>
+    <string name="pref_gif_key_summary">Serve per GIPHY, Tenor, Klipy e Imgur (per Imgur è il Client ID). Il pulsante sopra apre la pagina dove ottenerla, gratis.</string>
     <string name="pref_gif_key_message">Incolla la chiave. Resta su questo telefono.</string>
     <string name="pref_gif_folder_title">Cartella di GIF…</string>
     <string name="pref_gif_folder_summary">Per \"Una cartella del telefono\": le GIF che hai salvato</string>
     <string name="cat_gif_custom">Un servizio tuo</string>
     <string name="pref_gif_custom_url_title">Indirizzo</string>
-    <string name="pref_gif_custom_url_summary">Indirizzo https con {query}, {key}, {limit} e {lang}</string>
+    <string name="pref_gif_custom_url_summary">Indirizzo https con {query}, {key}, {limit}, {lang} e {rating}</string>
     <string name="pref_gif_custom_list_title">Dove sono i risultati nella risposta</string>
     <string name="pref_gif_custom_preview_title">Immagine piccola, in ogni risultato</string>
     <string name="pref_gif_custom_full_title">GIF completa, in ogni risultato</string>
@@ -244,18 +244,6 @@
         <item>custom</item>
         <item>off</item>
     </string-array>
-    <string-array name="gif_source_names">
-        <item>GIPHY</item>
-        <item>Tenor</item>
-        <item>Una cartella del telefono</item>
-        <item>Un servizio tuo</item>
-    </string-array>
-    <string-array name="gif_source_values">
-        <item>giphy</item>
-        <item>tenor</item>
-        <item>folder</item>
-        <item>custom</item>
-    </string-array>
     <string-array name="gif_chips">
         <item>Di tendenza</item>
         <item>Grazie</item>
@@ -293,7 +281,7 @@
     <string name="tut_emoji_title">Emoji ed emoticon classiche</string>
     <string name="tut_emoji_body">Il tasto con la faccina apre le emoji per categoria, con le recenti per prime. Tieni premuta una mano o una persona per i toni della pelle. Le ultime due schede contengono le emoticon classiche, :-) e compagnia, e i kaomoji giapponesi, che funzionano in ogni app.</string>
     <string name="tut_gif_title">GIF</string>
-    <string name="tut_gif_body">Apri GIF dalla cassetta degli strumenti. Toccane una per inviarla. Con il pulsante di ricerca scrivi con la tastiera per cercarne altre. La fonte si sceglie in Impostazioni → GIF: GIPHY o Tenor (con una tua chiave gratuita), una cartella del telefono o un tuo servizio.</string>
+    <string name="tut_gif_body">Apri GIF dalla cassetta degli strumenti. Toccane una per inviarla. Con il pulsante di ricerca scrivi con la tastiera per cercarne altre. La fonte si sceglie in Impostazioni → GIF: GIPHY, Tenor, Klipy o Imgur (con una tua chiave gratuita; un pulsante apre la pagina dove prenderla), una cartella del telefono o un tuo servizio, e si decide quanto è severa la ricerca (da G a R).</string>
     <string name="tut_translate_title">Traduci</string>
     <string name="tut_translate_body">Apri Traduci dalla cassetta degli strumenti. Prende il testo selezionato, o tutto quello del campo, e lo traduce. Tocca i nomi delle lingue per cambiarle, le frecce per scambiarle. \"Appunti\" traduce ciò che hai appena copiato, utile per i messaggi ricevuti. Poi sostituisci il testo, inserisci la traduzione dopo o copiala. Di default usa Google; il servizio si cambia in Impostazioni → Traduzione, dove DeepL mostra anche quanti caratteri restano nel tuo piano. Il testo viene inviato al servizio solo quando traduci.</string>
     <string name="tut_voice_title">Digitazione vocale</string>
@@ -375,4 +363,12 @@
     <string name="usage_unlimited">%1$s usati (nessun limite in questo piano)</string>
     <string name="usage_bad_key">DeepL non accetta questa chiave</string>
     <string name="usage_error">Impossibile controllare. Tocca per riprovare.</string>
+    <string name="pref_try_title">Prova la tastiera</string>
+    <string name="pref_try_summary">Apre un campo di testo con la tastiera, per vedere le modifiche dal vivo</string>
+    <string name="pref_gif_get_key_title">Prendi la chiave dal sito del servizio</string>
+    <string name="pref_gif_rating_title">Livello dei contenuti</string>
+    <string-array name="gif_source_names"><item>GIPHY</item><item>Tenor</item><item>Klipy</item><item>Imgur</item><item>Una cartella del telefono</item><item>Un servizio tuo</item></string-array>
+    <string-array name="gif_source_values"><item>giphy</item><item>tenor</item><item>klipy</item><item>imgur</item><item>folder</item><item>custom</item></string-array>
+    <string-array name="gif_rating_names"><item>Tutti (G)</item><item>Con la guida dei genitori (PG)</item><item>Adolescenti (PG-13)</item><item>Adulti (R): tutto ciò che il servizio consente</item></string-array>
+    <string-array name="gif_rating_values"><item>g</item><item>pg</item><item>pg-13</item><item>r</item></string-array>
 </resources>

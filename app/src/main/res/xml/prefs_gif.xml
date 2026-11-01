@@ -2,7 +2,9 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <ListPreference android:key="gif_source" android:title="@string/pref_gif_source_title" android:entries="@array/gif_source_names" android:entryValues="@array/gif_source_values" android:defaultValue="giphy" app:useSimpleSummaryProvider="true" />
+    <Preference android:key="gif_get_key" android:title="@string/pref_gif_get_key_title" />
     <EditTextPreference android:key="gif_api_key" android:title="@string/pref_gif_key_title" android:summary="@string/pref_gif_key_summary" android:dialogMessage="@string/pref_gif_key_message" />
+    <ListPreference android:key="gif_rating" android:title="@string/pref_gif_rating_title" android:entries="@array/gif_rating_names" android:entryValues="@array/gif_rating_values" android:defaultValue="pg-13" app:useSimpleSummaryProvider="true" />
     <Preference android:key="gif_folder_pick" android:title="@string/pref_gif_folder_title" android:summary="@string/pref_gif_folder_summary" />
     <PreferenceCategory android:title="@string/cat_gif_custom">
         <EditTextPreference android:key="gif_custom_url" android:title="@string/pref_gif_custom_url_title" android:summary="@string/pref_gif_custom_url_summary" />

@@ -229,7 +229,14 @@ class AppearanceFragment : BaseFragment(R.xml.prefs_appearance, R.string.screen_
     }
 }
 
-class SizeFragment : BaseFragment(R.xml.prefs_size, R.string.screen_size) { override fun setup() {} }
+class SizeFragment : BaseFragment(R.xml.prefs_size, R.string.screen_size) {
+    // The preview redraws as soon as a slider or switch changes.
+    private val listener = android.content.SharedPreferences.OnSharedPreferenceChangeListener { _, _ -> findPreference<KeyboardPreview>("size_preview")?.refresh() }
+
+    override fun setup() { click("size_try") { startActivity(Intent(requireContext(), TestActivity::class.java)) } }
+    override fun onStart() { super.onStart(); app.prefs.sp.registerOnSharedPreferenceChangeListener(listener) }
+    override fun onStop() { app.prefs.sp.unregisterOnSharedPreferenceChangeListener(listener); super.onStop() }
+}
 
 class TypingFragment : BaseFragment(R.xml.prefs_typing, R.string.screen_typing) { override fun setup() {} }
 
@@ -294,14 +301,24 @@ class GifFragment : BaseFragment(R.xml.prefs_gif, R.string.screen_gif) {
 
     override fun setup() {
         click("gif_folder_pick") { pickFolder.launch(null) }
+        click("gif_get_key") {
+            com.metrowin.keyboard.gif.GifSourceType.from(app.prefs.gifSource).keyPage?.let { startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(it))) }
+        }
         findPreference<Preference>("gif_source")?.setOnPreferenceChangeListener { _, v -> showFor(v as String); true }
         showFor(app.prefs.gifSource)
     }
 
     /** Only the settings the chosen source uses are shown. */
     private fun showFor(source: String) {
-        val online = source == "giphy" || source == "tenor" || source == "custom"
+        val type = com.metrowin.keyboard.gif.GifSourceType.from(source)
+        val online = type != com.metrowin.keyboard.gif.GifSourceType.FOLDER
         findPreference<Preference>("gif_api_key")?.isVisible = online
+        // The button that opens the page where the key is obtained, for the services that give one.
+        findPreference<Preference>("gif_get_key")?.apply {
+            isVisible = type.keyPage != null
+            type.keyPage?.let { summary = Uri.parse(it).host }
+        }
+        findPreference<Preference>("gif_rating")?.isVisible = type.hasRating
         findPreference<Preference>("gif_folder_pick")?.isVisible = source == "folder"
         listOf("gif_custom_url", "gif_custom_list", "gif_custom_preview", "gif_custom_full").forEach { findPreference<Preference>(it)?.isVisible = source == "custom" }
         findPreference<Preference>("gif_link_fallback")?.isVisible = online

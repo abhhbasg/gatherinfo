@@ -151,13 +151,13 @@
     <string name="clipboard_no_images">This app does not accept pictures</string>
     <string name="pref_gif_source_title">Where GIFs come from</string>
     <string name="pref_gif_key_title">API key</string>
-    <string name="pref_gif_key_summary">Needed for GIPHY and Tenor. Get a free key from their developer sites.</string>
+    <string name="pref_gif_key_summary">Needed for GIPHY, Tenor, Klipy and Imgur (for Imgur it is the Client ID). The button above opens the page where you get one, free.</string>
     <string name="pref_gif_key_message">Paste the key. It stays on this phone.</string>
     <string name="pref_gif_folder_title">GIF folder…</string>
     <string name="pref_gif_folder_summary">For \"A folder on this phone\": the GIFs you saved</string>
     <string name="cat_gif_custom">Your own service</string>
     <string name="pref_gif_custom_url_title">Address</string>
-    <string name="pref_gif_custom_url_summary">https address with {query}, {key}, {limit} and {lang}</string>
+    <string name="pref_gif_custom_url_summary">https address with {query}, {key}, {limit}, {lang} and {rating}</string>
     <string name="pref_gif_custom_list_title">Where the results are in the answer</string>
     <string name="pref_gif_custom_preview_title">Small picture, inside each result</string>
     <string name="pref_gif_custom_full_title">Full GIF, inside each result</string>
@@ -244,18 +244,6 @@
         <item>custom</item>
         <item>off</item>
     </string-array>
-    <string-array name="gif_source_names">
-        <item>GIPHY</item>
-        <item>Tenor</item>
-        <item>A folder on this phone</item>
-        <item>Your own service</item>
-    </string-array>
-    <string-array name="gif_source_values">
-        <item>giphy</item>
-        <item>tenor</item>
-        <item>folder</item>
-        <item>custom</item>
-    </string-array>
     <string-array name="gif_chips">
         <item>Trending</item>
         <item>Thanks</item>
@@ -293,7 +281,7 @@
     <string name="tut_emoji_title">Emoji and classic emoticons</string>
     <string name="tut_emoji_body">The smiley key opens emoji by category, with the recent ones first. Hold a hand or a person for skin tones. The last two tabs hold the classic emoticons, :-) and friends, and the Japanese kaomoji, which work in every app.</string>
     <string name="tut_gif_title">GIF</string>
-    <string name="tut_gif_body">Open GIF from the toolbox. Tap one to send it. Use the search button and type with the keyboard to look for others. You choose where GIFs come from in Settings → GIF: GIPHY or Tenor (with your own free key), a folder on your phone, or your own service.</string>
+    <string name="tut_gif_body">Open GIF from the toolbox. Tap one to send it. Use the search button and type with the keyboard to look for others. You choose where GIFs come from in Settings → GIF: GIPHY, Tenor, Klipy or Imgur (with your own free key; a button opens the page to get it), a folder on your phone, or your own service, and how strict the search is (G to R).</string>
     <string name="tut_translate_title">Translate</string>
     <string name="tut_translate_body">Open Translate from the toolbox. It takes the selected text, or everything in the field, and translates it. Tap the language names to change them, the arrows to swap. \"Clipboard\" translates what you just copied, handy for messages you received. Then replace the text, insert the translation after it, or copy it. Google is used by default; you can change the service in Settings → Translate, where DeepL also shows how many characters are left in your plan. The text is sent to the service only when you translate.</string>
     <string name="tut_voice_title">Voice typing</string>
@@ -375,4 +363,12 @@
     <string name="usage_unlimited">%1$s used (no limit on this plan)</string>
     <string name="usage_bad_key">DeepL does not accept this key</string>
     <string name="usage_error">Could not check. Tap to try again.</string>
+    <string name="pref_try_title">Try the keyboard</string>
+    <string name="pref_try_summary">Opens a text box with the keyboard, to see the changes for real</string>
+    <string name="pref_gif_get_key_title">Get a key from the service\'s site</string>
+    <string name="pref_gif_rating_title">Content level</string>
+    <string-array name="gif_source_names"><item>GIPHY</item><item>Tenor</item><item>Klipy</item><item>Imgur</item><item>A folder on this phone</item><item>Your own service</item></string-array>
+    <string-array name="gif_source_values"><item>giphy</item><item>tenor</item><item>klipy</item><item>imgur</item><item>folder</item><item>custom</item></string-array>
+    <string-array name="gif_rating_names"><item>Everyone (G)</item><item>Parental guidance (PG)</item><item>Teens (PG-13)</item><item>Mature (R): all the service allows</item></string-array>
+    <string-array name="gif_rating_values"><item>g</item><item>pg</item><item>pg-13</item><item>r</item></string-array>
 </resources>

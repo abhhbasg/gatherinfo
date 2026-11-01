@@ -1,0 +1,1 @@
+GIF: aggiunti Klipy e Imgur, un pulsante per prendere ogni chiave, livello dei contenuti da G a R. Anteprima dal vivo della tastiera in Dimensioni e disposizione.

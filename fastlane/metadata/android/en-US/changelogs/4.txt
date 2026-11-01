@@ -1,0 +1,1 @@
+GIF: Klipy and Imgur added, a button to get each key, content level from G to R. Live keyboard preview in Size and layout.
