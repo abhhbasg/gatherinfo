@@ -20,7 +20,7 @@ import com.metrowin.keyboard.theme.ColorMath
 import com.metrowin.keyboard.theme.KeyboardColors
 
 /** A flat button with an icon or a text, painted in the colours of the theme. */
-class IconButton(context: Context, private val icon: Icon?, private val text: String? = null) : View(context) {
+class IconButton(context: Context, private val icon: Icon?, var text: String? = null) : View(context) {
     var colors: KeyboardColors? = null
     var highlighted = false
     var onClick: (() -> Unit)? = null
@@ -35,10 +35,15 @@ class IconButton(context: Context, private val icon: Icon?, private val text: St
         if (down) { paint.color = ColorMath.withAlpha(c.text, 0x22); canvas.drawRect(0f, 0f, width.toFloat(), height.toFloat(), paint) }
         paint.color = if (highlighted) c.accent else c.text
         if (icon != null) Icons.draw(canvas, icon, width / 2f, height / 2f, minOf(width, height) * 0.46f, paint)
-        else if (text != null) {
-            paint.textSize = height * 0.42f
+        else text?.let { t ->
+            paint.typeface = Fonts.regular(context)
+            paint.textSize = height * 0.40f
+            // Long labels shrink to fit the button.
+            val room = width * 0.92f
+            val w = paint.measureText(t)
+            if (w > room) paint.textSize *= room / w
             val m = paint.fontMetrics
-            canvas.drawText(text, width / 2f, height / 2f - (m.ascent + m.descent) / 2f, paint)
+            canvas.drawText(t, width / 2f, height / 2f - (m.ascent + m.descent) / 2f, paint)
         }
     }
 

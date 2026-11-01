@@ -5,7 +5,7 @@ import android.graphics.Paint
 import android.graphics.Path
 import android.graphics.RectF
 
-enum class Icon { SHIFT, SHIFT_LOCK, BACKSPACE, ENTER, SEARCH, SEND, ARROW_RIGHT, CHECK, EMOJI, GLOBE, MIC, CLIPBOARD, GIF, SETTINGS, GRID, CLOSE, PIN, PLUS, TRASH, IMAGE }
+enum class Icon { SHIFT, SHIFT_LOCK, BACKSPACE, ENTER, SEARCH, SEND, ARROW_RIGHT, CHECK, EMOJI, GLOBE, MIC, CLIPBOARD, GIF, SETTINGS, GRID, CLOSE, PIN, PLUS, TRASH, IMAGE, ELLIPSIS, SWAP, HELP, TRANSLATE, COPY, CHEVRON_LEFT, CHEVRON_RIGHT }
 
 /** The icons of the keyboard, drawn with paths in a -1..1 square so they are crisp at any size and take the colour of the theme. */
 object Icons {
@@ -145,6 +145,52 @@ object Icons {
                 c.drawLine(-0.25f, -0.85f, 0.25f, -0.85f, paint)
                 path.reset(); path.moveTo(-0.6f, -0.55f); path.lineTo(-0.5f, 0.9f); path.lineTo(0.5f, 0.9f); path.lineTo(0.6f, -0.55f)
                 c.drawPath(path, paint)
+            }
+            Icon.ELLIPSIS -> {
+                // The three dots of the Windows Phone app bar.
+                paint.style = Paint.Style.FILL
+                for (x in listOf(-0.62f, 0f, 0.62f)) c.drawCircle(x, 0f, 0.19f, paint)
+            }
+            Icon.SWAP -> {
+                paint.style = Paint.Style.STROKE
+                c.drawLine(-0.8f, -0.35f, 0.8f, -0.35f, paint)
+                path.reset(); path.moveTo(0.3f, -0.8f); path.lineTo(0.8f, -0.35f); path.lineTo(0.3f, 0.1f); c.drawPath(path, paint)
+                c.drawLine(0.8f, 0.4f, -0.8f, 0.4f, paint)
+                path.reset(); path.moveTo(-0.3f, -0.05f); path.lineTo(-0.8f, 0.4f); path.lineTo(-0.3f, 0.85f); c.drawPath(path, paint)
+            }
+            Icon.HELP -> {
+                paint.style = Paint.Style.STROKE
+                c.drawCircle(0f, 0f, 0.85f, paint)
+                paint.style = Paint.Style.FILL
+                val old = paint.textSize; val align = paint.textAlign
+                paint.textAlign = Paint.Align.CENTER; paint.textSize = 1.3f; paint.isFakeBoldText = true
+                c.drawText("?", 0f, 0.45f, paint)
+                paint.isFakeBoldText = false; paint.textSize = old; paint.textAlign = align
+            }
+            Icon.TRANSLATE -> {
+                // Two speech bubbles, one with an A and one with a second letter: "from one language to another".
+                paint.style = Paint.Style.STROKE
+                rect.set(-0.95f, -0.85f, 0.25f, 0.25f); c.drawRoundRect(rect, 0.15f, 0.15f, paint)
+                rect.set(-0.25f, -0.25f, 0.95f, 0.85f); c.drawRoundRect(rect, 0.15f, 0.15f, paint)
+                paint.style = Paint.Style.FILL
+                val old = paint.textSize; val align = paint.textAlign
+                paint.textAlign = Paint.Align.CENTER; paint.textSize = 0.8f; paint.isFakeBoldText = true
+                c.drawText("A", -0.35f, -0.05f, paint); c.drawText("B", 0.35f, 0.65f, paint)
+                paint.isFakeBoldText = false; paint.textSize = old; paint.textAlign = align
+            }
+            Icon.COPY -> {
+                paint.style = Paint.Style.STROKE
+                rect.set(-0.35f, -0.35f, 0.85f, 0.85f); c.drawRoundRect(rect, 0.12f, 0.12f, paint)
+                path.reset(); path.moveTo(-0.55f, 0.35f); path.lineTo(-0.85f, 0.35f); path.lineTo(-0.85f, -0.85f); path.lineTo(0.35f, -0.85f); path.lineTo(0.35f, -0.55f)
+                c.drawPath(path, paint)
+            }
+            Icon.CHEVRON_LEFT -> {
+                paint.style = Paint.Style.STROKE
+                path.reset(); path.moveTo(0.35f, -0.75f); path.lineTo(-0.4f, 0f); path.lineTo(0.35f, 0.75f); c.drawPath(path, paint)
+            }
+            Icon.CHEVRON_RIGHT -> {
+                paint.style = Paint.Style.STROKE
+                path.reset(); path.moveTo(-0.35f, -0.75f); path.lineTo(0.4f, 0f); path.lineTo(-0.35f, 0.75f); c.drawPath(path, paint)
             }
             Icon.IMAGE -> {
                 paint.style = Paint.Style.STROKE

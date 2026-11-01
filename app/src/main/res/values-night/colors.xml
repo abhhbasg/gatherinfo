@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="metro_bg">#000000</color>
+    <color name="metro_fg">#FFFFFF</color>
+    <color name="metro_subtle">#999999</color>
+    <color name="metro_tile">#2B2B2B</color>
+</resources>

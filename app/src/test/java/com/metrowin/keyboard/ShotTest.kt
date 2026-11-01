@@ -2,7 +2,16 @@ package com.metrowin.keyboard
 
 import android.graphics.Bitmap
 import android.graphics.Canvas
+import android.os.SystemClock
+import android.view.MotionEvent
 import android.view.View
+import android.widget.LinearLayout
+import com.metrowin.keyboard.translate.Translator
+import com.metrowin.keyboard.ui.Slot
+import com.metrowin.keyboard.ui.SuggestionBar
+import com.metrowin.keyboard.ui.TranslatePanel
+import com.metrowin.keyboard.ui.TutorialPanel
+import com.metrowin.keyboard.tutorial.Tutorial
 import androidx.test.core.app.ApplicationProvider
 import com.metrowin.keyboard.layout.KeyboardBuilder
 import com.metrowin.keyboard.theme.KeyboardTheme
@@ -35,5 +44,45 @@ class ShotTest {
             File(out, "$style-$mode.png").outputStream().use { bmp.compress(Bitmap.CompressFormat.PNG, 100, it) }
             assertTrue(bmp.getPixel(5, 5) != 0 || bmp.getPixel(540, 100) != 0)
         }
+    }
+
+    private fun render(v: View, w: Int, h: Int, file: File) {
+        v.measure(View.MeasureSpec.makeMeasureSpec(w, View.MeasureSpec.EXACTLY), View.MeasureSpec.makeMeasureSpec(h, View.MeasureSpec.EXACTLY))
+        v.layout(0, 0, w, h)
+        val bmp = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888)
+        v.draw(Canvas(bmp))
+        file.outputStream().use { bmp.compress(Bitmap.CompressFormat.PNG, 100, it) }
+    }
+
+    @Test fun drawsTheWholeKeyboardAndPanels() {
+        val app = ApplicationProvider.getApplicationContext<KeyboardApp>()
+        val out = File("build/shots").apply { mkdirs() }
+        for (style in listOf("classic", "glass", "droid")) {
+            app.prefs.sp.edit().clear().putString(K.THEME_STYLE, style).putString(K.THEME_MODE, "dark").commit()
+            val c = KeyboardTheme.resolve(app, app.prefs, true, null)
+            val kb = KeyboardView(app)
+            kb.setColors(c)
+            kb.setPage(KeyboardBuilder.letters(app.layouts.get("it")!!, false, true, true))
+            kb.setLanguageName("Italiano"); kb.setShift(0)
+            val bar = SuggestionBar(app).also { it.setColors(c); it.setSlots(listOf(Slot("caio", literal = true), Slot("ciao", best = true), Slot("cairo"))); it.setBadge(true) }
+            val col = LinearLayout(app).apply { orientation = LinearLayout.VERTICAL }
+            col.addView(bar, LinearLayout.LayoutParams(1080, 150))
+            col.addView(kb, LinearLayout.LayoutParams(1080, 900))
+            col.measure(View.MeasureSpec.makeMeasureSpec(1080, View.MeasureSpec.EXACTLY), View.MeasureSpec.makeMeasureSpec(1050, View.MeasureSpec.EXACTLY))
+            col.layout(0, 0, 1080, 1050)
+            // Finger down on "g": the colour preview appears above it.
+            val g = kb.letterCenters().getValue('g')
+            val t = SystemClock.uptimeMillis()
+            kb.dispatchTouchEvent(MotionEvent.obtain(t, t, MotionEvent.ACTION_DOWN, g.x, g.y, 0))
+            val bmp = Bitmap.createBitmap(1080, 1050, Bitmap.Config.ARGB_8888)
+            col.draw(Canvas(bmp))
+            File(out, "full-$style.png").outputStream().use { bmp.compress(Bitmap.CompressFormat.PNG, 100, it) }
+        }
+        app.prefs.sp.edit().clear().putString(K.THEME_STYLE, "classic").commit()
+        val c = KeyboardTheme.resolve(app, app.prefs, true, null)
+        val tut = TutorialPanel(app).also { it.setColors(c); it.open(Tutorial.startIndex(1)) }
+        render(tut, 1080, 760, File(out, "panel-tutorial.png"))
+        val tr = TranslatePanel(app, Translator(app.prefs), app.prefs).also { it.setColors(c) }
+        render(tr, 1080, 760, File(out, "panel-translate.png"))
     }
 }

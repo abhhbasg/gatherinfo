@@ -1,0 +1,2 @@
+Corretta l'ultima riga nascosta dietro la barra di navigazione. Corretti gli accenti scritti al posto delle lettere con un tocco lento.
+Nuovo aspetto Windows Phone, tasto rapido sulla barra, traduzione, tutorial e guida all'attivazione.

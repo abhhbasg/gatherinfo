@@ -1,3 +1,5 @@
+import java.util.Properties
+
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
@@ -12,15 +14,35 @@ android {
         applicationId = "com.metrowin.keyboard"
         minSdk = 26
         targetSdk = 35
-        versionCode = 1
-        versionName = "0.1.0"
+        versionCode = 2
+        versionName = "0.2.0"
+    }
+
+    // The key of the official release comes from keystore.properties in the root of the project (never committed): storeFile,
+    // storePassword, keyAlias and keyPassword. Without it the release build is unsigned, which is what F-Droid wants; for a test
+    // build that installs over the debug build, pass -PsignWithDebugKey=true.
+    val keystoreFile = rootProject.file("keystore.properties")
+    val official = keystoreFile.takeIf { it.exists() }?.let { file ->
+        val keys = Properties().apply { file.inputStream().use { load(it) } }
+        signingConfigs.create("official") {
+            storeFile = rootProject.file(keys.getProperty("storeFile"))
+            storePassword = keys.getProperty("storePassword")
+            keyAlias = keys.getProperty("keyAlias")
+            keyPassword = keys.getProperty("keyPassword")
+        }
     }
 
     buildTypes {
         release {
-            isMinifyEnabled = true
-            isShrinkResources = true
-            proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
+            // Not shrunk: the settings screens are created by name from XML, and a keyboard that fails on a renamed class is worth
+            // more than a smaller file (the app is a few MB).
+            isMinifyEnabled = false
+            isDebuggable = false
+            signingConfig = when {
+                official != null -> official
+                providers.gradleProperty("signWithDebugKey").orNull == "true" -> signingConfigs.getByName("debug")
+                else -> null
+            }
         }
     }
 

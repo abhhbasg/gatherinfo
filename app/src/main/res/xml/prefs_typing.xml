@@ -7,4 +7,6 @@
     <SwitchPreferenceCompat android:key="auto_caps" android:title="@string/pref_auto_caps_title" android:summary="@string/pref_auto_caps_summary" android:defaultValue="true" />
     <SwitchPreferenceCompat android:key="swipe_typing" android:title="@string/pref_swipe_title" android:summary="@string/pref_swipe_summary" android:defaultValue="true" />
     <SwitchPreferenceCompat android:key="space_cursor" android:title="@string/pref_space_cursor_title" android:summary="@string/pref_space_cursor_summary" android:defaultValue="true" />
+    <SwitchPreferenceCompat android:key="key_preview" android:title="@string/pref_key_preview_title" android:summary="@string/pref_key_preview_summary" android:defaultValue="true" />
+    <ListPreference android:key="quick_tool" android:title="@string/pref_quick_tool_title" android:entries="@array/quick_tool_names" android:entryValues="@array/quick_tool_values" android:defaultValue="clipboard" app:useSimpleSummaryProvider="true" />
 </PreferenceScreen>

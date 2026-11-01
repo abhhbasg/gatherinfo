@@ -1,6 +1,7 @@
 package com.metrowin.keyboard.settings
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.ComponentName
 import android.content.Intent
@@ -18,7 +19,14 @@ import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
+import android.widget.TextView
 import androidx.preference.Preference
+import androidx.preference.PreferenceCategory
+import androidx.preference.PreferenceGroupAdapter
+import androidx.preference.PreferenceScreen
+import androidx.preference.PreferenceViewHolder
+import androidx.recyclerview.widget.RecyclerView
+import com.metrowin.keyboard.ui.Fonts
 import androidx.preference.PreferenceFragmentCompat
 import com.metrowin.keyboard.K
 import com.metrowin.keyboard.KeyboardApp
@@ -31,6 +39,24 @@ import java.util.concurrent.Executors
 
 /** Shared plumbing of the settings screens: a preference file, a title, and quick access to the app. */
 abstract class BaseFragment(private val xml: Int, private val title: Int) : PreferenceFragmentCompat() {
+    /** Rows in the Windows Phone manner: big light titles, small grey summaries, accent-coloured section names. */
+    @SuppressLint("RestrictedApi")
+    override fun onCreateAdapter(preferenceScreen: PreferenceScreen): RecyclerView.Adapter<*> = object : PreferenceGroupAdapter(preferenceScreen) {
+        override fun onBindViewHolder(holder: PreferenceViewHolder, position: Int) {
+            super.onBindViewHolder(holder, position)
+            val ctx = holder.itemView.context
+            val item = getItem(position)
+            val titleView = holder.findViewById(android.R.id.title) as? TextView
+            val summaryView = holder.findViewById(android.R.id.summary) as? TextView
+            if (item is PreferenceCategory) {
+                titleView?.apply { text = text.toString().uppercase(); typeface = Fonts.semibold(ctx); textSize = 13f; setTextColor(MetroUi.accent(ctx)) }
+            } else {
+                titleView?.apply { typeface = Fonts.light(ctx); textSize = 22f; setTextColor(MetroUi.fg(ctx)) }
+                summaryView?.apply { typeface = Fonts.regular(ctx); textSize = 14f; setTextColor(MetroUi.subtle(ctx)) }
+            }
+        }
+    }
+
     protected val app get() = KeyboardApp.of(requireContext())
     private val io = Executors.newSingleThreadExecutor()
 
@@ -41,7 +67,7 @@ abstract class BaseFragment(private val xml: Int, private val title: Int) : Pref
 
     abstract fun setup()
 
-    override fun onResume() { super.onResume(); requireActivity().setTitle(title); (requireActivity() as? androidx.appcompat.app.AppCompatActivity)?.supportActionBar?.setDisplayHomeAsUpEnabled(parentFragmentManager.backStackEntryCount > 0) }
+    override fun onResume() { super.onResume(); requireActivity().setTitle(title) }
 
     protected fun click(key: String, block: () -> Unit) {
         findPreference<Preference>(key)?.setOnPreferenceClickListener { block(); true }
@@ -69,6 +95,8 @@ class RootFragment : BaseFragment(R.xml.prefs_root, R.string.app_name) {
         click("setup_enable") { startActivity(Intent(Settings.ACTION_INPUT_METHOD_SETTINGS)) }
         click("setup_select") { (requireContext().getSystemService(InputMethodManager::class.java)).showInputMethodPicker() }
         click("setup_try") { startActivity(Intent(requireContext(), TestActivity::class.java)) }
+        click("setup_guide") { startActivity(Intent(requireContext(), OnboardingActivity::class.java)) }
+        click("setup_tutorial") { startActivity(Intent(requireContext(), TutorialActivity::class.java)) }
     }
 
     override fun onResume() {
@@ -79,6 +107,7 @@ class RootFragment : BaseFragment(R.xml.prefs_root, R.string.app_name) {
         val active = Settings.Secure.getString(requireContext().contentResolver, Settings.Secure.DEFAULT_INPUT_METHOD)?.startsWith("$pkg/") == true
         findPreference<Preference>("setup_enable")?.summary = getString(if (enabled) R.string.setup_enabled else R.string.setup_disabled)
         findPreference<Preference>("setup_select")?.summary = getString(if (active) R.string.setup_active else R.string.setup_inactive)
+        findPreference<Preference>("setup_tutorial")?.summary = getString(if (com.metrowin.keyboard.tutorial.Tutorial.hasNew(app.prefs.tutorialSeen)) R.string.setup_tutorial_new else R.string.setup_tutorial_summary)
     }
 }
 
@@ -314,5 +343,18 @@ class AboutFragment : BaseFragment(R.xml.prefs_about, R.string.screen_about) {
     override fun setup() {
         val v = runCatching { requireContext().packageManager.getPackageInfo(requireContext().packageName, 0).versionName }.getOrNull().orEmpty()
         findPreference<Preference>("about_version")?.summary = v
+    }
+}
+
+class TranslateFragment : BaseFragment(R.xml.prefs_translate, R.string.screen_translate) {
+    override fun setup() {
+        findPreference<Preference>("translate_provider")?.setOnPreferenceChangeListener { _, v -> showFor(v as String); true }
+        showFor(app.prefs.translateProvider)
+    }
+
+    private fun showFor(code: String) {
+        val p = com.metrowin.keyboard.translate.Provider.from(code)
+        findPreference<Preference>("translate_key")?.isVisible = p.needsKey || p == com.metrowin.keyboard.translate.Provider.LIBRE
+        findPreference<Preference>("translate_url")?.isVisible = p.needsUrl
     }
 }

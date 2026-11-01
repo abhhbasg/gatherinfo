@@ -70,6 +70,7 @@ class KeyboardView(context: Context) : View(context) {
     private var swipeEnabled = true
     private var spaceCursorEnabled = true
     private var showHints = true
+    private var preview = true
 
     private val keyPaint = Paint(Paint.ANTI_ALIAS_FLAG)
     private val strokePaint = Paint(Paint.ANTI_ALIAS_FLAG).apply { style = Paint.Style.STROKE }
@@ -105,7 +106,8 @@ class KeyboardView(context: Context) : View(context) {
     fun setLanguageName(name: String) { languageName = name; invalidate() }
     fun setEnterAction(icon: Icon, label: String?) { enterIcon = icon; enterLabel = label; invalidate() }
     fun setBackgroundImage(b: Bitmap?, dim: Int) { backgroundBitmap = b; bgDim = dim; invalidate() }
-    fun setBehavior(longPress: Boolean, longPressMs: Int, swipe: Boolean, spaceCursor: Boolean, hints: Boolean) {
+    fun setBehavior(longPress: Boolean, longPressMs: Int, swipe: Boolean, spaceCursor: Boolean, hints: Boolean, preview: Boolean = true) {
+        this.preview = preview
         this.longPressEnabled = longPress; this.longPressMs = longPressMs.toLong(); this.swipeEnabled = swipe
         this.spaceCursorEnabled = spaceCursor; this.showHints = hints; invalidate()
     }
@@ -169,6 +171,7 @@ class KeyboardView(context: Context) : View(context) {
         val corner = dp(c.cornerDp)
         for (k in p.keys) drawKey(canvas, k, c, corner)
         drawPopup(canvas, c)
+        drawPreview(canvas, c)
         drawTrail(canvas, c)
     }
 
@@ -195,7 +198,8 @@ class KeyboardView(context: Context) : View(context) {
             k.special -> c.special
             else -> c.key
         }
-        rect.set(k.left, k.top, k.right, k.bottom)
+        if (pressed) { val inset = minOf(k.width, k.height) * 0.05f; rect.set(k.left + inset, k.top + inset, k.right - inset, k.bottom - inset) }
+        else rect.set(k.left, k.top, k.right, k.bottom)
         keyPaint.color = fill
         canvas.drawRoundRect(rect, corner, corner, keyPaint)
         if (c.strokeDp > 0f && !pressed) {
@@ -232,9 +236,27 @@ class KeyboardView(context: Context) : View(context) {
 
     private fun drawLabel(canvas: Canvas, text: String, cx: Float, cy: Float, size: Float, color: Int, bold: Boolean) {
         textPaint.color = color; textPaint.textSize = size
-        textPaint.typeface = if (bold) Typeface.DEFAULT_BOLD else Typeface.DEFAULT
+        textPaint.typeface = if (bold) Fonts.semibold(context) else Fonts.light(context)
         val m = textPaint.fontMetrics
         canvas.drawText(text, cx, cy - (m.ascent + m.descent) / 2f, textPaint)
+    }
+
+    /** The big letter above the finger while a key is down, in the accent colour, as on Windows Phone. */
+    private fun drawPreview(canvas: Canvas, c: KeyboardColors) {
+        if (!preview) return
+        for (p in pointers.values) {
+            val k = p.key ?: continue
+            if (k.type != KeyType.CHAR || p.popupKey != null || p.swiping || k.label.isEmpty()) continue
+            val w = maxOf(k.width * 1.35f, dp(52f)); val h = k.height * 1.3f
+            var left = k.centerX - w / 2f
+            left = left.coerceIn(0f, maxOf(0f, width - w))
+            val top = maxOf(0f, k.top - h - dp(4f))
+            rect.set(left, top, left + w, top + h)
+            keyPaint.color = c.accent
+            canvas.drawRect(rect, keyPaint)
+            val label = if (shift != 0) k.label.uppercase() else k.label
+            drawLabel(canvas, label, rect.centerX(), rect.centerY(), h * 0.55f, c.onAccent, false)
+        }
     }
 
     // --- long-press bar ---------------------------------------------------------------------------------------------

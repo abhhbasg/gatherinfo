@@ -6,6 +6,7 @@
     <SeekBarPreference android:key="keyboard_width" android:title="@string/pref_width_title" android:summary="@string/pref_width_summary" android:defaultValue="100" android:max="100" app:min="55" app:seekBarIncrement="5" app:showSeekBarValue="true" />
     <ListPreference android:key="keyboard_align" android:title="@string/pref_align_title" android:entries="@array/align_names" android:entryValues="@array/align_values" android:defaultValue="center" app:useSimpleSummaryProvider="true" />
     <SeekBarPreference android:key="key_gap" android:title="@string/pref_gap_title" android:defaultValue="3" android:max="10" app:min="0" app:showSeekBarValue="true" />
-    <SwitchPreferenceCompat android:key="number_row" android:title="@string/pref_number_row_title" android:summary="@string/pref_number_row_summary" android:defaultValue="true" />
+    <SwitchPreferenceCompat android:key="number_row" android:title="@string/pref_number_row_title" android:summary="@string/pref_number_row_summary" android:defaultValue="false" />
     <SwitchPreferenceCompat android:key="key_hints" android:title="@string/pref_hints_title" android:summary="@string/pref_hints_summary" android:defaultValue="true" />
+    <SeekBarPreference android:key="bottom_padding" android:title="@string/pref_bottom_padding_title" android:summary="@string/pref_bottom_padding_summary" android:defaultValue="0" android:max="64" app:min="0" app:seekBarIncrement="2" app:showSeekBarValue="true" />
 </PreferenceScreen>

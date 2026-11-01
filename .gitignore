@@ -9,3 +9,4 @@ keystore.properties
 *.keystore
 captures/
 .cxx/
+app/build/shots/

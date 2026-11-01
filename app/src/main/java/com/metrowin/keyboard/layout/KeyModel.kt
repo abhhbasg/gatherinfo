@@ -46,6 +46,10 @@ class KeyboardPage(val rows: List<List<Key>>) {
 object KeyboardBuilder {
     private val digits = "1234567890".map { it.toString() }
 
+    /** The long-press bar of a key: the key's own character first (letting go without sliding types it), then the alternatives. */
+    private fun withBase(base: String, alternatives: List<String>): List<String> =
+        if (alternatives.isEmpty()) emptyList() else listOf(base) + alternatives.filter { it != base }
+
     val symbolPopups: Map<String, List<String>> = mapOf(
         "-" to listOf("–", "—", "•", "_"),
         "\"" to listOf("«", "»", "“", "”", "„"),
@@ -72,7 +76,7 @@ object KeyboardBuilder {
 
     fun letters(layout: LanguageLayout, showNumberRow: Boolean, showHints: Boolean, multiLanguage: Boolean): KeyboardPage {
         val rows = ArrayList<List<Key>>()
-        if (showNumberRow) rows += digits.map { d -> Key(KeyType.CHAR, d, popups = symbolPopups[d].orEmpty()) }
+        if (showNumberRow) rows += digits.map { d -> Key(KeyType.CHAR, d, popups = withBase(d, symbolPopups[d].orEmpty())) }
         layout.rows.forEachIndexed { index, letters ->
             val keys = ArrayList<Key>()
             val isLast = index == layout.rows.lastIndex && layout.rows.size >= 3
@@ -80,10 +84,10 @@ object KeyboardBuilder {
             letters.forEachIndexed { col, l ->
                 // With no number row, the first row carries the digits as hints and as the first long-press choice.
                 val digit = if (!showNumberRow && index == 0 && col < 10) digits[col] else null
-                val popups = buildList {
+                val popups = withBase(l, buildList {
                     if (digit != null) add(digit)
                     addAll(layout.longPress[l].orEmpty())
-                }
+                })
                 keys += Key(KeyType.CHAR, l, popups = popups, hint = if (showHints) digit else null)
             }
             if (isLast) keys += Key(KeyType.BACKSPACE, weight = 1.5f, special = true)
@@ -95,7 +99,7 @@ object KeyboardBuilder {
 
     fun symbols(page: Page, showNumberRow: Boolean): KeyboardPage {
         val rows = ArrayList<List<Key>>()
-        fun chars(s: String) = s.split(' ').map { c -> Key(KeyType.CHAR, c, popups = symbolPopups[c].orEmpty()) }
+        fun chars(s: String) = s.split(' ').map { c -> Key(KeyType.CHAR, c, popups = withBase(c, symbolPopups[c].orEmpty())) }
         if (page == Page.SYMBOLS_1) {
             rows += chars("1 2 3 4 5 6 7 8 9 0")
             rows += chars("@ # $ % & - + ( )")
@@ -111,7 +115,7 @@ object KeyboardBuilder {
 
     /** The pad for number and phone fields: big digits, the signs a phone number uses, no letters. */
     fun numbers(phone: Boolean): KeyboardPage {
-        fun chars(s: String) = s.split(' ').map { c -> Key(KeyType.CHAR, c, popups = symbolPopups[c].orEmpty()) }
+        fun chars(s: String) = s.split(' ').map { c -> Key(KeyType.CHAR, c, popups = withBase(c, symbolPopups[c].orEmpty())) }
         val rows = listOf(
             chars("1 2 3"), chars("4 5 6"), chars("7 8 9"),
             chars(if (phone) "+ 0 #" else ". 0 -") ,
@@ -124,9 +128,9 @@ object KeyboardBuilder {
         add(Key(toggleType, toggleLabel, 1.5f, special = true))
         add(Key(KeyType.EMOJI, "☺", 1f, special = true))
         if (multiLanguage) add(Key(KeyType.LANGUAGE, "", 1f, special = true))
-        add(Key(KeyType.CHAR, ",", 0.8f, popups = symbolPopups[","].orEmpty()))
+        add(Key(KeyType.CHAR, ",", 0.8f, popups = withBase(",", symbolPopups[","].orEmpty())))
         add(Key(KeyType.SPACE, "", if (multiLanguage) 3.2f else 4.2f))
-        add(Key(KeyType.CHAR, ".", 0.8f, popups = symbolPopups["."].orEmpty()))
+        add(Key(KeyType.CHAR, ".", 0.8f, popups = withBase(".", symbolPopups["."].orEmpty())))
         add(Key(KeyType.ENTER, "", 1.5f, special = true))
     }
 }

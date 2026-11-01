@@ -47,6 +47,8 @@
             </intent-filter>
         </activity>
 
+        <activity android:name=".settings.TutorialActivity" android:exported="false" />
+        <activity android:name=".settings.OnboardingActivity" android:exported="false" android:windowSoftInputMode="adjustResize" />
         <activity android:name=".settings.TestActivity" android:exported="false" android:windowSoftInputMode="stateAlwaysVisible|adjustResize" />
 
         <!-- Transparent helper: asks for the microphone and picks a picture, because a keyboard cannot show those dialogs itself. -->

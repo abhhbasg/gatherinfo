@@ -1,12 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="metro_cyan">#1BA1E2</color>
-    <color name="ic_background">#1BA1E2</color>
-
-    <style name="Theme.MetroWinKeyboard" parent="Theme.AppCompat.DayNight.DarkActionBar">
+    <!-- Flat, black or white, no action bar: the screens draw their own big light title, like Windows Phone. -->
+    <style name="Theme.MetroWinKeyboard" parent="Theme.AppCompat.DayNight.NoActionBar">
         <item name="colorPrimary">@color/metro_cyan</item>
-        <item name="colorPrimaryDark">#0F6E9C</item>
+        <item name="colorPrimaryDark">@color/metro_bg</item>
         <item name="colorAccent">@color/metro_cyan</item>
+        <item name="android:windowBackground">@color/metro_bg</item>
+        <item name="android:statusBarColor">@color/metro_bg</item>
+        <item name="android:navigationBarColor">@color/metro_bg</item>
+        <item name="android:windowLightStatusBar">false</item>
+        <item name="alertDialogTheme">@style/Theme.MetroWinKeyboard.Dialog</item>
+    </style>
+
+    <style name="Theme.MetroWinKeyboard.Dialog" parent="Theme.AppCompat.DayNight.Dialog.Alert">
+        <item name="colorAccent">@color/metro_cyan</item>
+        <item name="android:windowBackground">@color/metro_tile</item>
     </style>
 
     <style name="Theme.MetroWinKeyboard.Transparent" parent="Theme.AppCompat.DayNight.NoActionBar">

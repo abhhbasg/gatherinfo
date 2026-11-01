@@ -69,6 +69,16 @@ object K {
     const val EMOJI_RECENT = "emoji_recent"
     const val SOUND_FILE = "sound_file_set"
     const val BG_IMAGE_SET = "bg_image_set"
+    const val QUICK_TOOL = "quick_tool"
+    const val KEY_PREVIEW = "key_preview"
+    const val BOTTOM_PADDING = "bottom_padding"
+    const val ONBOARDING_DONE = "onboarding_done"
+    const val TUTORIAL_SEEN = "tutorial_seen_version"
+    const val TRANSLATE_PROVIDER = "translate_provider"
+    const val TRANSLATE_KEY = "translate_key"
+    const val TRANSLATE_URL = "translate_url"
+    const val TRANSLATE_SOURCE = "translate_source"
+    const val TRANSLATE_TARGET = "translate_target"
     const val PICTURE_ACCENT = "picture_accent"
     const val USE_PICTURE_ACCENT = "use_picture_accent"
 }
@@ -108,7 +118,23 @@ class Prefs(context: Context) {
     val keyGap get() = i(K.KEY_GAP, 3)
     val keyboardWidth get() = i(K.KEYBOARD_WIDTH, 100)
     val keyboardAlign get() = s(K.KEYBOARD_ALIGN, "center")
-    val numberRow get() = b(K.NUMBER_ROW, true)
+    val numberRow get() = b(K.NUMBER_ROW, false)
+    val quickTool get() = s(K.QUICK_TOOL, "clipboard")
+    val keyPreview get() = b(K.KEY_PREVIEW, true)
+    val bottomPadding get() = i(K.BOTTOM_PADDING, 0)
+    val onboardingDone get() = b(K.ONBOARDING_DONE, false)
+    var tutorialSeen: Int
+        get() = i(K.TUTORIAL_SEEN, 0)
+        set(v) { sp.edit().putInt(K.TUTORIAL_SEEN, v).apply() }
+    val translateProvider get() = s(K.TRANSLATE_PROVIDER, "google")
+    val translateKey get() = s(K.TRANSLATE_KEY, "").trim()
+    val translateUrl get() = s(K.TRANSLATE_URL, "").trim()
+    var translateSource: String
+        get() = s(K.TRANSLATE_SOURCE, "auto")
+        set(v) { putString(K.TRANSLATE_SOURCE, v) }
+    var translateTarget: String
+        get() = sp.getString(K.TRANSLATE_TARGET, null) ?: (languages.map { it.substringBefore('-') }.firstOrNull { it != java.util.Locale.getDefault().language } ?: "en")
+        set(v) { putString(K.TRANSLATE_TARGET, v) }
     val keyHints get() = b(K.KEY_HINTS, true)
 
     val doubleSpace get() = b(K.DOUBLE_SPACE, true)

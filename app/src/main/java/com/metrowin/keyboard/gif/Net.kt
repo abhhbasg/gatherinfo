@@ -14,6 +14,27 @@ object Net {
 
     fun getString(url: String): String = String(getBytes(url, MAX_JSON), Charsets.UTF_8)
 
+    /** A request with a body and headers (translation services). The answer is read as text, with the same limits as the rest. */
+    fun request(method: String, url: String, body: ByteArray?, contentType: String?, headers: Map<String, String> = emptyMap()): String {
+        require(url.startsWith("https://")) { "Only https addresses are used" }
+        val c = URL(url).openConnection() as HttpURLConnection
+        try {
+            c.requestMethod = method
+            c.connectTimeout = 8000; c.readTimeout = 15000; c.instanceFollowRedirects = true
+            c.setRequestProperty("User-Agent", "MetroWinKeyboard")
+            headers.forEach { (k, v) -> c.setRequestProperty(k, v) }
+            if (body != null) {
+                c.doOutput = true
+                contentType?.let { c.setRequestProperty("Content-Type", it) }
+                c.outputStream.use { it.write(body) }
+            }
+            if (c.responseCode !in 200..299) throw IOException("HTTP ${c.responseCode}")
+            val out = ByteArrayOutputStream()
+            c.inputStream.use { copyLimited(it, out, MAX_JSON) }
+            return String(out.toByteArray(), Charsets.UTF_8)
+        } finally { c.disconnect() }
+    }
+
     fun getBytes(url: String, limit: Int): ByteArray {
         open(url).use { s ->
             val out = ByteArrayOutputStream()

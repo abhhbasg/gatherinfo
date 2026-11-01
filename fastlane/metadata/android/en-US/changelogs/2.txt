@@ -1,0 +1,2 @@
+Fixed the bottom row hidden behind the navigation bar. Fixed accents typed instead of letters on a slow press.
+New Windows Phone look, quick button on the bar, translation, tutorial and guided set-up.
