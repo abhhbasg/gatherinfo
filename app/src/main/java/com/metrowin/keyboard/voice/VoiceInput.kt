@@ -59,9 +59,14 @@ class VoiceInput(private val context: Context, private val prefs: Prefs, private
             putExtra(RecognizerIntent.EXTRA_PARTIAL_RESULTS, true)
             putExtra(RecognizerIntent.EXTRA_PREFER_OFFLINE, prefs.voiceOffline)
             putExtra(RecognizerIntent.EXTRA_CALLING_PACKAGE, context.packageName)
+            // A pause to think is not the end of the text. Some recognisers ignore these; then "keep listening" starts the next phrase.
+            putExtra(RecognizerIntent.EXTRA_SPEECH_INPUT_COMPLETE_SILENCE_LENGTH_MILLIS, SILENCE_MS)
+            putExtra(RecognizerIntent.EXTRA_SPEECH_INPUT_POSSIBLY_COMPLETE_SILENCE_LENGTH_MILLIS, SILENCE_MS)
         }
         r.startListening(intent)
     }
+
+    private companion object { const val SILENCE_MS = 4000L }
 
     private val listener = object : RecognitionListener {
         override fun onReadyForSpeech(params: Bundle?) {}

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
     <Preference android:key="voice_permission" android:title="@string/pref_voice_permission_title" android:summary="@string/pref_voice_permission_summary" />
-    <SwitchPreferenceCompat android:key="voice_continuous" android:title="@string/pref_voice_continuous_title" android:summary="@string/pref_voice_continuous_summary" android:defaultValue="false" />
+    <SwitchPreferenceCompat android:key="voice_continuous" android:title="@string/pref_voice_continuous_title" android:summary="@string/pref_voice_continuous_summary" android:defaultValue="true" />
     <SwitchPreferenceCompat android:key="voice_offline" android:title="@string/pref_voice_offline_title" android:summary="@string/pref_voice_offline_summary" android:defaultValue="false" />
 </PreferenceScreen>

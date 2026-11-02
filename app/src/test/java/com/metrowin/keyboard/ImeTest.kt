@@ -85,6 +85,26 @@ class ImeTest {
         assertEquals("ciao", text)
     }
 
+    @Test fun heardTextIsWrittenInTheFieldAsItComes() {
+        val v = ime.voiceCallbacks
+        v.onPartial("ciao co"); idle()
+        assertEquals("ciao co", text.lowercase())
+        v.onPartial("ciao come"); idle()
+        assertEquals("ciao come", text.lowercase())
+        v.onResult("ciao come stai"); idle()
+        assertEquals("ciao come stai ", text.lowercase())
+        // The next phrase goes on after it.
+        v.onPartial("bene"); v.onResult("bene"); idle()
+        assertEquals("ciao come stai bene ", text.lowercase())
+    }
+
+    @Test fun aKeyKeepsWhatWasHeardAndTypesAfterIt() {
+        ime.voiceCallbacks.onPartial("ciao"); idle()
+        ime.onPress(Key(KeyType.CHAR, "x"))
+        type("x")
+        assertEquals("ciaox", text.lowercase())
+    }
+
     @Test fun knownWordsAreLeftAlone() {
         type("casa ")
         assertEquals("casa ", text)

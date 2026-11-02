@@ -174,7 +174,7 @@ class Prefs(context: Context) {
     val gifLinkFallback get() = b(K.GIF_LINK_FALLBACK, true)
     val gifRating get() = s(K.GIF_RATING, "pg-13")
 
-    val voiceContinuous get() = b(K.VOICE_CONTINUOUS, false)
+    val voiceContinuous get() = b(K.VOICE_CONTINUOUS, true)
     val voiceOffline get() = b(K.VOICE_OFFLINE, false)
 
     var emojiRecent: List<String>

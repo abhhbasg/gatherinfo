@@ -421,7 +421,10 @@ open class MetroWinIME : InputMethodService(), KeyboardListener, SuggestionBar.L
 
     // --- keys -------------------------------------------------------------------------------------------------------
 
-    override fun onPress(key: Key) = feedback.press(key.type)
+    override fun onPress(key: Key) {
+        endVoiceText()
+        feedback.press(key.type)
+    }
 
     override fun onText(key: Key, text: String) {
         lastSwipe = null
@@ -633,6 +636,7 @@ open class MetroWinIME : InputMethodService(), KeyboardListener, SuggestionBar.L
     }
 
     override fun onSlot(slot: Slot) {
+        endVoiceText()
         val ic = currentInputConnection ?: return
         val swipe = lastSwipe
         if (swipe != null && !slot.literal) {
@@ -903,18 +907,23 @@ open class MetroWinIME : InputMethodService(), KeyboardListener, SuggestionBar.L
         if (voice.isActive) voice.stop() else { finishWord(false); voice.start(currentLayout().locale.toLanguageTag()) }
     }
 
-    private val voiceCallbacks = object : VoiceInput.Callbacks {
+    internal val voiceCallbacks = object : VoiceInput.Callbacks {
         override fun onListening(on: Boolean) {
+            if (!on) endVoiceText()
             bar?.setVoiceActive(on)
             bar?.setStatus(if (on) getString(R.string.voice_listening) else null)
         }
-        override fun onPartial(text: String) { bar?.setStatus(text) }
+        // What is heard is written in the field as it comes, as the text being composed; the bar only says that it listens.
+        override fun onPartial(text: String) {
+            val ic = currentInputConnection ?: return
+            if (!voiceText) startVoiceText(ic, text)
+            ic.setComposingText(voiceLead + voiceCase(text), 1)
+        }
         override fun onResult(text: String) {
             val ic = currentInputConnection ?: return
-            val t = if (shift != 0 || text.firstOrNull()?.isLowerCase() == true && isSentenceStart()) text.replaceFirstChar { it.titlecase(currentLayout().locale) } else text
-            val before = ic.getTextBeforeCursor(1, 0)
-            val lead = if (!before.isNullOrEmpty() && !before.last().isWhitespace()) " " else ""
-            ic.commitText("$lead$t ", 1)
+            if (!voiceText) startVoiceText(ic, text)
+            ic.commitText(voiceLead + voiceCase(text) + " ", 1)
+            voiceText = false
             if (shift == 1) setShift(0)
             refreshContext(); updateShiftFromCursor()
             bar?.setStatus(if (voice.isActive) getString(R.string.voice_listening) else null)
@@ -925,6 +934,27 @@ open class MetroWinIME : InputMethodService(), KeyboardListener, SuggestionBar.L
         }
         override fun onUnavailable() { Toast.makeText(this@MetroWinIME, R.string.voice_unavailable, Toast.LENGTH_LONG).show() }
         override fun onError(code: Int) { Toast.makeText(this@MetroWinIME, getString(R.string.voice_error, code), Toast.LENGTH_SHORT).show() }
+    }
+
+    private var voiceText = false
+    private var voiceLead = ""
+    private var voiceCapital = false
+
+    /** Decides, before the first word of a phrase is written, whether it needs a space before it and a capital. */
+    private fun startVoiceText(ic: android.view.inputmethod.InputConnection, text: String) {
+        val before = ic.getTextBeforeCursor(1, 0)
+        voiceLead = if (!before.isNullOrEmpty() && !before.last().isWhitespace()) " " else ""
+        voiceCapital = shift != 0 || text.firstOrNull()?.isLowerCase() == true && isSentenceStart()
+        voiceText = true
+    }
+
+    private fun voiceCase(text: String) = if (voiceCapital) text.replaceFirstChar { it.titlecase(currentLayout().locale) } else text
+
+    /** A key, a suggestion or the end of dictation arrives: what was heard so far stays in the field as normal text. */
+    private fun endVoiceText() {
+        if (!voiceText) return
+        voiceText = false
+        currentInputConnection?.finishComposingText()
     }
 
     private fun isSentenceStart(): Boolean {
