@@ -20,12 +20,13 @@ enum class Tool(val code: String, val icon: Icon) {
 }
 
 /** One of the three places of the bar. [best] is the word that space will insert; [literal] is exactly what was typed. */
-data class Slot(val text: String, val best: Boolean = false, val literal: Boolean = false, val phrase: Boolean = false)
+data class Slot(val text: String, val best: Boolean = false, val literal: Boolean = false, val phrase: Boolean = false, val emoji: Boolean = false)
 
 /**
  * The strip above the keys, laid out like an app bar: the three dots on the left open the toolbox, the middle holds three
  * suggestions (or the tools, when the toolbox is open), and on the right a quick button goes straight to one tool (the clipboard
- * by default), with a dot when something new was copied. Also shows a short status text (what the microphone hears, a GIF search).
+ * by default), with a dot when something new was copied. Also shows a short status text (a GIF search, "listening"). With more than
+ * three slots (emoji found by ":dog") the middle is a row that slides sideways.
  */
 class SuggestionBar(context: Context) : View(context) {
     interface Listener {
@@ -42,13 +43,19 @@ class SuggestionBar(context: Context) : View(context) {
     private var quick = Tool.CLIPBOARD
     private var badge = false
     private var pressedIndex = NONE
+    private var scroll = 0f
+    private var scrollAtDown = 0f
+    private var downX = 0f
+    private var dragging = false
+    private val slop = android.view.ViewConfiguration.get(context).scaledTouchSlop
     private val paint = Paint(Paint.ANTI_ALIAS_FLAG).apply { textAlign = Paint.Align.CENTER }
     private val fill = Paint(Paint.ANTI_ALIAS_FLAG)
     private val icon = Paint(Paint.ANTI_ALIAS_FLAG)
     private val tools = Tool.entries
 
     fun setColors(c: KeyboardColors) { colors = c; invalidate() }
-    fun setSlots(s: List<Slot?>) { slots = s; if (!toolsOpen) invalidate() }
+    fun setSlots(s: List<Slot?>) { if (s != slots) scroll = 0f; slots = s; if (!toolsOpen) invalidate() }
+    internal fun slotsForTest() = slots
     fun setStatus(text: String?) { status = text; invalidate() }
     fun setVoiceActive(on: Boolean) { voiceActive = on; invalidate() }
     fun setQuickTool(t: Tool) { if (quick != t) { quick = t; invalidate() } }
@@ -94,6 +101,7 @@ class SuggestionBar(context: Context) : View(context) {
             }
             return
         }
+        if (scrolling()) { drawRow(canvas, c, x0, w); return }
         val e = edges(w)
         for (i in 0 until 3) {
             val s = slots.getOrNull(i) ?: continue
@@ -102,6 +110,30 @@ class SuggestionBar(context: Context) : View(context) {
             val readable = ColorMath.luminance(c.accent).let { kotlin.math.abs(it - ColorMath.luminance(c.bar)) > 0.12 }
             drawText(canvas, shown(s), x0 + (e[i] + e[i + 1]) / 2f, h / 2f, e[i + 1] - e[i] - PAD, if (s.best && readable) c.accent else c.text, s.best, s.phrase)
         }
+    }
+
+    private fun scrolling() = slots.size > 3 && !toolsOpen && status == null
+
+    private fun rowCell(w: Float) = w / 5f
+    private fun maxScroll(w: Float) = maxOf(0f, slots.size * rowCell(w) - w)
+
+    /** The slots as a row of equal cells, five in view, that slides sideways. */
+    private fun drawRow(canvas: Canvas, c: KeyboardColors, x0: Float, w: Float) {
+        val cell = rowCell(w)
+        canvas.save()
+        canvas.clipRect(x0, 0f, x0 + w, height.toFloat())
+        paint.color = c.text
+        paint.typeface = Fonts.regular(context)
+        paint.textSkewX = 0f
+        paint.textSize = height * 0.52f
+        val m = paint.fontMetrics
+        slots.forEachIndexed { i, s ->
+            val left = x0 + i * cell - scroll
+            if (s == null || left + cell < x0 || left > x0 + w) return@forEachIndexed
+            if (pressedIndex == i) highlight(canvas, c, left, left + cell)
+            canvas.drawText(s.text, left + cell / 2f, height / 2f - (m.ascent + m.descent) / 2f, paint)
+        }
+        canvas.restore()
     }
 
     private fun shown(s: Slot) = when { s.literal -> "“${s.text}”"; s.phrase -> s.text + " …"; else -> s.text }
@@ -150,6 +182,7 @@ class SuggestionBar(context: Context) : View(context) {
         if (x < bw) return LEFT
         if (x > width - bw) return QUICK
         val w = width - 2 * bw
+        if (scrolling()) return ((x - bw + scroll) / rowCell(w)).toInt().coerceIn(0, slots.size - 1)
         if (toolsOpen && status == null) return ((x - bw) / (w / tools.size)).toInt().coerceIn(0, tools.size - 1)
         val e = edges(w)
         return (0..2).firstOrNull { x - bw < e[it + 1] } ?: 2
@@ -158,11 +191,17 @@ class SuggestionBar(context: Context) : View(context) {
     @SuppressLint("ClickableViewAccessibility")
     override fun onTouchEvent(e: MotionEvent): Boolean {
         when (e.actionMasked) {
-            MotionEvent.ACTION_DOWN -> { pressedIndex = indexAt(e.x); invalidate() }
-            MotionEvent.ACTION_MOVE -> { if (indexAt(e.x) != pressedIndex) { pressedIndex = NONE; invalidate() } }
+            MotionEvent.ACTION_DOWN -> { pressedIndex = indexAt(e.x); downX = e.x; scrollAtDown = scroll; dragging = false; invalidate() }
+            MotionEvent.ACTION_MOVE -> {
+                if (scrolling() && (dragging || (pressedIndex >= 0 && kotlin.math.abs(e.x - downX) > slop))) {
+                    dragging = true; pressedIndex = NONE
+                    scroll = (scrollAtDown - (e.x - downX)).coerceIn(0f, maxScroll(width - 2 * buttonWidth()))
+                    invalidate()
+                } else if (indexAt(e.x) != pressedIndex) { pressedIndex = NONE; invalidate() }
+            }
             MotionEvent.ACTION_UP -> {
                 val i = indexAt(e.x)
-                if (i == pressedIndex) when {
+                if (!dragging && i == pressedIndex) when {
                     i == LEFT -> toggleTools()
                     i == QUICK -> listener?.onTool(quick)
                     status != null -> {}

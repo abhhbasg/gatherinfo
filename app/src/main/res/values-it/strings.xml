@@ -114,6 +114,11 @@
     <string name="pref_suggestions_summary">Mostra parole sopra i tasti</string>
     <string name="pref_autocorrect_title">Correzione automatica</string>
     <string name="pref_autocorrect_summary">Corregge i refusi a fine parola. Backspace restituisce ciò che avevi scritto.</string>
+    <string name="pref_smart_emoji_title">Ricerca emoji intelligente</string>
+    <string name="pref_smart_emoji_summary">Scrivi i due punti e una parola, come :cane, e le emoji corrispondenti compaiono nella barra dei suggerimenti. Funziona con i suggerimenti attivi.</string>
+    <string name="emoji_search_prefix">Emoji:</string>
+    <string name="emoji_search_none">Nessuna emoji trovata</string>
+    <string name="emoji_search_button">Cerca emoji</string>
     <string name="pref_next_word_title">Prevedi la parola successiva</string>
     <string name="pref_next_word_summary">Suggerisce cosa scriverai dopo</string>
     <string name="pref_phrase_title">Completa la frase</string>

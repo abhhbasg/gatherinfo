@@ -1,5 +1,6 @@
 package com.metrowin.keyboard
 
+import com.metrowin.keyboard.emoji.EmojiIndex
 import com.metrowin.keyboard.engine.*
 import org.junit.Assert.*
 import org.junit.Test
@@ -231,5 +232,33 @@ class EngineTest {
         val dec = SwipeDecoder(d, null) { it == "hello" }
         assertFalse(dec.decode(trace("hello"), qwerty, 40f).contains("hello"))
         assertTrue(SwipeDecoder(d, null) { false }.decode(listOf(SwipePoint(1f, 1f), SwipePoint(2f, 2f)), qwerty, 40f).isEmpty())
+    }
+}
+
+class EmojiIndexTest {
+    private fun shipped(lang: String) = EmojiIndex.merge(listOf(EmojiIndex.parse(java.io.File("src/main/assets/emoji/$lang.tsv").bufferedReader())))
+
+    @Test fun findsByNameInTheLanguage() {
+        assertEquals("🐶", shipped("it").search("cane").first())
+        assertTrue(shipped("it").search("can").containsAll(listOf("🐶", "🐕️")))
+        assertEquals("🐶", shipped("en").search("dog").first())
+        assertTrue(shipped("es").search("perro").contains("🐶"))
+        assertTrue(shipped("fr").search("chien").contains("🐶"))
+        assertTrue(shipped("de").search("hund").contains("🐶"))
+    }
+
+    @Test fun ignoresAccentsAndNeedsEveryWord() {
+        assertTrue(shipped("it").search("facc").isNotEmpty())
+        val both = shipped("en").search("dog face")
+        assertTrue(both.contains("🐶"))
+        assertFalse(both.contains("😀"))
+        assertTrue(shipped("en").search("zzzzqq").isEmpty())
+        assertTrue(shipped("en").search("  ").isEmpty())
+    }
+
+    @Test fun otherLanguageCanBeAddedToTheSearch() {
+        val both = EmojiIndex.merge(listOf("it", "en").map { l -> EmojiIndex.parse(java.io.File("src/main/assets/emoji/$l.tsv").bufferedReader()) })
+        assertTrue(both.search("cane").contains("🐶"))
+        assertTrue(both.search("dog").contains("🐶"))
     }
 }

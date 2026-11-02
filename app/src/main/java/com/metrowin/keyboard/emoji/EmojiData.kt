@@ -70,6 +70,12 @@ object EmojiData {
         return out.filterValues { it.isNotEmpty() }
     }
 
+    /** The ones of [emoji] that this phone can draw. */
+    fun drawable(emoji: List<String>): List<String> {
+        val paint = Paint()
+        return emoji.filter { paint.hasGlyph(it) }
+    }
+
     private val tones = listOf(0x1F3FB, 0x1F3FC, 0x1F3FD, 0x1F3FE, 0x1F3FF).map { String(Character.toChars(it)) }
 
     /** The skin-tone variants of [emoji] that this phone can draw, or an empty list when it has none. */

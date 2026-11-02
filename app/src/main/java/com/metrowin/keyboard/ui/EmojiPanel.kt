@@ -9,6 +9,7 @@ import android.view.Gravity
 import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
+import android.widget.FrameLayout
 import android.widget.LinearLayout
 import android.widget.PopupWindow
 import android.widget.TextView
@@ -58,13 +59,20 @@ class IconButton(context: Context, private val icon: Icon?, var text: String? = 
     }
 }
 
-/** Emoji by category, the classic text emoticons and the kaomoji, with the recent ones first. */
+/**
+ * Emoji by category, the classic text emoticons and the kaomoji, with the recent ones first. All categories are one list that
+ * slides up and down; the tabs jump to a category and follow the list. The panel is as tall as the keyboard it replaces.
+ */
 class EmojiPanel(context: Context) : LinearLayout(context) {
     interface Listener {
         fun onEmoji(text: String)
         fun onBackspace()
         fun onBack()
+        fun onSearch()
     }
+
+    /** One cell of the list. [text] null is empty space that ends a row, so that a category starts on a new row. */
+    private class Item(val text: String?, val cat: EmojiCategory, val span: Int)
 
     var listener: Listener? = null
     private var colors: KeyboardColors? = null
@@ -72,44 +80,73 @@ class EmojiPanel(context: Context) : LinearLayout(context) {
     private var current = EmojiCategory.SMILEYS
     private var data: Map<EmojiCategory, List<String>> = emptyMap()
     private val grid = RecyclerView(context)
+    private val layoutManager = GridLayoutManager(context, ROW)
     private val adapter = Cells()
+    private val starts = HashMap<EmojiCategory, Int>()
     private val tabs = LinearLayout(context).apply { orientation = HORIZONTAL }
     private val tabViews = HashMap<EmojiCategory, IconButton>()
     private val back = IconButton(context, null, "ABC")
+    private val search = IconButton(context, Icon.SEARCH)
     private val delete = IconButton(context, Icon.BACKSPACE)
     private var popup: PopupWindow? = null
 
     init {
         orientation = VERTICAL
         grid.adapter = adapter
-        grid.layoutManager = GridLayoutManager(context, 8)
+        layoutManager.spanSizeLookup = object : GridLayoutManager.SpanSizeLookup() {
+            override fun getSpanSize(position: Int) = adapter.items.getOrNull(position)?.span ?: ROW
+        }
+        grid.layoutManager = layoutManager
         grid.setHasFixedSize(true)
+        grid.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+            override fun onScrolled(rv: RecyclerView, dx: Int, dy: Int) {
+                val first = layoutManager.findFirstVisibleItemPosition()
+                adapter.items.getOrNull(first)?.cat?.let { if (it != current) highlight(it) }
+            }
+        })
         addView(grid, LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 0, 1f))
         val bar = LinearLayout(context).apply { orientation = HORIZONTAL }
         bar.addView(back, LayoutParams(0, ViewGroup.LayoutParams.MATCH_PARENT, 1.4f))
-        bar.addView(tabs, LayoutParams(0, ViewGroup.LayoutParams.MATCH_PARENT, 9f))
+        bar.addView(search, LayoutParams(0, ViewGroup.LayoutParams.MATCH_PARENT, 1.1f))
+        bar.addView(tabs, LayoutParams(0, ViewGroup.LayoutParams.MATCH_PARENT, 8f))
         bar.addView(delete, LayoutParams(0, ViewGroup.LayoutParams.MATCH_PARENT, 1.2f))
         addView(bar, LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, dp(44f).toInt()))
         back.onClick = { listener?.onBack() }
+        search.onClick = { listener?.onSearch() }
+        search.contentDescription = context.getString(com.metrowin.keyboard.R.string.emoji_search_button)
         delete.onRepeat = { listener?.onBackspace() }
     }
 
     fun setColors(c: KeyboardColors) {
         colors = c
         setBackgroundColor(c.background)
-        back.colors = c; delete.colors = c
+        back.colors = c; search.colors = c; delete.colors = c
         tabViews.values.forEach { it.colors = c; it.invalidate() }
-        back.invalidate(); delete.invalidate(); adapter.notifyDataSetChanged()
+        back.invalidate(); search.invalidate(); delete.invalidate(); adapter.notifyDataSetChanged()
     }
 
     /** Called each time the panel is shown, so recent emoji and the tab list are current. */
     fun open(recentEmoji: List<String>) {
         recent = recentEmoji
-        data = EmojiData.categories(recent).filter { it.key != EmojiCategory.RECENT || recent.isNotEmpty() }
-        if (current !in data) current = data.keys.first { it != EmojiCategory.RECENT }
-        if (recent.isNotEmpty() && current == EmojiCategory.SMILEYS) current = EmojiCategory.RECENT
+        data = EmojiData.categories(recent).filter { it.value.isNotEmpty() }
+        if (current !in data || (recent.isNotEmpty() && current == EmojiCategory.SMILEYS)) current = data.keys.first()
+        buildItems()
         rebuildTabs()
-        show(current)
+        scrollTo(current)
+    }
+
+    private fun buildItems() {
+        val items = ArrayList<Item>()
+        var used = 0
+        starts.clear()
+        for ((cat, list) in data) {
+            if (used != 0) { items += Item(null, cat, ROW - used); used = 0 }
+            starts[cat] = items.size
+            val span = ROW / cat.columns
+            for (e in list) { items += Item(e, cat, span); used = (used + span) % ROW }
+        }
+        adapter.items = items
+        adapter.notifyDataSetChanged()
     }
 
     private fun rebuildTabs() {
@@ -117,19 +154,21 @@ class EmojiPanel(context: Context) : LinearLayout(context) {
         for (cat in data.keys) {
             val b = IconButton(context, null, cat.tab)
             b.colors = colors
-            b.onClick = { show(cat) }
+            b.onClick = { scrollTo(cat) }
             tabs.addView(b, LayoutParams(0, ViewGroup.LayoutParams.MATCH_PARENT, 1f))
             tabViews[cat] = b
         }
+        highlight(current)
     }
 
-    private fun show(cat: EmojiCategory) {
+    private fun highlight(cat: EmojiCategory) {
         current = cat
-        tabViews.forEach { (k, v) -> v.highlighted = k == cat; v.invalidate() }
-        (grid.layoutManager as GridLayoutManager).spanCount = cat.columns
-        adapter.items = data[cat].orEmpty(); adapter.big = cat.big
-        adapter.notifyDataSetChanged()
-        grid.scrollToPosition(0)
+        tabViews.forEach { (k, v) -> if (v.highlighted != (k == cat)) { v.highlighted = k == cat; v.invalidate() } }
+    }
+
+    private fun scrollTo(cat: EmojiCategory) {
+        highlight(cat)
+        layoutManager.scrollToPositionWithOffset(starts[cat] ?: 0, 0)
     }
 
     fun dismissPopup() { popup?.dismiss(); popup = null }
@@ -158,8 +197,7 @@ class EmojiPanel(context: Context) : LinearLayout(context) {
     }
 
     private inner class Cells : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
-        var items: List<String> = emptyList()
-        var big = true
+        var items: List<Item> = emptyList()
         override fun getItemCount() = items.size
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
             val tv = TextView(parent.context).apply { gravity = Gravity.CENTER }
@@ -168,12 +206,62 @@ class EmojiPanel(context: Context) : LinearLayout(context) {
         }
         override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
             val tv = holder.itemView as TextView
+            val item = items[position]
+            val e = item.text
+            tv.text = e.orEmpty()
+            tv.textSize = if (item.cat.big) 26f else 15f
+            tv.setTextColor(colors?.text ?: 0xFFFFFFFF.toInt())
+            tv.setOnClickListener(if (e == null) null else View.OnClickListener { listener?.onEmoji(e) })
+            tv.setOnLongClickListener(if (e == null || !item.cat.big) null else View.OnLongClickListener { showTones(tv, e); true })
+            tv.isClickable = e != null
+            tv.isLongClickable = e != null && item.cat.big
+        }
+    }
+
+    private companion object {
+        /** Every number of columns of a category (8, 6, 3, 2) divides this, so one grid holds them all. */
+        const val ROW = 24
+    }
+}
+
+/** The results of an emoji search: two rows that slide sideways, shown in the strip above the keys while the user types the search. */
+class EmojiResults(context: Context) : FrameLayout(context) {
+    var onPick: ((String) -> Unit)? = null
+    private var colors: KeyboardColors? = null
+    private var items: List<String> = emptyList()
+    private val list = RecyclerView(context)
+    private val empty = TextView(context).apply { gravity = Gravity.CENTER; textSize = 14f; setText(com.metrowin.keyboard.R.string.emoji_search_none) }
+    private val adapter = object : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+        override fun getItemCount() = items.size
+        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
+            val tv = TextView(parent.context).apply { gravity = Gravity.CENTER; textSize = 26f }
+            tv.layoutParams = RecyclerView.LayoutParams(dp(52f).toInt(), ViewGroup.LayoutParams.MATCH_PARENT)
+            return object : RecyclerView.ViewHolder(tv) {}
+        }
+        override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
+            val tv = holder.itemView as TextView
             val e = items[position]
             tv.text = e
-            tv.textSize = if (big) 26f else 15f
             tv.setTextColor(colors?.text ?: 0xFFFFFFFF.toInt())
-            tv.setOnClickListener { listener?.onEmoji(e) }
-            tv.setOnLongClickListener { if (big) { showTones(tv, e); true } else false }
+            tv.setOnClickListener { onPick?.invoke(e) }
         }
+    }
+
+    init {
+        list.layoutManager = GridLayoutManager(context, 2, RecyclerView.HORIZONTAL, false)
+        list.adapter = adapter
+        addView(list, LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT))
+        addView(empty, LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT))
+        empty.visibility = View.GONE
+    }
+
+    fun setColors(c: KeyboardColors) { colors = c; setBackgroundColor(c.background); empty.setTextColor(c.subtle); adapter.notifyDataSetChanged() }
+
+    /** [none] is true when the user has typed something and nothing matches, to say so instead of showing an empty strip. */
+    fun setResults(results: List<String>, none: Boolean) {
+        items = results
+        adapter.notifyDataSetChanged()
+        list.scrollToPosition(0)
+        empty.visibility = if (none) View.VISIBLE else View.GONE
     }
 }

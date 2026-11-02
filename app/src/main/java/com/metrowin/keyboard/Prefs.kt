@@ -44,6 +44,7 @@ object K {
     const val SUGGESTIONS = "suggestions"
     const val AUTOCORRECT = "autocorrect"
     const val NEXT_WORD = "next_word"
+    const val SMART_EMOJI = "smart_emoji_search"
     const val PHRASES = "phrase_completion"
     const val BLOCK_OFFENSIVE = "block_offensive"
     const val CUSTOM_BLOCKED = "custom_blocked"
@@ -154,6 +155,7 @@ class Prefs(context: Context) {
     val suggestions get() = b(K.SUGGESTIONS, true)
     val autocorrect get() = b(K.AUTOCORRECT, true)
     val nextWord get() = b(K.NEXT_WORD, true)
+    val smartEmoji get() = b(K.SMART_EMOJI, true)
     val phrases get() = b(K.PHRASES, true)
     val blockOffensive get() = b(K.BLOCK_OFFENSIVE, true)
     val customBlocked get() = s(K.CUSTOM_BLOCKED, "")

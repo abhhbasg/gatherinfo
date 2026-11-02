@@ -27,6 +27,8 @@ import com.metrowin.keyboard.K
 import com.metrowin.keyboard.KeyboardApp
 import com.metrowin.keyboard.R
 import com.metrowin.keyboard.clipboard.ClipItem
+import com.metrowin.keyboard.emoji.EmojiData
+import com.metrowin.keyboard.emoji.EmojiIndex
 import com.metrowin.keyboard.engine.LanguageEngine
 import com.metrowin.keyboard.engine.SuggestOptions
 import com.metrowin.keyboard.engine.SwipePoint
@@ -52,6 +54,7 @@ import com.metrowin.keyboard.ui.ClipboardPanel
 import com.metrowin.keyboard.ui.TranslatePanel
 import com.metrowin.keyboard.ui.TutorialPanel
 import com.metrowin.keyboard.ui.EmojiPanel
+import com.metrowin.keyboard.ui.EmojiResults
 import com.metrowin.keyboard.ui.GifPanel
 import com.metrowin.keyboard.ui.Icon
 import com.metrowin.keyboard.ui.ImageLoader
@@ -96,6 +99,7 @@ open class MetroWinIME : InputMethodService(), KeyboardListener, SuggestionBar.L
     private var frame: FrameLayout? = null
     private var keyboard: KeyboardView? = null
     private var emoji: EmojiPanel? = null
+    private var emojiResults: EmojiResults? = null
     private var clipboardPanel: ClipboardPanel? = null
     private var gifPanel: GifPanel? = null
     private var translatePanel: TranslatePanel? = null
@@ -117,6 +121,8 @@ open class MetroWinIME : InputMethodService(), KeyboardListener, SuggestionBar.L
     private var inLauncher = false
     private var gifSearching = false
     private val gifQuery = StringBuilder()
+    private var emojiSearching = false
+    private val emojiQuery = StringBuilder()
     private val composing = StringBuilder()
     private var prevWord: String? = null
     private var prevWord2: String? = null
@@ -178,6 +184,7 @@ open class MetroWinIME : InputMethodService(), KeyboardListener, SuggestionBar.L
         val kb = KeyboardView(ctx).also { it.listener = this }
         val bar = SuggestionBar(ctx).also { it.listener = this }
         val emoji = EmojiPanel(ctx).also { it.listener = emojiListener }
+        emojiResults = EmojiResults(ctx).also { it.onPick = { e -> emojiListener.onEmoji(e) } }
         val clip = ClipboardPanel(ctx, app.clipboard, images).also { it.listener = clipListener2 }
         val gif = GifPanel(ctx, gifRepo, images).also { it.listener = gifListener }
         val translate = TranslatePanel(ctx, translator, prefs).also { it.listener = translateListener }
@@ -352,7 +359,7 @@ open class MetroWinIME : InputMethodService(), KeyboardListener, SuggestionBar.L
         val picture = if (prefs.usePictureAccent && prefs.imageBackground) prefs.pictureAccent else 0
         val c = KeyboardTheme.resolve(this, prefs, KeyboardTheme.isSystemDark(this), if (prefs.adaptiveColor) AdaptiveColor.color else null, picture)
         colors = c
-        kb.setColors(c); bar?.setColors(c); emoji?.setColors(c); clipboardPanel?.setColors(c); gifPanel?.setColors(c); translatePanel?.setColors(c); tutorialPanel?.setColors(c)
+        kb.setColors(c); bar?.setColors(c); emoji?.setColors(c); emojiResults?.setColors(c); clipboardPanel?.setColors(c); gifPanel?.setColors(c); translatePanel?.setColors(c); tutorialPanel?.setColors(c)
         root?.setBackgroundColor(c.background)
         kb.setBackgroundImage(backgroundBitmap(), prefs.imageDim)
         val land = resources.configuration.orientation == android.content.res.Configuration.ORIENTATION_LANDSCAPE
@@ -474,6 +481,7 @@ open class MetroWinIME : InputMethodService(), KeyboardListener, SuggestionBar.L
     private fun typeText(text: String) {
         lastEdit = SystemClock.uptimeMillis()
         if (gifSearching) { typeIntoGifSearch(text); return }
+        if (emojiSearching) { typeIntoEmojiSearch(text); return }
         val ic = currentInputConnection ?: return
         lastCorrection = null
         val layout = currentLayout()
@@ -502,6 +510,7 @@ open class MetroWinIME : InputMethodService(), KeyboardListener, SuggestionBar.L
     private fun space() {
         lastEdit = SystemClock.uptimeMillis()
         if (gifSearching) { typeIntoGifSearch(" "); return }
+        if (emojiSearching) { typeIntoEmojiSearch(" "); return }
         val ic = currentInputConnection ?: return
         val now = SystemClock.uptimeMillis()
         if (composing.isNotEmpty()) {
@@ -528,6 +537,7 @@ open class MetroWinIME : InputMethodService(), KeyboardListener, SuggestionBar.L
     private fun enter() {
         lastEdit = SystemClock.uptimeMillis()
         if (gifSearching) { gifPanel?.run(gifQuery.toString().ifBlank { null }); exitGifSearch(); return }
+        if (emojiSearching) { showPanel(Panel.EMOJI); return }
         val ic = currentInputConnection ?: return
         finishWord(autocorrect = true, delimiter = "\n")
         val info = currentInputEditorInfo
@@ -542,6 +552,10 @@ open class MetroWinIME : InputMethodService(), KeyboardListener, SuggestionBar.L
     private fun backspace(repeat: Boolean) {
         lastEdit = SystemClock.uptimeMillis()
         if (gifSearching) { if (gifQuery.isNotEmpty()) gifQuery.deleteCharAt(gifQuery.length - 1); showGifQuery(); return }
+        if (emojiSearching) {
+            if (emojiQuery.isEmpty()) showPanel(Panel.EMOJI) else { emojiQuery.deleteCharAt(emojiQuery.length - 1); showEmojiQuery() }
+            return
+        }
         val ic = currentInputConnection ?: return
         if (composing.isNotEmpty()) {
             composing.setLength(composing.length - 1)
@@ -601,7 +615,14 @@ open class MetroWinIME : InputMethodService(), KeyboardListener, SuggestionBar.L
     private fun updateSuggestions() {
         val b = bar ?: return
         val eng = engine
-        if (gifSearching) return
+        if (gifSearching || emojiSearching) return
+        // ":dog": the emoji for the word after a colon take the bar (the colon itself is already in the text, the word is being composed).
+        val wanted = emojiWanted()
+        if (wanted != null) {
+            suggestSeq++
+            val found = EmojiData.drawable(emojiIndex().search(wanted, 40))
+            if (found.isNotEmpty()) { latest = null; b.setSlots(found.map { Slot(it, emoji = true) }); return }
+        }
         if (eng == null || !predictionOn) { b.setSlots(listOf(null, null, null)); return }
         val typed = composing.toString()
         val seq = ++suggestSeq
@@ -638,6 +659,19 @@ open class MetroWinIME : InputMethodService(), KeyboardListener, SuggestionBar.L
     override fun onSlot(slot: Slot) {
         endVoiceText()
         val ic = currentInputConnection ?: return
+        if (slot.emoji) {
+            // The colon and the word typed after it become the emoji.
+            ic.beginBatchEdit()
+            composing.setLength(0)
+            ic.commitText("", 1)
+            ic.deleteSurroundingText(1, 0)
+            ic.commitText(slot.text, 1)
+            ic.endBatchEdit()
+            rememberEmoji(slot.text)
+            latest = null; lastCorrection = null; autoSpace = false; lastSwipe = null
+            refreshContext(); updateShiftFromCursor(); updateSuggestions()
+            return
+        }
         val swipe = lastSwipe
         if (swipe != null && !slot.literal) {
             // Replace the word just drawn with another reading of the same swipe.
@@ -713,6 +747,7 @@ open class MetroWinIME : InputMethodService(), KeyboardListener, SuggestionBar.L
     }
 
     private fun showPanel(p: Panel) {
+        exitEmojiSearch()
         panel = p
         if (p != Panel.GIF) { exitGifSearch(); strip?.removeAllViews(); strip?.visibility = View.GONE }
         if (p != Panel.NONE) { bar?.closeTools(); bar?.setStatus(null) }
@@ -723,7 +758,12 @@ open class MetroWinIME : InputMethodService(), KeyboardListener, SuggestionBar.L
         clipboardPanel?.visibility = if (p == Panel.CLIPBOARD) View.VISIBLE else View.GONE
         gifPanel?.visibility = if (p == Panel.GIF) View.VISIBLE else View.GONE
         when (p) {
-            Panel.EMOJI -> emoji?.open(prefs.emojiRecent)
+            Panel.EMOJI -> {
+                // As tall as the keyboard, never more: the panel takes its place and nothing else.
+                val h = keyboard?.measuredHeight ?: 0
+                emoji?.let { v -> if (h > 0 && v.layoutParams.height != h) { v.layoutParams = v.layoutParams.apply { height = h } } }
+                emoji?.open(prefs.emojiRecent)
+            }
             Panel.CLIPBOARD -> { clipBadge = false; bar?.setBadge(false); clipboardPanel?.refresh() }
             Panel.TRANSLATE -> translatePanel?.open()
             Panel.TUTORIAL -> tutorialPanel?.open(Tutorial.startIndex(prefs.tutorialSeen))
@@ -738,11 +778,59 @@ open class MetroWinIME : InputMethodService(), KeyboardListener, SuggestionBar.L
     private val emojiListener = object : EmojiPanel.Listener {
         override fun onEmoji(text: String) {
             currentInputConnection?.commitText(text, 1)
-            prefs.emojiRecent = (listOf(text) + prefs.emojiRecent.filter { it != text }).take(32)
+            rememberEmoji(text)
             lastSwipe = null
         }
         override fun onBackspace() = sendDownUpKeyEvents(KeyEvent.KEYCODE_DEL)
         override fun onBack() = showPanel(Panel.NONE)
+        override fun onSearch() = enterEmojiSearch()
+    }
+
+    private fun rememberEmoji(text: String) {
+        prefs.emojiRecent = (listOf(text) + prefs.emojiRecent.filter { it != text }).take(32)
+    }
+
+    private fun emojiIndex() = EmojiIndex.load(this, currentLayout().locale.language)
+
+    /** The word after a colon that is being typed, if the smart emoji search is on and the colon starts a word (not "http:"). */
+    private fun emojiWanted(): String? {
+        if (!prefs.smartEmoji || !predictionOn || composing.length < 2) return null
+        val before = currentInputConnection?.getTextBeforeCursor(composing.length + 2, 0) ?: return null
+        val colon = before.length - composing.length - 1
+        if (colon < 0 || before[colon] != ':') return null
+        return if (colon == 0 || before[colon - 1].isWhitespace()) composing.toString() else null
+    }
+
+    // --- emoji search -----------------------------------------------------------------------------------------------
+
+    /** The search is typed with the keyboard itself: the results are a strip above the keys and the bar shows the words typed. */
+    private fun enterEmojiSearch() {
+        val results = emojiResults ?: return
+        showPanel(Panel.NONE)
+        emojiSearching = true
+        emojiQuery.setLength(0)
+        (results.parent as? ViewGroup)?.removeView(results)
+        strip?.removeAllViews(); strip?.addView(results, FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT)); strip?.visibility = View.VISIBLE
+        showEmojiQuery()
+    }
+
+    private fun exitEmojiSearch() {
+        if (!emojiSearching) return
+        emojiSearching = false
+        bar?.setStatus(null)
+        strip?.removeAllViews(); strip?.visibility = View.GONE
+    }
+
+    private fun typeIntoEmojiSearch(text: String) {
+        emojiQuery.append(text)
+        showEmojiQuery()
+    }
+
+    private fun showEmojiQuery() {
+        val q = emojiQuery.toString().trim()
+        val found = if (q.isEmpty()) prefs.emojiRecent else EmojiData.drawable(emojiIndex().search(q, 80))
+        bar?.setStatus(getString(R.string.emoji_search_prefix) + " " + emojiQuery.toString().ifEmpty { "…" })
+        emojiResults?.setResults(found, q.isNotEmpty() && found.isEmpty())
     }
 
     // --- clipboard --------------------------------------------------------------------------------------------------

@@ -105,6 +105,29 @@ class ImeTest {
         assertEquals("ciaox", text.lowercase())
     }
 
+    private fun slotTexts() = ime.suggestionBar!!.slotsForTest().filterNotNull().map { it.text }
+
+    @Test fun colonAndAWordOffersEmoji() {
+        type("ciao :cane")
+        val found = ime.suggestionBar!!.slotsForTest().filterNotNull()
+        assertTrue(found.isNotEmpty())
+        assertTrue(found.all { it.emoji })
+        assertTrue(found.map { it.text }.contains("🐶"))
+        // Choosing one replaces the colon and the word.
+        ime.onSlot(found.first { it.text == "🐶" })
+        idle()
+        assertEquals("ciao 🐶", text)
+    }
+
+    @Test fun smartEmojiSearchCanBeSwitchedOffAndIgnoresLinks() {
+        type("vai su http:ciao")
+        assertTrue(slotTexts().none { it == "🐶" })
+        assertTrue(ime.suggestionBar!!.slotsForTest().filterNotNull().none { it.emoji })
+        app.prefs.sp.edit().putBoolean(K.SMART_EMOJI, false).commit(); idle()
+        type(" :cane")
+        assertTrue(ime.suggestionBar!!.slotsForTest().filterNotNull().none { it.emoji })
+    }
+
     @Test fun knownWordsAreLeftAlone() {
         type("casa ")
         assertEquals("casa ", text)

@@ -114,6 +114,11 @@
     <string name="pref_suggestions_summary">Show words above the keys</string>
     <string name="pref_autocorrect_title">Automatic correction</string>
     <string name="pref_autocorrect_summary">Fixes typos when you end a word. Backspace brings back what you typed.</string>
+    <string name="pref_smart_emoji_title">Smart emoji search</string>
+    <string name="pref_smart_emoji_summary">Type a colon and a word, like :dog, and the emoji for it appear in the suggestion bar. Works while suggestions are on.</string>
+    <string name="emoji_search_prefix">Emoji:</string>
+    <string name="emoji_search_none">No emoji found</string>
+    <string name="emoji_search_button">Search emoji</string>
     <string name="pref_next_word_title">Predict the next word</string>
     <string name="pref_next_word_summary">Suggests what you are likely to write next</string>
     <string name="pref_phrase_title">Complete the phrase</string>
