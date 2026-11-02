@@ -40,6 +40,9 @@
     <string name="pref_languages_title">Active languages</string>
     <string name="pref_languages_summary">The globe key switches between them</string>
     <string name="cat_dictionaries">Dictionaries and layouts</string>
+    <string name="pref_dictionary_sources_title">Where to find dictionaries</string>
+    <string name="pref_dictionary_sources_summary">Free word lists to download and then import here</string>
+    <string name="dictionary_sources_note">Download a file, then use \"Import a dictionary\". Each source has its own licence.</string>
     <string name="pref_import_dictionary_title">Import a dictionary…</string>
     <string name="pref_import_dictionary_summary">Any word list: one word per line, \"word count\" frequency lists, or Hunspell .dic files</string>
     <string name="pref_remove_dictionary_title">Remove an imported dictionary…</string>

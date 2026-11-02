@@ -3,6 +3,7 @@
     <Preference android:key="languages_pick" android:title="@string/pref_languages_title" android:summary="@string/pref_languages_summary" />
     <PreferenceCategory android:title="@string/cat_dictionaries">
         <Preference android:key="import_dictionary" android:title="@string/pref_import_dictionary_title" android:summary="@string/pref_import_dictionary_summary" />
+        <Preference android:key="dictionary_sources" android:title="@string/pref_dictionary_sources_title" android:summary="@string/pref_dictionary_sources_summary" />
         <Preference android:key="remove_dictionary" android:title="@string/pref_remove_dictionary_title" android:summary="@string/pref_remove_dictionary_summary" />
         <Preference android:key="import_layout" android:title="@string/pref_import_layout_title" android:summary="@string/pref_import_layout_summary" />
         <Preference android:key="remove_layout" android:title="@string/pref_remove_layout_title" android:summary="@string/pref_remove_layout_summary" />

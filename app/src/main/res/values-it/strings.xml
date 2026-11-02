@@ -40,6 +40,9 @@
     <string name="pref_languages_title">Lingue attive</string>
     <string name="pref_languages_summary">Il tasto globo passa dall\'una all\'altra</string>
     <string name="cat_dictionaries">Vocabolari e layout</string>
+    <string name="pref_dictionary_sources_title">Dove trovare i vocabolari</string>
+    <string name="pref_dictionary_sources_summary">Liste di parole gratuite da scaricare e poi importare qui</string>
+    <string name="dictionary_sources_note">Scarica un file, poi usa \"Importa un vocabolario\". Ogni fonte ha la sua licenza.</string>
     <string name="pref_import_dictionary_title">Importa un vocabolario…</string>
     <string name="pref_import_dictionary_summary">Qualsiasi lista di parole: una per riga, liste di frequenza \"parola numero\" o file Hunspell .dic</string>
     <string name="pref_remove_dictionary_title">Rimuovi un vocabolario importato…</string>

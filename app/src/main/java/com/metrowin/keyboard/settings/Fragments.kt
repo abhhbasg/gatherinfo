@@ -149,6 +149,20 @@ class LanguagesFragment : BaseFragment(R.xml.prefs_languages, R.string.screen_la
             val all = app.layouts.all().values.toList()
             chooseOne(R.string.dialog_pick_language, all.map { it.name }) { i -> pendingLang = all[i].id; openDictionary.launch(arrayOf("*/*")) }
         }
+        click("dictionary_sources") {
+            val sources = listOf(
+                "Hunspell – LibreOffice dictionaries" to "https://github.com/LibreOffice/dictionaries",
+                "Hunspell – wooorm/dictionaries (many languages)" to "https://github.com/wooorm/dictionaries",
+                "FrequencyWords (frequency lists)" to "https://github.com/hermitdave/FrequencyWords",
+                "Wiktionary frequency lists" to "https://en.wiktionary.org/wiki/Wiktionary:Frequency_lists",
+                "Leipzig Corpora Collection (word lists)" to "https://wortschatz.uni-leipzig.de/en/download",
+            )
+            AlertDialog.Builder(requireContext()).setTitle(R.string.pref_dictionary_sources_title).setMessage(R.string.dictionary_sources_note)
+                .setItems(sources.map { it.first }.toTypedArray()) { _, i ->
+                    runCatching { startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(sources[i].second))) }
+                }
+                .setNegativeButton(R.string.cancel, null).show()
+        }
         click("remove_dictionary") {
             val withImport = app.layouts.all().values.filter { LanguageEngine.dictionaryFile(requireContext(), it.dictionaryId).exists() }
             if (withImport.isEmpty()) { toast(R.string.nothing_to_remove); return@click }

@@ -131,6 +131,36 @@ class EngineTest {
         assertTrue(s.nextWords("buon", null, 3, SuggestOptions(nextWord = false)).isEmpty())
     }
 
+    @Test fun nextWordBarIsUsefulOnAFreshInstall() {
+        val seed = NextWordSeed.parse("^\tnon\t90\tio\t50\ncome\tsi\t100\tstai\t80\tva\t60\n".reader().buffered())
+        val s = Suggester(dict(), UserModel(), Blocklist(), Locale.ITALIAN, seed)
+        assertEquals(listOf("si", "stai", "va"), s.nextWords("come", null, 3, SuggestOptions()))
+        // At the start of a sentence, and after a word nobody knows, the bar is still filled.
+        assertEquals("non", s.nextWords(null, null, 3, SuggestOptions()).first())
+        assertEquals(3, s.nextWords("zzzz", null, 3, SuggestOptions()).size)
+    }
+
+    @Test fun threeWordHabitBeatsTwoWordHabit() {
+        val u = UserModel()
+        repeat(3) { u.learn(null, "come", "stai") }
+        repeat(2) { u.learn("ciao", "come", "va") }
+        val s = Suggester(dict(), u, Blocklist(), Locale.ITALIAN)
+        assertEquals("stai", s.nextWords("come", null, 3, SuggestOptions()).first())
+        assertEquals("va", s.nextWords("come", "ciao", 3, SuggestOptions()).first())
+        // The habit survives being saved and read back.
+        val text = java.io.StringWriter().also { u.write(it) }.toString()
+        val back = UserModel().also { it.read(text.reader().buffered()) }
+        assertEquals("va", Suggester(dict(), back, Blocklist(), Locale.ITALIAN).nextWords("come", "ciao", 3, SuggestOptions()).first())
+    }
+
+    @Test fun shippedBigramsPredictWords() {
+        val d = java.io.File("src/main/assets/dictionaries/it.txt").bufferedReader().use { WordDictionary.parse(it, Locale.ITALIAN) }
+        val seed = java.io.File("src/main/assets/bigrams/it.txt").bufferedReader().use { NextWordSeed.parse(it) }
+        val s = Suggester(d, UserModel(), Blocklist(), Locale.ITALIAN, seed)
+        assertTrue(s.nextWords("come", null, 3, SuggestOptions()).containsAll(listOf("si")))
+        assertEquals(3, s.nextWords(null, null, 3, SuggestOptions()).size)
+    }
+
     @Test fun userVocabularyStopsAutocorrect() {
         val u = UserModel()
         val s = Suggester(dict(), u, Blocklist(), Locale.ITALIAN)

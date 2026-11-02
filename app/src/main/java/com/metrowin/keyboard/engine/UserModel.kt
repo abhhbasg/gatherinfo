@@ -18,17 +18,25 @@ class UserModel(private val maxWords: Int = 20_000, private val maxPairs: Int = 
 
     @Synchronized fun count(word: String): Int = unigrams[word] ?: 0
 
-    @Synchronized fun learn(previous: String?, word: String) {
+    @Synchronized fun learn(previous: String?, word: String) = learn(null, previous, word)
+
+    /** Also remembers the three words in a row: they are kept like a pair whose first part is "[before] [previous]". */
+    @Synchronized fun learn(before: String?, previous: String?, word: String) {
         if (word.isEmpty()) return
         unigrams[word] = (unigrams[word] ?: 0) + 1
         if (!previous.isNullOrEmpty()) {
-            val next = bigrams.getOrPut(previous) { HashMap() }
-            val c = next[word]
-            if (c == null) pairCount++
-            next[word] = (c ?: 0) + 1
+            addPair(previous, word)
+            if (!before.isNullOrEmpty()) addPair("$before $previous", word)
         }
         dirty = true
         if (unigrams.size > maxWords * 5 / 4 || pairCount > maxPairs * 5 / 4) prune()
+    }
+
+    private fun addPair(previous: String, word: String) {
+        val next = bigrams.getOrPut(previous) { HashMap() }
+        val c = next[word]
+        if (c == null) pairCount++
+        next[word] = (c ?: 0) + 1
     }
 
     /** Words that followed [previous] (most often first). */

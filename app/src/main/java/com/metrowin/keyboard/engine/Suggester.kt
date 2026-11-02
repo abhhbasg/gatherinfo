@@ -23,6 +23,7 @@ class Suggester(
     private val user: UserModel,
     private val blocklist: Blocklist,
     private val locale: Locale,
+    private val seed: NextWordSeed = NextWordSeed.EMPTY,
 ) {
     private fun blocked(w: String, o: SuggestOptions) = o.blockOffensive && blocklist.contains(w)
 
@@ -91,13 +92,15 @@ class Suggester(
     fun nextWords(previous: String?, before: String?, limit: Int, o: SuggestOptions): List<String> {
         if (!o.nextWord) return emptyList()
         val out = LinkedHashMap<String, Double>()
+        // What the user has typed comes first, and a habit of three words beats one of two.
         if (previous != null && o.usePersonal) {
-            for ((w, n) in user.followers(previous, 8)) if (!blocked(w, o)) out[w] = 10.0 + Math.log1p(n.toDouble())
+            if (before != null) for ((w, n) in user.followers("$before $previous", 8)) if (!blocked(w, o)) out[w] = 200.0 + Math.log1p(n.toDouble())
+            for ((w, n) in user.followers(previous, 8)) if (!blocked(w, o)) out.putIfAbsent(w, 100.0 + Math.log1p(n.toDouble()))
         }
-        if (out.size < limit && previous == null) {
-            // Start of a sentence and nothing learned yet: the most common words of the language are a fair guess.
-            for (c in dictionary.top(limit * 2) { blocked(it, o) }) out.putIfAbsent(c.word, c.score)
-        }
+        // Then what people usually write after that word, a little in favour of words that are common anyway.
+        for ((w, n) in seed.after(previous)) if (!blocked(w, o)) out.putIfAbsent(w, Math.log1p(n.toDouble()) + 0.3 * Math.log1p(dictionary.frequency(w).toDouble()))
+        // Nothing known: the most common words of the language are a fair guess, so the bar is never empty.
+        if (out.size < limit) for (c in dictionary.top(limit * 2) { blocked(it, o) }) out.putIfAbsent(c.word, c.score * 0.1)
         return out.entries.sortedByDescending { it.value }.map { it.key }.take(limit)
     }
 

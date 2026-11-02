@@ -589,7 +589,7 @@ open class MetroWinIME : InputMethodService(), KeyboardListener, SuggestionBar.L
 
     private fun learn(word: String) {
         val w = word.lowercase()
-        if (learningOn && w.length >= 2 && w.none { it.isDigit() } && engine?.blocklist?.contains(w) != true) engine?.user?.learn(prevWord, w)
+        if (learningOn && w.length >= 2 && w.none { it.isDigit() } && engine?.blocklist?.contains(w) != true) engine?.user?.learn(prevWord2, prevWord, w)
         prevWord2 = prevWord; prevWord = w
     }
 

@@ -72,17 +72,17 @@ class ImeTest {
     private val text get() = box.text.toString()
 
     @Test fun typoIsCorrectedWhenTheWordEnds() {
-        type("caio ")
+        type("ciaoo ")
         assertEquals("ciao ", text)
     }
 
     @Test fun backspaceRightAfterACorrectionGivesBackWhatWasTyped() {
-        type("caio ")
+        type("ciaoo ")
         backspace()
-        assertEquals("caio", text)
+        assertEquals("ciaoo", text)
         // And the word is editable again: one more backspace removes a letter, not the whole word.
         backspace()
-        assertEquals("cai", text)
+        assertEquals("ciao", text)
     }
 
     @Test fun knownWordsAreLeftAlone() {
@@ -108,15 +108,15 @@ class ImeTest {
 
     @Test fun autocorrectCanBeSwitchedOff() {
         app.prefs.putBoolean(K.AUTOCORRECT, false); idle()
-        type("caio ")
-        assertEquals("caio ", text)
+        type("ciaoo ")
+        assertEquals("ciaoo ", text)
     }
 
     @Test fun passwordFieldsAreTypedAsTheyAreAndNothingIsLearned() {
         start(InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_PASSWORD)
-        type("caio ")
-        assertEquals("caio ", text)
-        assertNull(app.cachedEngine("it")?.user?.count("caio")?.takeIf { it > 0 })
+        type("ciaoo ")
+        assertEquals("ciaoo ", text)
+        assertNull(app.cachedEngine("it")?.user?.count("ciaoo")?.takeIf { it > 0 })
     }
 
     @Test fun thePickedSuggestionReplacesTheWordAndAddsASpace() {
@@ -133,9 +133,9 @@ class ImeTest {
     }
 
     @Test fun whatIsTypedIsLearnedAndStopsBeingCorrected() {
-        type("zzzzy ")   // not a word; far from everything, so typed as it is
-        assertEquals("zzzzy ", text)
-        assertTrue(app.engine("it").user.count("zzzzy") > 0)
+        type("xqzjk ")   // not a word; far from everything, so typed as it is
+        assertEquals("xqzjk ", text)
+        assertTrue(app.engine("it").user.count("xqzjk") > 0)
     }
 
     @Test fun nextWordFollowsWhatWasWrittenOften() {
@@ -155,9 +155,9 @@ class ImeTest {
 
     @Test fun launcherSearchBoxGetsNoCorrectionAndNoLearning() {
         start(pkg = "com.metrowin.launcher")
-        type("caio ")
-        assertEquals("caio ", text)
-        assertEquals(0, app.engine("it").user.count("caio"))
+        type("ciaoo ")
+        assertEquals("ciaoo ", text)
+        assertEquals(0, app.engine("it").user.count("ciaoo"))
     }
 
     @Test fun apostropheBreaksWordsInItalianButNotInEnglish() {
@@ -181,14 +181,14 @@ class ImeTest {
         kb.layout(0, 0, 1080, kb.measuredHeight)
         val centers = kb.letterCenters()
         val pts = ArrayList<SwipePoint>()
-        val word = "ciao"
+        val word = "grazie"
         for (i in 1 until word.length) {
             val a = centers.getValue(word[i - 1]); val b = centers.getValue(word[i])
             for (s in 0 until 10) pts += SwipePoint(a.x + (b.x - a.x) * s / 10f, a.y + (b.y - a.y) * s / 10f)
         }
         pts += centers.getValue(word.last())
         ime.onSwipe(pts); idle()
-        assertEquals("ciao ", text)
+        assertEquals("grazie ", text)
     }
 
     @Test fun numberFieldsGetTheNumberPad() {

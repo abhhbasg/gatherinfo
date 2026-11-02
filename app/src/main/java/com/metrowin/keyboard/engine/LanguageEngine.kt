@@ -12,8 +12,9 @@ class LanguageEngine(
     val user: UserModel,
     val blocklist: Blocklist,
     private val userFile: File,
+    seed: NextWordSeed = NextWordSeed.EMPTY,
 ) {
-    val suggester = Suggester(dictionary, user, blocklist, layout.locale)
+    val suggester = Suggester(dictionary, user, blocklist, layout.locale, seed)
     val swipe = SwipeDecoder(dictionary, user) { blocklist.contains(it) }
 
     /** Writes what was learned to the phone's storage, if anything changed. */
@@ -44,7 +45,8 @@ class LanguageEngine(
             val file = userFile(c, layout.id)
             val user = UserModel()
             if (file.exists()) runCatching { file.bufferedReader().use { user.read(it) } }
-            return LanguageEngine(layout, dictionary, user, blocklist, file)
+            val seed = runCatching { c.assets.open("bigrams/$dictId.txt").bufferedReader().use { NextWordSeed.parse(it) } }.getOrDefault(NextWordSeed.EMPTY)
+            return LanguageEngine(layout, dictionary, user, blocklist, file, seed)
         }
 
         /** Saves a word list for [dictId]. Returns the number of words, or 0 if the file held no words (nothing is saved then). */
