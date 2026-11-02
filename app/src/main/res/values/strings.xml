@@ -267,7 +267,7 @@
     <string name="tut_basics_title">Typing</string>
     <string name="tut_basics_body">Tap the arrow for a capital; tap it twice (or hold it) to lock capitals. \"?123\" switches to numbers and symbols, and \"=\&lt;\" to more of them. The smiley opens emoji and the globe changes language (hide the globe in the settings to widen the space bar; then hold the space bar to change language). Press Enter for the action of the field (search, send, next…).</string>
     <string name="tut_hold_title">Hold for more</string>
-    <string name="tut_hold_body">Hold a key and a bar appears above it with accents, digits and symbols. Slide your finger to one of them and let go. If you let go without sliding, you get the normal letter. How long to hold is in Settings → Typing (200 ms to start).</string>
+    <string name="tut_hold_body">Hold a key and a bar appears above it with accents, digits and symbols. Slide your finger to one of them and let go. If you let go without sliding, you get the first one, the accented letter; the plain letter is in the bar. How long to hold is in Settings → Typing (200 ms to start).</string>
     <string name="tut_swipe_title">Swipe to type</string>
     <string name="tut_swipe_body">Put your finger on the first letter of a word and slide over the others without lifting. The word appears with a space. If it is not the one you wanted, tap another in the bar above the keys. Works in the language you are using.</string>
     <string name="tut_space_title">Move the cursor</string>

@@ -267,7 +267,7 @@
     <string name="tut_basics_title">Scrivere</string>
     <string name="tut_basics_body">Tocca la freccia per una maiuscola; toccala due volte (o tienila premuta) per bloccare il maiuscolo. \"?123\" passa a numeri e simboli, \"=\&lt;\" ad altri ancora. La faccina apre le emoji e il globo cambia lingua (nascondi il globo nelle impostazioni per allargare la barra spaziatrice; allora tieni premuta la barra spaziatrice per cambiare lingua). Invio esegue l\'azione del campo (cerca, invia, avanti…).</string>
     <string name="tut_hold_title">Tieni premuto per altro</string>
-    <string name="tut_hold_body">Tieni premuto un tasto e sopra compare una barra con accenti, cifre e simboli. Fai scorrere il dito su uno e rilascia. Se rilasci senza scorrere ottieni la lettera normale. Quanto tenere premuto si regola in Impostazioni → Digitazione (200 ms all\'inizio).</string>
+    <string name="tut_hold_body">Tieni premuto un tasto e sopra compare una barra con accenti, cifre e simboli. Fai scorrere il dito su uno e rilascia. Se rilasci senza scorrere ottieni la prima, cioè la lettera accentata; la lettera normale è nella barra. Quanto tenere premuto si regola in Impostazioni → Digitazione (200 ms all\'inizio).</string>
     <string name="tut_swipe_title">Scrivi scorrendo</string>
     <string name="tut_swipe_body">Appoggia il dito sulla prima lettera di una parola e scorri sulle altre senza staccarlo. La parola compare con lo spazio. Se non è quella che volevi, tocca un\'altra nella barra sopra i tasti. Funziona nella lingua che stai usando.</string>
     <string name="tut_space_title">Muovi il cursore</string>

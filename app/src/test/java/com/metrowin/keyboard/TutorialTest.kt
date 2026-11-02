@@ -38,14 +38,18 @@ class TutorialTest {
         assertTrue(Tutorial.hasNew(1)); assertFalse(Tutorial.hasNew(Tutorial.VERSION)); assertFalse(Tutorial.hasNew(0))
     }
 
-    @Test fun holdBarStartsWithTheKeysOwnLetter() {
+    @Test fun holdBarStartsWithTheAccentedLetter() {
         val app = ApplicationProvider.getApplicationContext<KeyboardApp>()
         val page = KeyboardBuilder.letters(app.layouts.get("it")!!, false, true, false)
         val a = page.keys.first { it.label == "a" }
-        assertEquals("a", a.popups.first())
-        assertTrue(a.popups.contains("à"))
-        // On the top row the digit comes right after the letter.
+        assertEquals("à", a.popups.first())
+        assertTrue(a.popups.contains("a"))
+        // A letter with no accent keeps itself first, then the digit of the top row.
         assertEquals(listOf("q", "1"), page.keys.first { it.label == "q" }.popups.take(2))
+        // On the top row the digit is last, after the plain letter.
+        val e = page.keys.first { it.label == "e" }
+        assertEquals(listOf("e", "3"), e.popups.takeLast(2))
+        assertNotEquals("e", e.popups.first())
     }
 
     @Test fun hidingTheGlobeGivesTheRoomToTheSpaceBar() {

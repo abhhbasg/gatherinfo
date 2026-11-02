@@ -81,7 +81,7 @@ class SuggestionBar(context: Context) : View(context) {
         val w = width - 2 * bw
         val text = status
         if (text != null) {
-            drawText(canvas, text, x0 + w / 2f, h / 2f, w - dp(12f), c.text, false, false)
+            drawText(canvas, text, x0 + w / 2f, h / 2f, w - PAD, c.text, false, false)
             if (voiceActive) { icon.color = c.accent; Icons.draw(canvas, Icon.MIC, qx + bw / 2f, h / 2f, h * 0.42f, icon) }
             return
         }
@@ -94,15 +94,38 @@ class SuggestionBar(context: Context) : View(context) {
             }
             return
         }
-        val cell = w / 3f
+        val e = edges(w)
         for (i in 0 until 3) {
             val s = slots.getOrNull(i) ?: continue
-            if (pressedIndex == i) highlight(canvas, c, x0 + cell * i, x0 + cell * (i + 1))
-            val shown = when { s.literal -> "“${s.text}”"; s.phrase -> s.text + " …"; else -> s.text }
+            if (pressedIndex == i) highlight(canvas, c, x0 + e[i], x0 + e[i + 1])
             // The word space will insert is in the accent colour, unless that colour would not read on this bar.
             val readable = ColorMath.luminance(c.accent).let { kotlin.math.abs(it - ColorMath.luminance(c.bar)) > 0.12 }
-            drawText(canvas, shown, x0 + cell * i + cell / 2f, h / 2f, cell - dp(12f), if (s.best && readable) c.accent else c.text, s.best, s.phrase)
+            drawText(canvas, shown(s), x0 + (e[i] + e[i + 1]) / 2f, h / 2f, e[i + 1] - e[i] - PAD, if (s.best && readable) c.accent else c.text, s.best, s.phrase)
         }
+    }
+
+    private fun shown(s: Slot) = when { s.literal -> "“${s.text}”"; s.phrase -> s.text + " …"; else -> s.text }
+
+    private fun style(bold: Boolean, italic: Boolean) {
+        paint.textSize = height * 0.38f
+        paint.typeface = if (bold) Fonts.semibold(context) else if (italic) Fonts.light(context) else Fonts.regular(context)
+        paint.textSkewX = if (italic) -0.18f else 0f
+    }
+
+    /**
+     * Left edges of the three cells, plus the right end, over a width of [w]. Equal thirds while every text fits in one; otherwise the
+     * room is shared in proportion to the texts, so that a long word is not cut.
+     */
+    private fun edges(w: Float): FloatArray {
+        val want = FloatArray(3) { i ->
+            slots.getOrNull(i)?.let { style(it.best, it.phrase); paint.measureText(shown(it)) + PAD } ?: 0f
+        }
+        val e = FloatArray(4)
+        if (want.all { it <= w / 3f }) { for (i in 1..3) e[i] = w / 3f * i; return e }
+        val share = FloatArray(3) { if (slots.getOrNull(it) == null) 0f else maxOf(want[it], w / 6f) }
+        val k = w / share.sum()
+        for (i in 0 until 3) e[i + 1] = e[i] + share[i] * k
+        return e
     }
 
     private fun highlight(canvas: Canvas, c: KeyboardColors, left: Float, right: Float) {
@@ -112,9 +135,10 @@ class SuggestionBar(context: Context) : View(context) {
 
     private fun drawText(canvas: Canvas, text: String, cx: Float, cy: Float, maxW: Float, color: Int, bold: Boolean, italic: Boolean) {
         paint.color = color
-        paint.textSize = height * 0.38f
-        paint.typeface = if (bold) Fonts.semibold(context) else if (italic) Fonts.light(context) else Fonts.regular(context)
-        paint.textSkewX = if (italic) -0.18f else 0f
+        style(bold, italic)
+        // A text that is too wide is made smaller; only below a size that still reads is it cut.
+        val full = paint.measureText(text)
+        if (full > maxW) paint.textSize = maxOf(paint.textSize * maxW / full, height * 0.38f * MIN_SCALE)
         val shown = TextUtils.ellipsize(text, TextPaint(paint), maxW, TextUtils.TruncateAt.END).toString()
         val m = paint.fontMetrics
         canvas.drawText(shown, cx, cy - (m.ascent + m.descent) / 2f, paint)
@@ -126,8 +150,9 @@ class SuggestionBar(context: Context) : View(context) {
         if (x < bw) return LEFT
         if (x > width - bw) return QUICK
         val w = width - 2 * bw
-        return if (toolsOpen && status == null) ((x - bw) / (w / tools.size)).toInt().coerceIn(0, tools.size - 1)
-        else ((x - bw) / (w / 3f)).toInt().coerceIn(0, 2)
+        if (toolsOpen && status == null) return ((x - bw) / (w / tools.size)).toInt().coerceIn(0, tools.size - 1)
+        val e = edges(w)
+        return (0..2).firstOrNull { x - bw < e[it + 1] } ?: 2
     }
 
     @SuppressLint("ClickableViewAccessibility")
@@ -151,5 +176,7 @@ class SuggestionBar(context: Context) : View(context) {
         return true
     }
 
-    private companion object { const val NONE = -9; const val LEFT = -1; const val QUICK = -2 }
+    private val PAD get() = dp(12f)
+
+    private companion object { const val NONE = -9; const val LEFT = -1; const val QUICK = -2; const val MIN_SCALE = 0.55f }
 }

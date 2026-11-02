@@ -46,7 +46,7 @@ class KeyboardPage(val rows: List<List<Key>>) {
 object KeyboardBuilder {
     private val digits = "1234567890".map { it.toString() }
 
-    /** The long-press bar of a key: the key's own character first (letting go without sliding types it), then the alternatives. */
+    /** The long-press bar of a digit or symbol key: the key's own character first (letting go without sliding types it), then the alternatives. */
     private fun withBase(base: String, alternatives: List<String>): List<String> =
         if (alternatives.isEmpty()) emptyList() else listOf(base) + alternatives.filter { it != base }
 
@@ -84,10 +84,9 @@ object KeyboardBuilder {
             letters.forEachIndexed { col, l ->
                 // With no number row, the first row carries the digits as hints and as the first long-press choice.
                 val digit = if (!showNumberRow && index == 0 && col < 10) digits[col] else null
-                val popups = withBase(l, buildList {
-                    if (digit != null) add(digit)
-                    addAll(layout.longPress[l].orEmpty())
-                })
+                // The first choice is the first accented form: holding a letter is how an accent is asked for. The plain letter and the digit follow.
+                val accents = layout.longPress[l].orEmpty().filter { it != l }
+                val popups = if (accents.isEmpty() && digit == null) emptyList() else accents + l + listOfNotNull(digit)
                 keys += Key(KeyType.CHAR, l, popups = popups, hint = if (showHints) digit else null)
             }
             if (isLast) keys += Key(KeyType.BACKSPACE, weight = 1.5f, special = true)
