@@ -286,6 +286,8 @@
     <string name="tut_toolbox_body">I tre puntini a sinistra della barra aprono la cassetta degli strumenti: appunti, traduci, GIF, emoji, voce, aiuto e impostazioni. Il tasto a destra porta direttamente a uno strumento, di default gli appunti, e mostra un puntino quando hai appena copiato qualcosa. Quale strumento apre si sceglie in Impostazioni → Digitazione.</string>
     <string name="tut_clipboard_title">Appunti</string>
     <string name="tut_clipboard_body">Tutto ciò che copi viene conservato, solo su questo telefono. Tocca un elemento per incollarlo, la puntina per tenerlo per sempre, la croce per eliminarlo. Anche le foto copiate vengono conservate e si incollano come immagini dove l\'app lo permette. Quanti elementi tenere si sceglie in Impostazioni → Appunti.</string>
+    <string name="tut_smartemoji_title">Trova un\'emoji dal nome</string>
+    <string name="tut_smartemoji_body">Scrivi i due punti e una parola, come :cane, e le emoji corrispondenti compaiono nella barra dei suggerimenti: falle scorrere di lato e tocca quella che vuoi al posto di quello che hai scritto. Nel pannello emoji, la lente cerca per nome usando la tastiera stessa. I nomi sono nella tua lingua e in inglese. La ricerca emoji intelligente si disattiva in Impostazioni → Suggerimenti.</string>
     <string name="tut_emoji_title">Emoji ed emoticon classiche</string>
     <string name="tut_emoji_body">Il tasto con la faccina apre le emoji per categoria, con le recenti per prime. Tieni premuta una mano o una persona per i toni della pelle. Le ultime due schede contengono le emoticon classiche, :-) e compagnia, e i kaomoji giapponesi, che funzionano in ogni app.</string>
     <string name="tut_gif_title">GIF</string>

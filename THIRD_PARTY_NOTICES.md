@@ -13,6 +13,12 @@ which is proprietary and cannot be bundled. The files are the ones MetroWin Laun
 (<https://creativecommons.org/licenses/by-sa/4.0/>), which one-way allows use in GPL-3.0 works. The files were cleaned (see the script) and
 a few words with apostrophes were added. This attribution is the credit CC BY-SA asks for.
 
+`app/src/main/assets/bigrams/*.txt` count which word follows which in the sentences of [Tatoeba](https://tatoeba.org), licensed CC BY 2.0 FR
+(<https://creativecommons.org/licenses/by/2.0/fr/>), built by [`tools/build_bigrams.py`](tools/build_bigrams.py).
+
+`app/src/main/assets/emoji/*.tsv` hold emoji names and keywords from [emojibase-data](https://emojibase.dev) (MIT), whose texts come from the Unicode
+CLDR (Unicode License v3), built by [`tools/build_emoji_index.py`](tools/build_emoji_index.py).
+
 ## Libraries
 
 AndroidX (core, appcompat, preference, recyclerview), Apache License 2.0. Tests only: JUnit (EPL 1.0), Robolectric (MIT), org.json (JSON License).

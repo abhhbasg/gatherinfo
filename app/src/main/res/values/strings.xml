@@ -286,6 +286,8 @@
     <string name="tut_toolbox_body">The three dots on the left of the bar open the toolbox: clipboard, translate, GIF, emoji, voice, help and settings. The button on the right goes straight to one tool, the clipboard by default, and shows a dot when you have just copied something. Choose which tool it opens in Settings → Typing.</string>
     <string name="tut_clipboard_title">Clipboard</string>
     <string name="tut_clipboard_body">Everything you copy is kept, on this phone only. Tap an item to paste it, the pin to keep it for good, the cross to delete it. Copied photos are kept too and are pasted as pictures where the app allows it. You choose how many items are kept in Settings → Clipboard.</string>
+    <string name="tut_smartemoji_title">Find an emoji by name</string>
+    <string name="tut_smartemoji_body">Type a colon and a word, like :dog, and the matching emoji appear in the suggestion bar: slide them sideways and tap one to replace what you typed. In the emoji panel, the magnifier searches by name with the keyboard itself. The names are in your language and in English. Smart emoji search can be switched off in Settings → Suggestions.</string>
     <string name="tut_emoji_title">Emoji and classic emoticons</string>
     <string name="tut_emoji_body">The smiley key opens emoji by category, with the recent ones first. Hold a hand or a person for skin tones. The last two tabs hold the classic emoticons, :-) and friends, and the Japanese kaomoji, which work in every app.</string>
     <string name="tut_gif_title">GIF</string>

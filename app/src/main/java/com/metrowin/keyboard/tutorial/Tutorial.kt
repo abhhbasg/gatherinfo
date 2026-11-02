@@ -23,7 +23,7 @@ data class TutorialPage(
 
 object Tutorial {
     /** Raise this when a page is added. */
-    const val VERSION = 2
+    const val VERSION = 3
 
     val pages: List<TutorialPage> = listOf(
         TutorialPage("welcome", R.string.tut_welcome_title, R.string.tut_welcome_body),
@@ -35,6 +35,7 @@ object Tutorial {
         TutorialPage("toolbox", R.string.tut_toolbox_title, R.string.tut_toolbox_body, Icon.ELLIPSIS, since = 2),
         TutorialPage("clipboard", R.string.tut_clipboard_title, R.string.tut_clipboard_body, Icon.CLIPBOARD),
         TutorialPage("emoji", R.string.tut_emoji_title, R.string.tut_emoji_body, Icon.EMOJI),
+        TutorialPage("smartemoji", R.string.tut_smartemoji_title, R.string.tut_smartemoji_body, Icon.EMOJI, since = 3),
         TutorialPage("gif", R.string.tut_gif_title, R.string.tut_gif_body, Icon.GIF),
         TutorialPage("translate", R.string.tut_translate_title, R.string.tut_translate_body, Icon.TRANSLATE, since = 2),
         TutorialPage("voice", R.string.tut_voice_title, R.string.tut_voice_body, Icon.MIC),

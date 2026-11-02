@@ -1,5 +1,17 @@
 # Changelog
 
+## 0.3.0
+
+- **Corrections that work:** full word lists for Italian, English, Spanish, French and German (about 40,000 words each) are built in, so a mistyped word now gets a correction. "perche" becomes "perché", "dont" becomes "don't", "cose" also offers "cos'è". The lists are rebuilt with `tools/build_dictionaries.py`. *Settings → Languages* has a new entry listing where to find more dictionaries to import.
+- **Next-word prediction** is useful from the first day: common word pairs of each language are built in (`tools/build_bigrams.py`) and the keyboard also learns three-word habits. Everything stays on the phone.
+- **Long press:** the first choice is now the accented letter (hold `a`, let go: `à`); the plain letter follows it in the bar. This reverses the 0.2.0 behaviour.
+- **Suggestions are never cut with "…":** a long word gets more room and, if needed, smaller type.
+- **Clipboard:** an item deleted with the X (or cleared) no longer comes back when the keyboard is opened again.
+- **Emoji:** the panel is as tall as the keyboard and all categories are one list that scrolls. A magnifier searches emoji by name (*it, en, es, fr, de*, built from emojibase).
+- **Smart emoji search:** type `:dog` and the emoji appear in the suggestion bar, where they slide sideways. On by default; *Settings → Suggestions*.
+- **Voice:** what is heard is written in the text field as you speak instead of in the bar. Pauses of up to about four seconds no longer end the dictation, and "keep listening" is on by default.
+
+
 ## 0.2.2
 
 - **GIF:** Klipy and Imgur join GIPHY and Tenor. Picking a service shows a button that opens the page where its free key is obtained.
