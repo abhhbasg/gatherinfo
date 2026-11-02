@@ -18,6 +18,7 @@ class WordDictionary(words: List<String>, freqs: List<Int>) {
     private val order: IntArray            // indices sorted by folded form
     private val exact = HashMap<String, Int>(size * 2)
     private val byFirst = HashMap<Char, IntArray>()
+    private val apostrophed = HashMap<String, ArrayList<Int>>()   // "cose" -> the words "cos'è" and the like
 
     init {
         // Sort by folded form once; keep the arrays aligned with that order.
@@ -30,6 +31,7 @@ class WordDictionary(words: List<String>, freqs: List<Int>) {
         val lists = HashMap<Char, ArrayList<Int>>()
         for (i in 0 until size) if (word[i].isNotEmpty()) lists.getOrPut(word[i][0].lowercaseChar()) { ArrayList() }.add(i)
         for ((c, l) in lists) byFirst[c] = l.toIntArray()
+        for (i in 0 until size) if ('\'' in folded[i]) apostrophed.getOrPut(folded[i].replace("'", "")) { ArrayList() }.add(i)
     }
 
     fun contains(w: String) = exact.containsKey(w) || exact.containsKey(w.lowercase(Locale.ROOT))
@@ -61,6 +63,10 @@ class WordDictionary(words: List<String>, freqs: List<Int>) {
         }
         return top
     }
+
+    /** Words that are [typed] with an apostrophe (and maybe accents) added: "cose" gives "cos'è", "cest" gives "c'est". */
+    fun withApostrophe(typed: String): List<Candidate> =
+        apostrophed[Text.fold(typed)]?.map { Candidate(word[it], Math.log1p(freq[it].toDouble())) }.orEmpty()
 
     /** The [limit] most frequent words. */
     fun top(limit: Int, skip: (String) -> Boolean = { false }): List<Candidate> {

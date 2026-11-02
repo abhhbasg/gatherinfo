@@ -71,6 +71,43 @@ class EngineTest {
         assertTrue(off.candidates.contains("ciao"))
     }
 
+    /** The word lists that ship with the app, read from the assets folder (the tests run from app/). */
+    private fun shipped(lang: String, locale: Locale): Suggester {
+        val d = java.io.File("src/main/assets/dictionaries/$lang.txt").bufferedReader().use { WordDictionary.parse(it, locale) }
+        assertTrue("$lang has a real dictionary", d.size > 30_000)
+        return Suggester(d, UserModel(), Blocklist(), locale)
+    }
+
+    @Test fun shippedDictionariesFixTypos() {
+        val o = SuggestOptions()
+        fun fix(s: Suggester, typed: String) = s.forTyped(typed, null, o).autocorrect
+        val it = shipped("it", Locale.ITALIAN)
+        assertEquals("perché", fix(it, "perche"))
+        assertEquals("perché", fix(it, "perchè"))
+        assertEquals("più", fix(it, "piu"))
+        assertEquals("perfetto", fix(it, "perfeto"))
+        assertNull(fix(it, "casa"))
+        val en = shipped("en", Locale.ENGLISH)
+        assertEquals("don't", fix(en, "dont"))
+        assertEquals("because", fix(en, "becuase"))
+        assertEquals("tomorrow", fix(en, "tommorow"))
+        assertEquals("también", fix(shipped("es", Locale("es")), "tambien"))
+        assertEquals("maintenant", fix(shipped("fr", Locale.FRENCH), "maintenat"))
+        assertEquals("wirklich", fix(shipped("de", Locale.GERMAN), "wirklihc"))
+    }
+
+    @Test fun offersTheApostropheForm() {
+        val it = shipped("it", Locale.ITALIAN)
+        // "cose" is a word, so it is kept, but "cos'è" is offered next to it.
+        val r = it.forTyped("cose", null, SuggestOptions())
+        assertNull(r.autocorrect)
+        assertTrue(r.candidates.toString(), r.candidates.contains("cos'è"))
+        // The word after an apostrophe is checked on its own: "l'" stays.
+        assertEquals("l'amico", it.forTyped("l'amicp", null, SuggestOptions()).autocorrect)
+        assertNull(it.forTyped("l'amico", null, SuggestOptions()).autocorrect)
+        assertTrue(shipped("fr", Locale.FRENCH).forTyped("cest", null, SuggestOptions()).let { it.autocorrect == "c'est" || it.candidates.contains("c'est") })
+    }
+
     @Test fun keepsCapitalisation() {
         val s = Suggester(dict(), UserModel(), Blocklist(), Locale.ITALIAN)
         assertEquals("Ciao", s.forTyped("Caio", null, SuggestOptions()).autocorrect)

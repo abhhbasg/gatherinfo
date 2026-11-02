@@ -1,0 +1,21 @@
+# Words with an apostrophe that the subtitle list lacks. Format: word count
+c'est 1500000
+c'était 250000
+qu'il 500000
+qu'elle 200000
+qu'on 250000
+qu'est 200000
+n'est 200000
+n'a 100000
+j'ai 800000
+s'il 250000
+s'est 150000
+l'homme 80000
+l'autre 80000
+d'accord 300000
+aujourd'hui 150000
+jusqu'à 70000
+quelqu'un 150000
+n'importe 150000
+d'un 200000
+d'une 150000

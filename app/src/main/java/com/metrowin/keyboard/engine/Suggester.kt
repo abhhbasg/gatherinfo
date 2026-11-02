@@ -34,6 +34,13 @@ class Suggester(
 
     fun forTyped(typed: String, previous: String?, o: SuggestOptions): WordSuggestions {
         val lower = typed.lowercase(locale)
+        // "l'amicho": the word is what follows the apostrophe; "l'" stays as it is and is put back on each suggestion.
+        val cut = typed.indexOfFirst { Text.isApostrophe(it) }
+        if (cut > 0 && cut < typed.length - 1 && !dictionary.contains(lower)) {
+            val head = typed.substring(0, cut + 1)
+            val r = forTyped(typed.substring(cut + 1), previous, o)
+            return WordSuggestions(typed, r.candidates.map { head + it }, r.autocorrect?.let { head + it }, r.typedIsKnown)
+        }
         val known = isKnown(typed)
         val skip: (String) -> Boolean = { blocked(it, o) }
         val scores = LinkedHashMap<String, Double>()
@@ -47,6 +54,9 @@ class Suggester(
                 if (n > 0) scores[w] = scores[w]!! + 2.5 + Math.log1p(n.toDouble())
             }
         }
+
+        // The same word with an apostrophe ("cose" -> "cos'è"): offered even when the typed word is a real one.
+        if (cut < 0) for (c in dictionary.withApostrophe(lower)) if (!blocked(c.word, o)) scores[c.word] = maxOf(scores[c.word] ?: 0.0, c.score + 1.0)
 
         // Typos: only when the word is not known, so a valid word is never "corrected" to a more common one.
         var fix: Candidate? = null
