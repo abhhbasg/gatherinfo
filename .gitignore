@@ -10,3 +10,4 @@ keystore.properties
 captures/
 .cxx/
 app/build/shots/
+.kotlin/
