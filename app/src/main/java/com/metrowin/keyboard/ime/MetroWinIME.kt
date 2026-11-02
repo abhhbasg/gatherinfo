@@ -136,7 +136,7 @@ open class MetroWinIME : InputMethodService(), KeyboardListener, SuggestionBar.L
         scheduleRefresh()
     }
     private val adaptiveListener: () -> Unit = { if (prefs.adaptiveColor) scheduleRefresh() }
-    private val clipListener = ClipboardManager.OnPrimaryClipChangedListener { captureClip() }
+    private val clipListener = ClipboardManager.OnPrimaryClipChangedListener { captureClip(copied = true) }
 
     private fun screenHeight(): Int =
         if (android.os.Build.VERSION.SDK_INT >= 30) getSystemService(android.view.WindowManager::class.java).currentWindowMetrics.bounds.height()
@@ -229,7 +229,7 @@ open class MetroWinIME : InputMethodService(), KeyboardListener, SuggestionBar.L
         refreshContext()
         updateShiftFromCursor()
         updateSuggestions()
-        captureClip()
+        captureClip(copied = false)
     }
 
     override fun onFinishInputView(finishingInput: Boolean) {
@@ -759,7 +759,7 @@ open class MetroWinIME : InputMethodService(), KeyboardListener, SuggestionBar.L
     }
 
     /** Takes what was just copied into the history (text and pictures), unless the field it came from is private. */
-    private fun captureClip() {
+    private fun captureClip(copied: Boolean) {
         if (!prefs.clipboard || field == Field.PASSWORD) return
         val cm = getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
         val clip: ClipData = runCatching { cm.primaryClip }.getOrNull() ?: return
@@ -776,7 +776,7 @@ open class MetroWinIME : InputMethodService(), KeyboardListener, SuggestionBar.L
             return
         }
         val text = runCatching { item.coerceToText(this) }.getOrNull()?.toString().orEmpty()
-        if (text.isNotBlank() && app.clipboard.addText(text) && panel != Panel.CLIPBOARD) {
+        if (text.isNotBlank() && app.clipboard.addText(text, copied) && panel != Panel.CLIPBOARD) {
             clipBadge = true
             if (Tool.from(prefs.quickTool) == Tool.CLIPBOARD) bar?.setBadge(true)
         }

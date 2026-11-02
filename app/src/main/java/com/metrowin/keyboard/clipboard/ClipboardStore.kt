@@ -24,10 +24,12 @@ class ClipboardStore(private val dir: File, private val maxItems: () -> Int, pri
     private val items = ArrayList<ClipItem>()
     private val index = File(dir, "clips.json")
     private val listeners = ArrayList<() -> Unit>()
+    private val dismissed = LinkedHashSet<String>()
 
     init {
         dir.mkdirs()
         load()
+        loadDismissed()
     }
 
     @Synchronized fun all(): List<ClipItem> = items.sortedWith(compareByDescending<ClipItem> { it.pinned }.thenByDescending { it.time })
@@ -40,11 +42,16 @@ class ClipboardStore(private val dir: File, private val maxItems: () -> Int, pri
 
     fun imageFile(item: ClipItem): File? = item.file?.let { File(dir, it) }
 
-    /** Adds [text]; if the same text is already there it moves to the top instead of being doubled. */
-    fun addText(text: String): Boolean {
+    /**
+     * Adds [text]; if the same text is already there it moves to the top instead of being doubled.
+     * [copied] is false when the text was only found on the phone's clipboard (keyboard opened), not just copied: then a text the user
+     * deleted here is not brought back.
+     */
+    fun addText(text: String, copied: Boolean = true): Boolean {
         val t = text.take(MAX_TEXT)
         if (t.isBlank()) return false
         synchronized(this) {
+            if (copied) { if (dismissed.remove(t)) saveDismissed() } else if (t in dismissed) return false
             val same = items.firstOrNull { !it.image && it.text == t }
             if (same != null) same.time = now() else items += ClipItem(UUID.randomUUID().toString(), false, t, null, now(), false)
             trim()
@@ -86,6 +93,7 @@ class ClipboardStore(private val dir: File, private val maxItems: () -> Int, pri
     fun remove(id: String) {
         synchronized(this) {
             val it = items.firstOrNull { c -> c.id == id } ?: return
+            dismiss(listOf(it))
             deleteFile(it); items.remove(it)
         }
         changed()
@@ -95,6 +103,7 @@ class ClipboardStore(private val dir: File, private val maxItems: () -> Int, pri
     fun clear(includePinned: Boolean = false) {
         synchronized(this) {
             val gone = items.filter { includePinned || !it.pinned }
+            dismiss(gone)
             gone.forEach { deleteFile(it) }
             items.removeAll(gone.toSet())
         }
@@ -111,6 +120,24 @@ class ClipboardStore(private val dir: File, private val maxItems: () -> Int, pri
     }
 
     private fun deleteFile(item: ClipItem) { item.file?.let { File(dir, it).delete() } }
+
+    /** Remembers deleted texts: the phone's clipboard may still hold one, and reading it again must not restore it. Capped, oldest first out. */
+    private fun dismiss(gone: List<ClipItem>) {
+        gone.mapNotNull { it.text }.forEach { dismissed.remove(it); dismissed.add(it) }
+        while (dismissed.size > MAX_DISMISSED) dismissed.remove(dismissed.first())
+        saveDismissed()
+    }
+
+    private fun saveDismissed() {
+        runCatching { File(dir, "dismissed.json").writeText(JSONArray(dismissed.toList()).toString()) }
+    }
+
+    private fun loadDismissed() {
+        runCatching {
+            val arr = JSONArray(File(dir, "dismissed.json").readText())
+            for (n in 0 until arr.length()) dismissed.add(arr.getString(n))
+        }
+    }
 
     private fun save() {
         val arr = JSONArray()
@@ -138,5 +165,6 @@ class ClipboardStore(private val dir: File, private val maxItems: () -> Int, pri
     companion object {
         const val MAX_TEXT = 20_000
         const val MAX_IMAGE = 8 * 1024 * 1024
+        const val MAX_DISMISSED = 50
     }
 }
