@@ -1,0 +1,445 @@
+{
+ "total_records": 311,
+ "by_platform": {
+  "v2ex": 1,
+  "lemmy": 15,
+  "hackernews": 295
+ },
+ "topics": [
+  {
+   "topic": "(未归类)",
+   "n": 104
+  },
+  {
+   "topic": "编程 / 无代码建应用",
+   "n": 70,
+   "score": 1307,
+   "pay_mentions": 15,
+   "n_platforms": 2,
+   "platforms": {
+    "lemmy": 1,
+    "hackernews": 69
+   },
+   "n_communities": 2,
+   "top_communities": [
+    [
+     "hackernews:HN",
+     69
+    ],
+    [
+     "lemmy:onehundredninetysix",
+     1
+    ]
+   ],
+   "samples_file": "samples_编程_无代码建应用.jsonl"
+  },
+  {
+   "topic": "学习 / 辅导 / 个性化讲解",
+   "n": 45,
+   "score": 431,
+   "pay_mentions": 13,
+   "n_platforms": 2,
+   "platforms": {
+    "lemmy": 3,
+    "hackernews": 42
+   },
+   "n_communities": 4,
+   "top_communities": [
+    [
+     "hackernews:HN",
+     42
+    ],
+    [
+     "lemmy:technology",
+     1
+    ],
+    [
+     "lemmy:upliftingnews",
+     1
+    ],
+    [
+     "lemmy:196",
+     1
+    ]
+   ],
+   "samples_file": "samples_学习_辅导_个性化讲解.jsonl"
+  },
+  {
+   "topic": "搜索 / 研究 / 信息过滤",
+   "n": 44,
+   "score": 384,
+   "pay_mentions": 14,
+   "n_platforms": 3,
+   "platforms": {
+    "v2ex": 1,
+    "lemmy": 2,
+    "hackernews": 41
+   },
+   "n_communities": 4,
+   "top_communities": [
+    [
+     "hackernews:HN",
+     41
+    ],
+    [
+     "v2ex:create",
+     1
+    ],
+    [
+     "lemmy:upliftingnews",
+     1
+    ],
+    [
+     "lemmy:mildlyinfuriating",
+     1
+    ]
+   ],
+   "samples_file": "samples_搜索_研究_信息过滤.jsonl"
+  },
+  {
+   "topic": "可信 / 不胡编 / 带出处",
+   "n": 43,
+   "score": 15,
+   "pay_mentions": 7,
+   "n_platforms": 1,
+   "platforms": {
+    "hackernews": 43
+   },
+   "n_communities": 1,
+   "top_communities": [
+    [
+     "hackernews:HN",
+     43
+    ]
+   ],
+   "samples_file": "samples_可信_不胡编_带出处.jsonl"
+  },
+  {
+   "topic": "文档 / PDF / 表格处理与数据录入",
+   "n": 31,
+   "score": 332,
+   "pay_mentions": 8,
+   "n_platforms": 2,
+   "platforms": {
+    "lemmy": 2,
+    "hackernews": 29
+   },
+   "n_communities": 3,
+   "top_communities": [
+    [
+     "hackernews:HN",
+     29
+    ],
+    [
+     "lemmy:mildlyinfuriating",
+     1
+    ],
+    [
+     "lemmy:technology",
+     1
+    ]
+   ],
+   "samples_file": "samples_文档_PDF_表格处理与数据录入.jsonl"
+  },
+  {
+   "topic": "隐私 / 本地运行 / 数据不出门",
+   "n": 28,
+   "score": 277,
+   "pay_mentions": 5,
+   "n_platforms": 2,
+   "platforms": {
+    "lemmy": 2,
+    "hackernews": 26
+   },
+   "n_communities": 3,
+   "top_communities": [
+    [
+     "hackernews:HN",
+     26
+    ],
+    [
+     "lemmy:technology",
+     1
+    ],
+    [
+     "lemmy:mildlyinfuriating",
+     1
+    ]
+   ],
+   "samples_file": "samples_隐私_本地运行_数据不出门.jsonl"
+  },
+  {
+   "topic": "记忆与长期上下文 (AI 记住我/项目)",
+   "n": 25,
+   "score": 507,
+   "pay_mentions": 6,
+   "n_platforms": 2,
+   "platforms": {
+    "lemmy": 1,
+    "hackernews": 24
+   },
+   "n_communities": 2,
+   "top_communities": [
+    [
+     "hackernews:HN",
+     24
+    ],
+    [
+     "lemmy:technology",
+     1
+    ]
+   ],
+   "samples_file": "samples_记忆与长期上下文_AI_记住我_项目_.jsonl"
+  },
+  {
+   "topic": "求职 / 简历 / 申请自动化",
+   "n": 21,
+   "score": 187,
+   "pay_mentions": 7,
+   "n_platforms": 2,
+   "platforms": {
+    "lemmy": 1,
+    "hackernews": 20
+   },
+   "n_communities": 2,
+   "top_communities": [
+    [
+     "hackernews:HN",
+     20
+    ],
+    [
+     "lemmy:asklemmy",
+     1
+    ]
+   ],
+   "samples_file": "samples_求职_简历_申请自动化.jsonl"
+  },
+  {
+   "topic": "个人助理 / 邮件日程收件箱",
+   "n": 21,
+   "score": 6,
+   "pay_mentions": 7,
+   "n_platforms": 1,
+   "platforms": {
+    "hackernews": 21
+   },
+   "n_communities": 1,
+   "top_communities": [
+    [
+     "hackernews:HN",
+     21
+    ]
+   ],
+   "samples_file": "samples_个人助理_邮件日程收件箱.jsonl"
+  },
+  {
+   "topic": "购物 / 理财 / 生活事务",
+   "n": 19,
+   "score": 643,
+   "pay_mentions": 8,
+   "n_platforms": 2,
+   "platforms": {
+    "lemmy": 2,
+    "hackernews": 17
+   },
+   "n_communities": 3,
+   "top_communities": [
+    [
+     "hackernews:HN",
+     17
+    ],
+    [
+     "lemmy:technology",
+     1
+    ],
+    [
+     "lemmy:news",
+     1
+    ]
+   ],
+   "samples_file": "samples_购物_理财_生活事务.jsonl"
+  },
+  {
+   "topic": "内容创作 / 社媒运营 / 剪辑",
+   "n": 17,
+   "score": 716,
+   "pay_mentions": 5,
+   "n_platforms": 2,
+   "platforms": {
+    "lemmy": 3,
+    "hackernews": 14
+   },
+   "n_communities": 4,
+   "top_communities": [
+    [
+     "hackernews:HN",
+     14
+    ],
+    [
+     "lemmy:selfhosted",
+     1
+    ],
+    [
+     "lemmy:technology",
+     1
+    ],
+    [
+     "lemmy:asklemmy",
+     1
+    ]
+   ],
+   "samples_file": "samples_内容创作_社媒运营_剪辑.jsonl"
+  },
+  {
+   "topic": "客服 / 销售线索 / 小企业运营",
+   "n": 16,
+   "score": 139,
+   "pay_mentions": 5,
+   "n_platforms": 2,
+   "platforms": {
+    "lemmy": 1,
+    "hackernews": 15
+   },
+   "n_communities": 2,
+   "top_communities": [
+    [
+     "hackernews:HN",
+     15
+    ],
+    [
+     "lemmy:upliftingnews",
+     1
+    ]
+   ],
+   "samples_file": "samples_客服_销售线索_小企业运营.jsonl"
+  },
+  {
+   "topic": "文件 / 照片 / 知识库整理",
+   "n": 15,
+   "score": 168,
+   "pay_mentions": 3,
+   "n_platforms": 2,
+   "platforms": {
+    "lemmy": 1,
+    "hackernews": 14
+   },
+   "n_communities": 2,
+   "top_communities": [
+    [
+     "hackernews:HN",
+     14
+    ],
+    [
+     "lemmy:asklemmy",
+     1
+    ]
+   ],
+   "samples_file": "samples_文件_照片_知识库整理.jsonl"
+  },
+  {
+   "topic": "价格 / 订阅疲劳 / 一个工具统一",
+   "n": 13,
+   "score": 5,
+   "pay_mentions": 7,
+   "n_platforms": 2,
+   "platforms": {
+    "v2ex": 1,
+    "hackernews": 12
+   },
+   "n_communities": 2,
+   "top_communities": [
+    [
+     "hackernews:HN",
+     12
+    ],
+    [
+     "v2ex:create",
+     1
+    ]
+   ],
+   "samples_file": "samples_价格_订阅疲劳_一个工具统一.jsonl"
+  },
+  {
+   "topic": "电脑 / 浏览器 / 手机操作代理 (代我点)",
+   "n": 13,
+   "score": 158,
+   "pay_mentions": 2,
+   "n_platforms": 2,
+   "platforms": {
+    "lemmy": 1,
+    "hackernews": 12
+   },
+   "n_communities": 2,
+   "top_communities": [
+    [
+     "hackernews:HN",
+     12
+    ],
+    [
+     "lemmy:mildlyinfuriating",
+     1
+    ]
+   ],
+   "samples_file": "samples_电脑_浏览器_手机操作代理_代我点_.jsonl"
+  },
+  {
+   "topic": "健康 / 饮食 / 情绪陪伴",
+   "n": 8,
+   "score": 127,
+   "pay_mentions": 4,
+   "n_platforms": 2,
+   "platforms": {
+    "lemmy": 1,
+    "hackernews": 7
+   },
+   "n_communities": 2,
+   "top_communities": [
+    [
+     "hackernews:HN",
+     7
+    ],
+    [
+     "lemmy:mildlyinfuriating",
+     1
+    ]
+   ],
+   "samples_file": "samples_健康_饮食_情绪陪伴.jsonl"
+  },
+  {
+   "topic": "写作润色 / 去 AI 味 / 保持个人风格",
+   "n": 5,
+   "score": 2,
+   "pay_mentions": 1,
+   "n_platforms": 1,
+   "platforms": {
+    "hackernews": 5
+   },
+   "n_communities": 1,
+   "top_communities": [
+    [
+     "hackernews:HN",
+     5
+    ]
+   ],
+   "samples_file": "samples_写作润色_去_AI_味_保持个人风格.jsonl"
+  },
+  {
+   "topic": "会议 / 通话 / 语音转录总结",
+   "n": 3,
+   "score": 0,
+   "pay_mentions": 1,
+   "n_platforms": 1,
+   "platforms": {
+    "hackernews": 3
+   },
+   "n_communities": 1,
+   "top_communities": [
+    [
+     "hackernews:HN",
+     3
+    ]
+   ],
+   "samples_file": "samples_会议_通话_语音转录总结.jsonl"
+  }
+ ]
+}
