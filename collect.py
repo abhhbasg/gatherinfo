@@ -28,7 +28,7 @@ def get(url, tries=3):
                 return json.loads(r.read().decode("utf-8", "replace"))
         except Exception as e:
             print("  ! retry", i, url[:90], e, file=sys.stderr)
-            time.sleep(2 * (i + 1))
+            time.sleep(8 * (i + 1))
     return None
 
 # 需求表达句式（英文 + 中文）
@@ -88,7 +88,7 @@ def _reddit_sub(sub):
         field = "body" if kind == "comments" else "query"
         url = (f"https://arctic-shift.photon-reddit.com/api/{kind}/search?"
                + urllib.parse.urlencode({"subreddit": sub, field: q, "limit": 100, "after": a, "before": b, "sort": "desc"}))
-        d = get(url, tries=2)
+        d = get(url, tries=3); time.sleep(1.5)
         for x in (d or {}).get("data") or []:
             text = x.get("body") if kind == "comments" else (x.get("title", "") + "\n" + (x.get("selftext") or ""))
             recs.append({"platform": "reddit", "community": sub, "kind": kind[:-1], "id": x.get("id"),
@@ -100,7 +100,7 @@ def _reddit_sub(sub):
 def reddit(f):
     from concurrent.futures import ThreadPoolExecutor
     n = 0
-    with ThreadPoolExecutor(6) as ex:
+    with ThreadPoolExecutor(2) as ex:
         for sub, recs in ex.map(_reddit_sub, SUBS):
             got = sum(emit(f, r) for r in recs)
             f.flush(); n += got
