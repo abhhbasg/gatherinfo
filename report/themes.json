@@ -1,0 +1,1431 @@
+{
+ "total": 776,
+ "by_platform": {
+  "v2ex": 1,
+  "lemmy": 15,
+  "reddit": 465,
+  "hackernews": 295
+ },
+ "themes": [
+  {
+   "theme": "A 识别/过滤 AI 生成内容（真人认证）",
+   "n": 47,
+   "platforms": {
+    "reddit": 20,
+    "hackernews": 27
+   },
+   "n_communities": 11,
+   "score_sum": 1110,
+   "top_communities": [
+    [
+     "hackernews:HN",
+     27
+    ],
+    [
+     "reddit:Etsy",
+     9
+    ],
+    [
+     "reddit:GradSchool",
+     2
+    ],
+    [
+     "reddit:legaladvice",
+     2
+    ],
+    [
+     "reddit:Entrepreneur",
+     1
+    ],
+    [
+     "reddit:sidehustle",
+     1
+    ],
+    [
+     "reddit:content_marketing",
+     1
+    ],
+    [
+     "reddit:YouTubers",
+     1
+    ]
+   ],
+   "examples": [
+    {
+     "score": 625,
+     "where": "reddit/Teachers",
+     "url": "https://reddit.com/r/Teachers/comments/1sjlhbx/at_my_wits_end_with_ai_cheating_how_are_you_all/",
+     "text": "At my wit's end with AI cheating. How are you all handling it? I teach in a High School and this year has been brutal. I can't prove anything with most of student submissions and the tools I've tried (Turnitin, GPTZero) feel like I'm always second-guessing the results.  What's frustrating me most is that the problem isn't really \\*detecting\\* AI after the fact; it's that students are constantly ga"
+    },
+    {
+     "score": 102,
+     "where": "hackernews/HN",
+     "url": "https://news.ycombinator.com/item?id=48894630",
+     "text": "Show HN: Jacquard, a programming language for AI-written, human-reviewed code I'm fascinated by the generative AI wave rolling over us, and wondered if AI could create a language that it might prefer using over the ones created by and for humans. To create the design, I had AI analyze the ASTs of several mainstream languages plus a few of the conceptually groundbreaking but esoteric ones (listed i"
+    },
+    {
+     "score": 95,
+     "where": "reddit/PhD",
+     "url": "https://reddit.com/r/PhD/comments/1ukm2if/reviewed_a_manuscript_last_week_three_of_the/",
+     "text": "Reviewed a manuscript last week, three of the cited papers did not exist, this is becoming normal Needed to vent and also warn anyone in the review trenches. I am a PhD candidate reviewing for the first time this year, and last week I reviewed a submission that looked fine on the surface, decent methodology, clean writing. Started checking references as I always do and three of the cited papers do"
+    },
+    {
+     "score": 92,
+     "where": "reddit/Etsy",
+     "url": "https://reddit.com/r/Etsy/comments/1pbyyy0/mild_rant_about_my_feelings_on_art_etsy_lately/",
+     "text": "Mild Rant about my feelings on art etsy lately regarding AI usage I have been viewing etsy's art options a lot lately, and I have even purchased a few \"couples photo\" digital art. It was so obviously AI once I obtained it.   Why is there so many AI \"artists\"? It is actually so annoying. What is the point of even ordering art if you can just ask google journeys and get the same result (which are pr"
+    },
+    {
+     "score": 73,
+     "where": "reddit/Etsy",
+     "url": "https://reddit.com/r/Etsy/comments/1t0fsh0/bought_a_digital_product_that_is_very_clearly_ai/",
+     "text": "Bought a digital product that is very clearly AI generated and this was not disclosed in the description. Am I wrong for wanting a refund? I bought a set of mockups and from the listing photos they looked fine but when I downloaded and opened them they are all TERRIBLE AI generated slop. Like one of the photos has what is supposed to be flowers on the side, but the AI made the flowers pearls.  As "
+    },
+    {
+     "score": 29,
+     "where": "reddit/Etsy",
+     "url": "https://reddit.com/r/Etsy/comments/1plv2nr/how_to_block_ai_etsy_seller/",
+     "text": "How to block AI Etsy seller There is an Etsy seller posting AI crochet patterns and I really do not want to see their items clog up the listings. It’s really just false advertising and it really makes me upset. It’s making it harder to find actual listings since it’s now on my home page “inspiration” section too. I have tried to report the page but Etsy hasn’t responded and I have a feeling they w"
+    },
+    {
+     "score": 26,
+     "where": "reddit/Etsy",
+     "url": "https://reddit.com/r/Etsy/comments/1sftc2w/do_you_guys_think_this_is_a_valid_reason_for/of02w87/",
+     "text": "I can't comment on sewing but just want to chime in that the amount of AI art on Etsy is INSANE. I see some sellers claiming stuff is hand drawn and.... no no it is not. I REALLY wish there was an anti-AI policy that was clear.  But I absolutely agree with you. I don't sew but I can imagine you want to see how the REAL garment will look. If the seller has to use AI have they even tried the patter "
+    },
+    {
+     "score": 16,
+     "where": "reddit/GradSchool",
+     "url": "https://reddit.com/r/GradSchool/comments/1srmye5/confused_i_think_my_professor_is_hitting_on_me/ohj0rly/",
+     "text": "As a faculty member who is a gender minority, and who was a victim of sexual assault in grad school, I’m here to second the ombudsperson. I had no idea when I was a student the ombudsman existed. It’s not uncommon for me to have a female student want to disclose to me. If I get a sense this might be about to happen, I try to bring up the ombudsperson, because a lot of people don’t realize faculty "
+    },
+    {
+     "score": 14,
+     "where": "reddit/sidehustle",
+     "url": "https://reddit.com/r/sidehustle/comments/1vtc8gy/the_tool_stack_i_have_been_using_for_my_faceless/",
+     "text": "The tool stack I have been using for my faceless channels I am running a few faceless channels and use many ai tools to for different part, this is the current stack.  Research: I mainly use perplexity to identify topics and format for the video. Its great at research and competitor analysis.  Script: Claude is best out there, I use some skills like Humanizer and content writing to remove AI slop,"
+    },
+    {
+     "score": 12,
+     "where": "reddit/content_marketing",
+     "url": "https://reddit.com/r/content_marketing/comments/1r6yiqz/i_work_12_hours_to_get_paid_for_1_because/",
+     "text": "I work 12 hours to get paid for 1 because apparently AI is that impressive. What am I doing wrong? The no win: I turn in AI slop and get fired, don't turn in AI slop and get fired. It feels like I work nonstop these days, and it’s mostly for free. I wish AI were as horrifyingly impressive as they say. I wish it could do all my work for me, because then maybe I’d know what it’s like to sleep eight "
+    },
+    {
+     "score": 8,
+     "where": "reddit/Entrepreneur",
+     "url": "https://reddit.com/r/Entrepreneur/comments/1xf40r0/leaving_well_paying_job_for_a_small_business/19rn6kgafygow/",
+     "text": "Keep your job. I was in your exact situation more than a year ago. I actually like entrepreneurship and I think I’m the right “type” for it. But I wish I had kept my (rather easy, well paying job) for longer while testing business ideas on the side, rather than quitting and jumping head-on into startup life. The stress is obviously high but to me it’s manageable; not making money however, is an un"
+    },
+    {
+     "score": 8,
+     "where": "reddit/Etsy",
+     "url": "https://reddit.com/r/Etsy/comments/1w7lrxx/finally_something_good_from_etsy/p7y3yuy/",
+     "text": "In my case yeah my main issue is that the search function isn't great at filtering AI listings, but also listings that are drop shipped. I use etsy for vintage and small creators and makers, not temu quality shit, and I wish there was a way to look through my searches easier than having to comb through the results and check each shop individually. What tends to happen is thst i get overwhelmed and"
+    }
+   ]
+  },
+  {
+   "theme": "J 小商家获客与内容持续生产",
+   "n": 46,
+   "platforms": {
+    "lemmy": 2,
+    "reddit": 29,
+    "hackernews": 15
+   },
+   "n_communities": 22,
+   "score_sum": 731,
+   "top_communities": [
+    [
+     "hackernews:HN",
+     15
+    ],
+    [
+     "reddit:socialmedia",
+     4
+    ],
+    [
+     "reddit:startups",
+     3
+    ],
+    [
+     "reddit:ChatGPT",
+     2
+    ],
+    [
+     "reddit:ClaudeAI",
+     2
+    ],
+    [
+     "reddit:Entrepreneur",
+     2
+    ],
+    [
+     "reddit:sales",
+     2
+    ],
+    [
+     "reddit:recruiting",
+     2
+    ]
+   ],
+   "examples": [
+    {
+     "score": 398,
+     "where": "lemmy/news",
+     "url": "https://lemmy.world/post/42454584",
+     "text": "Trump’s post-truth agenda beaten back as Americans refuse to accept ICE lies ***Effort to manipulate killing of Alex Pretti collapsed after footage torpedoed ‘domestic terrorist’ claim – could this be a turning point?***  Facing a widespread backlash from the public, Democrats and even his own Republican party, Trump was forced into a partial retreat, distancing himself from efforts by aides such "
+    },
+    {
+     "score": 129,
+     "where": "lemmy/upliftingnews",
+     "url": "https://programming.dev/comment/9953732",
+     "text": "I'm really torn on news like this.  I'll get it out of the way that I am jealous. I wish I had been able to do what she did. I also think that if more people cared about education on this level, we could really get a significantly smarter population and start to solve some of the problems in the world.  Having said that, I have concerns over what her life is like. I would need a lot more details t"
+    },
+    {
+     "score": 76,
+     "where": "reddit/sales",
+     "url": "https://reddit.com/r/sales/comments/1wwam0v/examples_of_high_performing_sales_people/",
+     "text": "Examples of high performing sales people Something I wish there was more of is examples of high performing sales people in action. For instance, you can watch someone play basketball and tell when someone is playing at a high level, but unfortunately there’s very few anecdotes of sales people demonstrating real live performance, and I’d imagine this is largely due to confidentiality reasons.   It’"
+    },
+    {
+     "score": 30,
+     "where": "reddit/college",
+     "url": "https://reddit.com/r/college/comments/1xbq1vo/gen_z_college_students_are_you_aware_how/19rfwfxt477j8/",
+     "text": "Gosh, covid ruined me... I was a great student until then. The shift in education was something I could not adjust to for the life of me. I went from As and Bs to failing classes. I lost my scholarship and ended up having to work to pay for my classes. I went from full-time to part-time student. It wasn't until I could go back in person that my grades improved, but my college never brought back as"
+    },
+    {
+     "score": 21,
+     "where": "reddit/ChatGPT",
+     "url": "https://reddit.com/r/ChatGPT/comments/1wpvi9f/i_hate_how_chatgpt_talks/",
+     "text": "I hate how Chatgpt talks I feel like it deliberately adds far too much fluff talk in its messages specifically in order to 'befriend' and basically make emotionally lonelier Pro+ users feel a sense of attachment, but it falls flat and feels utterly irritating when you are using it for simple tasks or as an assistant for specific work.  For example, it would over-exaggerate or under-exaggerate impo"
+    },
+    {
+     "score": 17,
+     "where": "reddit/ChatGPT",
+     "url": "https://reddit.com/r/ChatGPT/comments/1x3w9yl/the_new_ill_provide_responses_in_chunks_ux_is_a/",
+     "text": "The New \"I'll provide responses in chunks\" UX is a downgrade I find the new \"feature\" where GPT-6 Thinking starts creating a complete answer immediately and then updates it with additional reasoning and information it finds really annoying and a downgrade compared to be previous model behavior.  It start with an incompletely reasoned speculative answer, that then evolves throughout the answer it p"
+    },
+    {
+     "score": 10,
+     "where": "reddit/sidehustle",
+     "url": "https://reddit.com/r/sidehustle/comments/1so03hm/good_side_hustles_from_a_laptop/ogxzs3h/",
+     "text": "Fair pushback, and you're right that if it was just hours updates, nobody would pay for it. The actual monthly work is weekly posts (GBP rewards active profiles with better map pack ranking), photo uploads, Q&A management, responding to reviews within 24 hours, adding products/services, tracking the insights dashboard, and catching the random suspensions or listing hijacks that happen more than yo"
+    },
+    {
+     "score": 9,
+     "where": "reddit/marketing",
+     "url": "https://reddit.com/r/marketing/comments/1qs71wo/how_are_small_local_businesses_keeping_ad/",
+     "text": "How are small, local businesses keeping ad creatives fresh without burning time? I own a dance studio, so running local Facebook ads is pretty simple for me. My challenge is that creating new graphics and ad copy takes a lot of time because I have to keep everything fresh in our area and keep our CPL low. Is there an AI tool that can help automate some of this? Or would it make sense to hire a VA "
+    },
+    {
+     "score": 7,
+     "where": "reddit/LawFirm",
+     "url": "https://reddit.com/r/LawFirm/comments/1r87ygs/what_happens_when_wall_street_takes_over_your_law/o63sbjg/",
+     "text": "I wish I had more insight into this question and it's something I'm exploring in follow-up stories. A lot of what I know comes from whistleblower reports, Bar discipline, and lawsuits, which say that various Arizona firms generally acted with a greater disregard for ethics standards -- e.g. not giving lawyers the resources they needed to properly represent their clients, playing fast and loose wit"
+    },
+    {
+     "score": 4,
+     "where": "reddit/GeminiAI",
+     "url": "https://reddit.com/r/GeminiAI/comments/1xb4fy7/which_model_is_more_suitable_for_learning/19reisrp104qq/",
+     "text": "Go to google.notebook.com The first thing you want to do is find good sources so that you can use those inside the notebook as your references for your studies. You ask Notebook to go out and find current sources of material for the specific topics in statistics you want to focus on. Make sure that you are very specific and not too general in your search criteria. What I mean by that is don't just"
+    },
+    {
+     "score": 4,
+     "where": "hackernews/HN",
+     "url": "https://news.ycombinator.com/item?id=48017838",
+     "text": "I'm looking for an AI Automation Engineer role or gig Hi all, I'm an AI automation engineer who builds systems that replace manual work, scale outreach, and turn workflows into revenue. I have sent out working systems for managing leads to CRM, finding real estate deals, sorting emails with AI, chatbot integration, AI voice integration, and agentic RAG systems. I am also always improving my skills"
+    },
+    {
+     "score": 3,
+     "where": "reddit/sales",
+     "url": "https://reddit.com/r/sales/comments/1tvop60/am_i_bad_at_this_or_was_i_set_up_to_fail/",
+     "text": "Am I bad at this, or was I set up to fail? Feeling stressed and unsure here...  So I got hired as a part-time appointment setter through linkedin. Main KPI is scheduling meetings, but they also want 2x posts a day, new followers, thought leadership, etc...  The company is a \"boutique consulting firm\" focused on \"implementing enterprise AI\". The founders all have 20+ years of exp in telecom and are"
+    }
+   ]
+  },
+  {
+   "theme": "B 记住我/品牌语气的持久记忆",
+   "n": 42,
+   "platforms": {
+    "lemmy": 1,
+    "reddit": 22,
+    "hackernews": 19
+   },
+   "n_communities": 13,
+   "score_sum": 587,
+   "top_communities": [
+    [
+     "hackernews:HN",
+     19
+    ],
+    [
+     "reddit:productivity",
+     5
+    ],
+    [
+     "reddit:ChatGPT",
+     4
+    ],
+    [
+     "reddit:ChatGPTPro",
+     4
+    ],
+    [
+     "reddit:ClaudeAI",
+     2
+    ],
+    [
+     "lemmy:technology",
+     1
+    ],
+    [
+     "reddit:OpenAI",
+     1
+    ],
+    [
+     "reddit:artificial",
+     1
+    ]
+   ],
+   "examples": [
+    {
+     "score": 501,
+     "where": "lemmy/technology",
+     "url": "https://lemmy.world/post/52992176",
+     "text": "Intel to release new CPUs on old socket in early 2027 says Gigabyte - memory crisis making DDR4 desirable again So you mean to tell me they had the technology the whole time to make upgraded modular chips and sell them for pre-existing computer architecture but chose not to because they knew people would pay for the shiny new toys.  There's a chip crisis and SUDDENLY!!!!!! We're all able to use ne"
+    },
+    {
+     "score": 21,
+     "where": "reddit/ChatGPT",
+     "url": "https://reddit.com/r/ChatGPT/comments/1wpvi9f/i_hate_how_chatgpt_talks/",
+     "text": "I hate how Chatgpt talks I feel like it deliberately adds far too much fluff talk in its messages specifically in order to 'befriend' and basically make emotionally lonelier Pro+ users feel a sense of attachment, but it falls flat and feels utterly irritating when you are using it for simple tasks or as an assistant for specific work.  For example, it would over-exaggerate or under-exaggerate impo"
+    },
+    {
+     "score": 13,
+     "where": "reddit/ClaudeAI",
+     "url": "https://reddit.com/r/ClaudeAI/comments/1x3vm7e/how_do_you_organize_your_ai_conversations/",
+     "text": "How do you organize your AI conversations? I use AI for different parts of my life — work, fitness, personal projects, and personal matters.  Sometimes it gets messy keeping conversations organized and making sure the AI has the right context. I often end up searching through old chats or repeating information.  How do you handle this today? Do features like Projects, folders, or memory solve the "
+    },
+    {
+     "score": 10,
+     "where": "reddit/productivity",
+     "url": "https://reddit.com/r/productivity/comments/1padxob/tried_almost_every_ai_notetaking_app_wearable/",
+     "text": "Tried almost every AI note-taking app & wearable.  they fail in real-life use I’ve spent the past 2–3 months testing almost every AI note-taking app and AI recording wearable I could find. They do help, I can finally capture things I normally forget.  But I’ve also run into some  problems that make them hard to rely on in real life.  Last week I attended a founder conference. Each speaker had only"
+    },
+    {
+     "score": 8,
+     "where": "reddit/jobs",
+     "url": "https://reddit.com/r/jobs/comments/1sxb3q1/i_realized_i_dont_actually_want_the_life_i_spent/oimth3g/",
+     "text": "So many people are all wrap up in what they do to make a living. It's a job it is not who you are. I an husband a father and a happy man. I worked for a living and now retired. People forget what comes first in life. I had a nabor that was a professor who had 5 degrees.  She was a very nice woman but she passed just like the rest of us will. When I go I want people to remember me as a good husband"
+    },
+    {
+     "score": 6,
+     "where": "reddit/ChatGPTPro",
+     "url": "https://reddit.com/r/ChatGPTPro/comments/1sh812j/ai_memory_rules_dont_work_heres_what_does/",
+     "text": "AI memory rules don't work. Here's what does Every AI coding tool now has memory. Claude Code has memory files. Cursor has .cursorrules. ChatGPT has persistent memory. You correct the AI, it \"learns,\" life is good.  Except it isn't.  I tracked my Claude Code session yesterday. Saved 7 correction rules. Violated 3 of them within the same session. The rules were there. Claude read them. Claude ignor"
+    },
+    {
+     "score": 5,
+     "where": "reddit/productivity",
+     "url": "https://reddit.com/r/productivity/comments/1pxhyvf/ai_schedule_management_options/",
+     "text": "AI Schedule Management Options What I'm curious about is basically this - is there an AI tool that can take all my tasks, goals, hobbies, and meetings and give me a daily schedule factoring in task importance and deadline, adjusting for time spent as it goes? I also would love something that can handle unconventional scheduling items too. Like if I wanted to work out twice a week, it can factor th"
+    },
+    {
+     "score": 5,
+     "where": "hackernews/HN",
+     "url": "https://news.ycombinator.com/item?id=48239117",
+     "text": "Show HN: CoreMem – Portable context for AI agents CoreMem lets you build collections of context, called a mem, and share it with any AI agent via URL, a Chrome extension, MCP, Cursor/VS Code plugins, a skill, and more. Instead of re-explaining your project or goal when you switch agents or start new sessions, CoreMem keeps your context centrally organized so that any AI tool can read it. This orig"
+    },
+    {
+     "score": 3,
+     "where": "reddit/ChatGPT",
+     "url": "https://reddit.com/r/ChatGPT/comments/1xdxg17/gpt6_for_creative_writing_and_making_stories/",
+     "text": "GPT-6 For Creative Writing and Making Stories IMO I use GPT-6 High Thinking for my model kit assemblies and making creative stories with it  But my god, GPT-6 on High Thinking CHAT MODE is slow as molasses, taking up to 10 minutes of waiting time for long chats.   Other than that, the memory retention is.....alright, and the length response is what I want. But my god I wish it could be faster in g"
+    },
+    {
+     "score": 3,
+     "where": "reddit/ChatGPTPro",
+     "url": "https://reddit.com/r/ChatGPTPro/comments/1x1n8eo/how_to_backup_and_move_your_entire_chat_history/",
+     "text": "How to backup and move your entire chat history between services Moving your actual, entire history wasn't possible. Having to start over is horrible. Not having a truly reloadable backup of your work, research or AI ally is rough. Data portability is our right, and we shouldn't have to start over or be locked in because of it.  ChatGPT and Claude's export give you a JSON file that is bloated with"
+    },
+    {
+     "score": 2,
+     "where": "reddit/Accounting",
+     "url": "https://reddit.com/r/Accounting/comments/1swjyqk/what_repetitive_annoying_or_risky_tasks_in/oig7tno/",
+     "text": "Finally, i love these posts. Here are 3 from me.  - Sending letters to colleagues in other departments. I run out to get stamps daily and it just takes a lot out of my day  - accounting manager but i forget what a debit and credit is haha  - when i have a lot of numbers to sum in excel, i wish there was a way to add everything efficiently instead of click each cell then typing \"+\""
+    },
+    {
+     "score": 2,
+     "where": "hackernews/HN",
+     "url": "https://news.ycombinator.com/item?id=46872109",
+     "text": "Show HN: Sandy – Accelerate AI agents: think once, replay forever I gave my AI agent a Sandevistan. What's the point of browser automation that's slower than a human? Watching it pause for seconds before every click drove me crazy. We build muscle memory for repetitive tasks—why can't AI? Traditional Agent Observe → LLM reasoning (slow) → Action → Observe → LLM... repeat Stops to think before ever"
+    }
+   ]
+  },
+  {
+   "theme": "H 可信研究：带出处、不编造",
+   "n": 92,
+   "platforms": {
+    "lemmy": 1,
+    "reddit": 45,
+    "hackernews": 46
+   },
+   "n_communities": 28,
+   "score_sum": 527,
+   "top_communities": [
+    [
+     "hackernews:HN",
+     46
+    ],
+    [
+     "reddit:ClaudeAI",
+     6
+    ],
+    [
+     "reddit:productivity",
+     5
+    ],
+    [
+     "reddit:ChatGPTPro",
+     4
+    ],
+    [
+     "reddit:socialmedia",
+     3
+    ],
+    [
+     "reddit:legaladvice",
+     3
+    ],
+    [
+     "reddit:VideoEditing",
+     2
+    ],
+    [
+     "reddit:PhD",
+     2
+    ]
+   ],
+   "examples": [
+    {
+     "score": 125,
+     "where": "lemmy/mildlyinfuriating",
+     "url": "https://lemmy.world/comment/2386956",
+     "text": "The fall of newspapers led us down the path of click bait, low quality, ad driven \"news\". Very few newspapers survived the transition to digital because suddenly nobody wanted to pay for  access to something they could get online for free. Those that did survive mostly exist in a much smaller form with low funding and reduced quality.   Personally, I'm excited to see it becoming more common for pe"
+    },
+    {
+     "score": 95,
+     "where": "reddit/PhD",
+     "url": "https://reddit.com/r/PhD/comments/1ukm2if/reviewed_a_manuscript_last_week_three_of_the/",
+     "text": "Reviewed a manuscript last week, three of the cited papers did not exist, this is becoming normal Needed to vent and also warn anyone in the review trenches. I am a PhD candidate reviewing for the first time this year, and last week I reviewed a submission that looked fine on the surface, decent methodology, clean writing. Started checking references as I always do and three of the cited papers do"
+    },
+    {
+     "score": 85,
+     "where": "reddit/Accounting",
+     "url": "https://reddit.com/r/Accounting/comments/1tjqq0j/rejected_from_job_for_using_ai_for_assessment/",
+     "text": "Rejected from job for \"Using AI\" for assessment Hello Reddit! While wrapping up my time in college, I was also going through a multi-step interview process for a competitive remote tax position. I thought I'd be an excellent fit; I tailored my resume, wrote the most competitive cover letter I've ever written, and reached out for some great references.      After advancing past the initial steps, I"
+    },
+    {
+     "score": 44,
+     "where": "reddit/sidehustle",
+     "url": "https://reddit.com/r/sidehustle/comments/1skcj2c/whats_a_boring_side_hustle_that_is_surprisingly/og047tp/",
+     "text": "that's great to hear for your niece! im curious though why people would pay for this and take the trouble of going to a in-person session when there are so many free resources for this online and people could also easily get help from AI? no hate, just curiousity"
+    },
+    {
+     "score": 37,
+     "where": "reddit/legaladvice",
+     "url": "https://reddit.com/r/legaladvice/comments/1xd2sus/update_got_subpoenaed_as_a_witness_at_my_former/19risn6qt20o1/",
+     "text": "This post, and the \"advice\" in the comments have gotten out of hand.  I had meant to comment on the first post, and wish I had, but I got busy.  This poor person...  OP-  Your managers/management are committing a crime.  Compelling someone to not show up for a criminal witness subpoena is a crime in Maryland.  Maryland Criminal Law § 9-302.  Its pretty easy - go Google it.  I am sure the prosecuto"
+    },
+    {
+     "score": 21,
+     "where": "reddit/ChatGPT",
+     "url": "https://reddit.com/r/ChatGPT/comments/1wpvi9f/i_hate_how_chatgpt_talks/",
+     "text": "I hate how Chatgpt talks I feel like it deliberately adds far too much fluff talk in its messages specifically in order to 'befriend' and basically make emotionally lonelier Pro+ users feel a sense of attachment, but it falls flat and feels utterly irritating when you are using it for simple tasks or as an assistant for specific work.  For example, it would over-exaggerate or under-exaggerate impo"
+    },
+    {
+     "score": 17,
+     "where": "reddit/smallbusiness",
+     "url": "https://reddit.com/r/smallbusiness/comments/1xgbq6w/being_sued_as_a_small_business_owner_what_happens/19rpdgok3r203/",
+     "text": "I understand your point. What concerns me most is how difficult it can be for a small business to navigate a legal dispute when legal help is so expensive. I’m still trying to understand the claims and figure out the best way forward. I wish there were more accessible resources to help small businesses navigate situations like this. Thanks for sharing your perspective."
+    },
+    {
+     "score": 10,
+     "where": "reddit/ChatGPTPro",
+     "url": "https://reddit.com/r/ChatGPTPro/comments/1sc5kau/best_ai_tool_to_format_and_export_a_codebase_into/",
+     "text": "Best AI tool to format and export a codebase into a clean, printable document? Hey everyone,  I’m looking for an AI-powered tool (or workflow) where I can input an entire codebase and give it instructions on how to format the output—basically turning the source code into a well-structured, printable document.  What I’m aiming for:  * Ability to ingest a full project (multiple files, folders, etc.)"
+    },
+    {
+     "score": 9,
+     "where": "reddit/socialmedia",
+     "url": "https://reddit.com/r/socialmedia/comments/1soaehu/are_influencers_just_modernday_scammers_with/ogroqpi/",
+     "text": "In my opinion, YES a lot of them are. Some, I think, or hope, have decent intentions. But a lot of them are def modern day scammers. But with the world today, with AI threatening jobs and costs rising… can we really blame them? I’m not supporting them, but I get it. They’re trying to find another source of income they have more control over. In some ways I wish I had it in me to do the same, but i"
+    },
+    {
+     "score": 8,
+     "where": "reddit/productivity",
+     "url": "https://reddit.com/r/productivity/comments/1up20g9/digital_organization_help_im_hoping_someone_in/",
+     "text": "Digital organization help, I’m hoping someone in this group has a solution because I’m completely stuck. I currently have 52,000+ photos that I’m trying to organize into categories. My goal is to sort everything into specific groups, but the process has become incredibly overwhelming.   So far I have tried:   • Using Apple Notes and creating separate folders/notes for each category. This works, bu"
+    },
+    {
+     "score": 7,
+     "where": "reddit/LawFirm",
+     "url": "https://reddit.com/r/LawFirm/comments/1r87ygs/what_happens_when_wall_street_takes_over_your_law/o63sbjg/",
+     "text": "I wish I had more insight into this question and it's something I'm exploring in follow-up stories. A lot of what I know comes from whistleblower reports, Bar discipline, and lawsuits, which say that various Arizona firms generally acted with a greater disregard for ethics standards -- e.g. not giving lawyers the resources they needed to properly represent their clients, playing fast and loose wit"
+    },
+    {
+     "score": 6,
+     "where": "reddit/ChatGPTPro",
+     "url": "https://reddit.com/r/ChatGPTPro/comments/1sh812j/ai_memory_rules_dont_work_heres_what_does/",
+     "text": "AI memory rules don't work. Here's what does Every AI coding tool now has memory. Claude Code has memory files. Cursor has .cursorrules. ChatGPT has persistent memory. You correct the AI, it \"learns,\" life is good.  Except it isn't.  I tracked my Claude Code session yesterday. Saved 7 correction rules. Violated 3 of them within the same session. The rules were there. Claude read them. Claude ignor"
+    }
+   ]
+  },
+  {
+   "theme": "F 个人排程/督促/ADHD 执行教练",
+   "n": 48,
+   "platforms": {
+    "reddit": 39,
+    "hackernews": 9
+   },
+   "n_communities": 20,
+   "score_sum": 340,
+   "top_communities": [
+    [
+     "reddit:productivity",
+     10
+    ],
+    [
+     "hackernews:HN",
+     9
+    ],
+    [
+     "reddit:ADHD",
+     6
+    ],
+    [
+     "reddit:socialmedia",
+     5
+    ],
+    [
+     "reddit:GradSchool",
+     2
+    ],
+    [
+     "reddit:jobs",
+     2
+    ],
+    [
+     "reddit:ChatGPT",
+     1
+    ],
+    [
+     "reddit:ClaudeAI",
+     1
+    ]
+   ],
+   "examples": [
+    {
+     "score": 148,
+     "where": "reddit/ADHD",
+     "url": "https://reddit.com/r/ADHD/comments/1sz3y4e/whats_a_lifealtering_book_or_resource_on_adhd/oiyuriw/",
+     "text": "**The ADHD Affect on Marriage** - Melissa Orlov   Applies to any serious long-term relationship, not just marriage.   There are incredibly common patterns and situations that come up in an ADHD relationship. I wish I had read this book YEARS AGO. It would have saved me and my spouse a huge amount of pain."
+    },
+    {
+     "score": 85,
+     "where": "reddit/Accounting",
+     "url": "https://reddit.com/r/Accounting/comments/1tjqq0j/rejected_from_job_for_using_ai_for_assessment/",
+     "text": "Rejected from job for \"Using AI\" for assessment Hello Reddit! While wrapping up my time in college, I was also going through a multi-step interview process for a competitive remote tax position. I thought I'd be an excellent fit; I tailored my resume, wrote the most competitive cover letter I've ever written, and reached out for some great references.      After advancing past the initial steps, I"
+    },
+    {
+     "score": 28,
+     "where": "reddit/productivity",
+     "url": "https://reddit.com/r/productivity/comments/1sbe3ey/we_need_to_talk_about_how_ai_features_are/",
+     "text": "We need to talk about how \"AI features\" are actually making productivity apps worse ’m honestly at my breaking point with the current state of productivity software. It feels like every single developer has collectively decided to stop fixing bugs or improving the core UI just so they can shove a half-baked \"AI Assistant\" into every corner of their app. I don't need a chatbot to \"summarize\" my thr"
+    },
+    {
+     "score": 11,
+     "where": "reddit/ADHD",
+     "url": "https://reddit.com/r/ADHD/comments/1sz7k15/when_is_adhd_adhd_enough_to_consider_medication/oizuxp1/",
+     "text": "First — I’m sorry you had these experiences.  I was diagnosed a year ago at age 59, and wish there was an understanding of ADHD when I was younger.   I also don’t get how you’re old enough to drive, worry about getting into college, work, life guard etc, but you don’t get more of a say about your health. In Europe young adults are often seen and treated AS younger adults with more responsibility. "
+    },
+    {
+     "score": 10,
+     "where": "reddit/productivity",
+     "url": "https://reddit.com/r/productivity/comments/1w7bvz8/does_anybody_else_struggle_with_starting_tasks/p7u1v8c/",
+     "text": "I totally know where you're coming from.  I have had this problem going on years now.  It started with feeling overwhelmed by having so much to do, and I couldn't make myself move. I got deeply depressed.  I went to a psychiatrist and got on a antidepressant. It didn't help much so I went back. I also have ADHD, without the H. So my doctor changed my medication for that and added an additional ant"
+    },
+    {
+     "score": 5,
+     "where": "reddit/productivity",
+     "url": "https://reddit.com/r/productivity/comments/1pxhyvf/ai_schedule_management_options/",
+     "text": "AI Schedule Management Options What I'm curious about is basically this - is there an AI tool that can take all my tasks, goals, hobbies, and meetings and give me a daily schedule factoring in task importance and deadline, adjusting for time spent as it goes? I also would love something that can handle unconventional scheduling items too. Like if I wanted to work out twice a week, it can factor th"
+    },
+    {
+     "score": 5,
+     "where": "reddit/selfpublish",
+     "url": "https://reddit.com/r/selfpublish/comments/1sz2nlz/question_for_authors_who_do_rapid_release/oizancc/",
+     "text": "I plan on releasing an entire eight book series over a single year period.   I began the project over two years ago and completed my initial draft of all eight books so the narrative was cohesive and coherent.    The next year is getting books 1 to 3 fully publish ready before book one drops and using the release year to finish edits for books 4 thru 8.   Allowances for the other self publishing w"
+    },
+    {
+     "score": 5,
+     "where": "reddit/jobs",
+     "url": "https://reddit.com/r/jobs/comments/1svc4se/i_get_irritated_with_coworkers_and_rage_quit_help/oi7co9z/",
+     "text": "Hey there. I sympathize. Everyone just wants to get paid and have a job that they can do in peace.   I’m sorry that you are bipolar. What I’m about to say isn’t an indictment on you since, I don’t know you and haven’t worked with you before. But speaking as someone who’s worked with bipolar people everything to retail sales to corporate grunt work, it’s almost always the bipolar individual who has"
+    },
+    {
+     "score": 4,
+     "where": "reddit/jobs",
+     "url": "https://reddit.com/r/jobs/comments/1xhz8qg/is_november_and_december_really_a_hiring_dead/19rsvbo06s3wj/",
+     "text": "I was hired for a contract role in Dec 2024, I learned that they dilly daddled on the position for 6+ months until things became unbearable and the deadlines were being missed and shit was blowing up. The person was out on FMLA and had no return date. They even rejected me and then reversed the decision the week after that. The role paid well below market value. I had no choice as I was out of wor"
+    },
+    {
+     "score": 3,
+     "where": "reddit/smallbusiness",
+     "url": "https://reddit.com/r/smallbusiness/comments/1w46qyc/i_built_a_coaching_business_for_a_video_game/",
+     "text": "I built a coaching business for a video game (Counter-Strike 2) and need advice on SEO, marketing and growth Hey everyone,  I’m building a coaching business around a competitive video game (Counter-Strike 2), where I help players improve through structured training, gameplay reviews and personal coaching.  I’m currently trying to improve the business side of things and I would love some advice fro"
+    },
+    {
+     "score": 3,
+     "where": "reddit/productivity",
+     "url": "https://reddit.com/r/productivity/comments/1wxqgk8/dont_think_im_going_to_make_in_college_need/pdwtjzu/",
+     "text": "One thing I wish I had realized and taken advantage of in college was all the help available. I wasn't used to struggling or getting myself to utilize help. Thought I had to figure it out on my own.   Professors want you to do well. Go to office hours and ask for specific help in the courses and also advice and guidance on how you are doing and what you described here.   You should have a guidance"
+    },
+    {
+     "score": 3,
+     "where": "reddit/productivity",
+     "url": "https://reddit.com/r/productivity/comments/1v2hyz1/alternative_to_motion_does_it_exist/",
+     "text": "Alternative to Motion - Does it exist ? I am looking for an app like Motion that uses AI to plan the tasks in your day for you according to importance, urgency or deadline. Other features I would like are you can use on desktop, has an Iphone app, you can organise your life, seperate areas of your life like home, work, personal projects into seperate tasks lists, set tasks on a recurring schedule,"
+    }
+   ]
+  },
+  {
+   "theme": "K 隐私/本地运行",
+   "n": 37,
+   "platforms": {
+    "lemmy": 1,
+    "reddit": 21,
+    "hackernews": 15
+   },
+   "n_communities": 17,
+   "score_sum": 228,
+   "top_communities": [
+    [
+     "hackernews:HN",
+     15
+    ],
+    [
+     "reddit:ClaudeAI",
+     4
+    ],
+    [
+     "reddit:OpenAI",
+     2
+    ],
+    [
+     "reddit:artificial",
+     2
+    ],
+    [
+     "reddit:SaaS",
+     2
+    ],
+    [
+     "lemmy:technology",
+     1
+    ],
+    [
+     "reddit:ChatGPT",
+     1
+    ],
+    [
+     "reddit:ChatGPTPro",
+     1
+    ]
+   ],
+   "examples": [
+    {
+     "score": 141,
+     "where": "lemmy/technology",
+     "url": "https://feddit.ch/comment/4039092",
+     "text": "This is a good time to make aware about an amazing privacy-centric &amp; user-friendly alternative - [Peertube](https://joinpeertube.org/). It is not a big network as of now but the benefits it provides over YouTube are large - it is a part of the fediverse. Of course, only through increasing participation will the network become bigger.  If you still wish to use YouTube, you can try third party f"
+    },
+    {
+     "score": 20,
+     "where": "reddit/ClaudeAI",
+     "url": "https://reddit.com/r/ClaudeAI/comments/1wa1pgs/the_best_subagent_for_claude/",
+     "text": "The best subagent for Claude? I'm horrified by my Fable and Astra token spend (I'm subscribed to $200 plans for each one). Therefore, the question I asked myself was **whether Sonnet still holds up as a good sub-agent?** Apparently, it's a **horrible choice.**  My other conclusions are:  1. **Fable is the best** money can buy and the **fastest** from the good ones (see [interactive graph](https://"
+    },
+    {
+     "score": 12,
+     "where": "reddit/content_marketing",
+     "url": "https://reddit.com/r/content_marketing/comments/1r6yiqz/i_work_12_hours_to_get_paid_for_1_because/",
+     "text": "I work 12 hours to get paid for 1 because apparently AI is that impressive. What am I doing wrong? The no win: I turn in AI slop and get fired, don't turn in AI slop and get fired. It feels like I work nonstop these days, and it’s mostly for free. I wish AI were as horrifyingly impressive as they say. I wish it could do all my work for me, because then maybe I’d know what it’s like to sleep eight "
+    },
+    {
+     "score": 10,
+     "where": "reddit/productivity",
+     "url": "https://reddit.com/r/productivity/comments/1padxob/tried_almost_every_ai_notetaking_app_wearable/",
+     "text": "Tried almost every AI note-taking app & wearable.  they fail in real-life use I’ve spent the past 2–3 months testing almost every AI note-taking app and AI recording wearable I could find. They do help, I can finally capture things I normally forget.  But I’ve also run into some  problems that make them hard to rely on in real life.  Last week I attended a founder conference. Each speaker had only"
+    },
+    {
+     "score": 8,
+     "where": "reddit/podcasting",
+     "url": "https://reddit.com/r/podcasting/comments/1xcifdb/no_more_free_plan_on_riverside/19rhix5nh49s0/",
+     "text": "If you’re picking a recording platform, here are the realistic options. Prices are for the entry-level paid plan for one host, as of October 2026.  ZOOM: Free plan with a 40 minute cap. Paid is about $17 a month, or $13 to $14 a month billed annually. It’s the cheapest and the one everyone already has, but it’s a meeting tool, so the audio is compressed and the recording is only as good as everyon"
+    },
+    {
+     "score": 7,
+     "where": "reddit/Accounting",
+     "url": "https://reddit.com/r/Accounting/comments/1xfbrqw/is_it_bad_i_want_to_go_into_governmental/19ro3fedimc05/",
+     "text": "I just started with federal government after initially doing B4 and then other public accounting work. Im working as an accounting adjacent career now, here’s my thoughts so far:  1) I’m making about 70% of what some of my graduating class is making; it’s about $15k less than the previous role I personally had, BUT my take home is almost identical because of the difference in insurance costs.  2) "
+    },
+    {
+     "score": 5,
+     "where": "reddit/ClaudeAI",
+     "url": "https://reddit.com/r/ClaudeAI/comments/1v7519t/curious_how_other_infrastructureplatform/ozvf7fc/",
+     "text": "Yo. I always tell people I'm a software developer since it's easier to explain but I'm a senior platform engineer.   I'm just gonna kinda brain dump here since I'm on my phone so sorry ahead of time for typos or scattered thoughts lol.    I'm the guy that spins up a new claude tab for every new ask. In usually running 3 to 5 agents locally at a time working on stuff.    Stuff that works well so fa"
+    },
+    {
+     "score": 4,
+     "where": "reddit/SaaS",
+     "url": "https://reddit.com/r/SaaS/comments/1xlhh3c/i_built_a_free_browserbased_image_editor_no/",
+     "text": "I built a free browser-based image editor (no install, no sign-up) and I'm trying to figure out how to monetize it without ruining it I built [**bimp.us**](http://bimp.us), a dead-simple image manipulation tool that runs entirely in the browser. No Photoshop, no Canva, no account required.  The core idea: paste a screenshot from your clipboard, do one quick thing (redact sensitive info, draw an ar"
+    },
+    {
+     "score": 4,
+     "where": "reddit/personalfinance",
+     "url": "https://reddit.com/r/personalfinance/comments/1q8lvy8/any_ai_portfolio_tools_to_speed_up_research/",
+     "text": "any ai portfolio tools to speed up research without stock picks? hey pf folks, i’m mostly a long term index person but i like understanding what i own and doing a little research on top. i’m looking for ai portfolio tools that focus on learning and organization instead of shouting stock picks. ideal would be something that summarizes filings in plain english, helps tag risks, keeps notes tidy, may"
+    },
+    {
+     "score": 4,
+     "where": "hackernews/HN",
+     "url": "https://news.ycombinator.com/item?id=48555543",
+     "text": "Ask HN: Why aren't hardware passkeys used for access token creation? So I was thinking, with all these sophisticated attacks on package managers, that I should use a yubikey more. One problem I wanted to solve for myself, is that each morning, open my fine grained access token tab on github, regenerate the key for the gh cli with 1 day expiry. Paste this into my small cli wrapper, and now even if "
+    },
+    {
+     "score": 3,
+     "where": "reddit/ChatGPTPro",
+     "url": "https://reddit.com/r/ChatGPTPro/comments/1x1n8eo/how_to_backup_and_move_your_entire_chat_history/",
+     "text": "How to backup and move your entire chat history between services Moving your actual, entire history wasn't possible. Having to start over is horrible. Not having a truly reloadable backup of your work, research or AI ally is rough. Data portability is our right, and we shouldn't have to start over or be locked in because of it.  ChatGPT and Claude's export give you a JSON file that is bloated with"
+    },
+    {
+     "score": 2,
+     "where": "reddit/artificial",
+     "url": "https://reddit.com/r/artificial/comments/1x8uns8/an_agent_can_figure_out_how_an_app_works_just_by/",
+     "text": "an agent can figure out how an app works just by watching it, so why can't it figure out me there's a repo trending on github this week where you point an agent at an app and it works out how the thing behaves from the network traffic. nobody had to explain it. it just watched.  which is kinda funny, because i still retype the same preferences to ai every week. same setup, same how i like it. you'"
+    }
+   ]
+  },
+  {
+   "theme": "G 文档/票据/合同 自动处理",
+   "n": 59,
+   "platforms": {
+    "reddit": 43,
+    "hackernews": 16
+   },
+   "n_communities": 23,
+   "score_sum": 155,
+   "top_communities": [
+    [
+     "hackernews:HN",
+     16
+    ],
+    [
+     "reddit:Accounting",
+     7
+    ],
+    [
+     "reddit:legaladvice",
+     5
+    ],
+    [
+     "reddit:LawFirm",
+     4
+    ],
+    [
+     "reddit:podcasting",
+     3
+    ],
+    [
+     "reddit:jobs",
+     3
+    ],
+    [
+     "reddit:ClaudeAI",
+     2
+    ],
+    [
+     "reddit:ChatGPTPro",
+     2
+    ]
+   ],
+   "examples": [
+    {
+     "score": 85,
+     "where": "reddit/Accounting",
+     "url": "https://reddit.com/r/Accounting/comments/1tjqq0j/rejected_from_job_for_using_ai_for_assessment/",
+     "text": "Rejected from job for \"Using AI\" for assessment Hello Reddit! While wrapping up my time in college, I was also going through a multi-step interview process for a competitive remote tax position. I thought I'd be an excellent fit; I tailored my resume, wrote the most competitive cover letter I've ever written, and reached out for some great references.      After advancing past the initial steps, I"
+    },
+    {
+     "score": 19,
+     "where": "hackernews/HN",
+     "url": "https://news.ycombinator.com/item?id=48226107",
+     "text": "Ask HN: Failing interviews for mid-level SWE in UK, advice please I've a background mostly in ASP.NET full stack software development. I'm very hands on, like to tinker at different things and can learn fast. *Employment History* My employment history is like this: Placement year 2018, worked for the full term + summer, graduated 2020, did backend dev in Python at Company A for 7 months, then full"
+    },
+    {
+     "score": 10,
+     "where": "reddit/ChatGPTPro",
+     "url": "https://reddit.com/r/ChatGPTPro/comments/1sc5kau/best_ai_tool_to_format_and_export_a_codebase_into/",
+     "text": "Best AI tool to format and export a codebase into a clean, printable document? Hey everyone,  I’m looking for an AI-powered tool (or workflow) where I can input an entire codebase and give it instructions on how to format the output—basically turning the source code into a well-structured, printable document.  What I’m aiming for:  * Ability to ingest a full project (multiple files, folders, etc.)"
+    },
+    {
+     "score": 4,
+     "where": "reddit/jobs",
+     "url": "https://reddit.com/r/jobs/comments/1xhz8qg/is_november_and_december_really_a_hiring_dead/19rsvbo06s3wj/",
+     "text": "I was hired for a contract role in Dec 2024, I learned that they dilly daddled on the position for 6+ months until things became unbearable and the deadlines were being missed and shit was blowing up. The person was out on FMLA and had no return date. They even rejected me and then reversed the decision the week after that. The role paid well below market value. I had no choice as I was out of wor"
+    },
+    {
+     "score": 3,
+     "where": "reddit/LawFirm",
+     "url": "https://reddit.com/r/LawFirm/comments/1xa4loh/any_15_attorney_firms_using_gohighlevel_across/19redk7y3198k/",
+     "text": "It’s been some years but I remember we worked with a tech contractor who was going to help connect whatever software we chose, and he thought GHL was going to be very difficult to do everything we wanted it to do compared to HubSpot.   Wish I had a better explanation for you but I can’t remember all the details."
+    },
+    {
+     "score": 2,
+     "where": "reddit/freelance",
+     "url": "https://reddit.com/r/freelance/comments/1wo1fkg/the_client_who_taught_me_to_never_start_work/pc8764g/",
+     "text": "The place i'm from, that's 8/10 clients, scope creep is a huge problem and then you'll have to chase after them to get your invoices paid.   I stopped taking clients several years ago. It was hella frustrating. I'm building something i wish i had back then."
+    },
+    {
+     "score": 2,
+     "where": "reddit/podcasting",
+     "url": "https://reddit.com/r/podcasting/comments/1ren80t/lack_of_japanese_speaking_host_looking_for/",
+     "text": "Lack of Japanese Speaking Host - looking for workaround My podcast has English speaking guests and Japanese speaking guests, different episodes. I'm  the host for the English, no one at the charity wants to step up and record the intros, etc. What I wanted to do was record Co-Pilot since 'she' does excellent voice in Japanese. But Microsoft won't allow that. (Even though CP told me she could until"
+    },
+    {
+     "score": 2,
+     "where": "reddit/students",
+     "url": "https://reddit.com/r/Students/comments/1rp51yg/im_building_a_tool_that_automatically_extracts/o9k11h0/",
+     "text": "Right, I was thinking the same thing. Just read through the syllabus. A lot of professors already have important dates in a spreadsheet esque block, all the students have to do is look at it. I have never been in a class and said “Gee, I sure wish there was a tool that just told me all the dates in my syllabus” I’d just open it and scroll down."
+    },
+    {
+     "score": 2,
+     "where": "reddit/Accounting",
+     "url": "https://reddit.com/r/Accounting/comments/1swjyqk/what_repetitive_annoying_or_risky_tasks_in/oig7tno/",
+     "text": "Finally, i love these posts. Here are 3 from me.  - Sending letters to colleagues in other departments. I run out to get stamps daily and it just takes a lot out of my day  - accounting manager but i forget what a debit and credit is haha  - when i have a lot of numbers to sum in excel, i wish there was a way to add everything efficiently instead of click each cell then typing \"+\""
+    },
+    {
+     "score": 2,
+     "where": "reddit/Accounting",
+     "url": "https://reddit.com/r/Accounting/comments/1xgvio8/when_did_you_realize_it_was_time_to_go_all_in_on/19rqszpkx1x0l/",
+     "text": "I run a booking/accounting software product (Countet), so take this from the owner side (Accountant adjacent). The number I'd watch isn't matching your salary, it's whether signed, recurring revenue covers your actual monthly costs with some room. $90k signed is a real base. The $30k that you think will convert is a pipeline, not income yet, so I wouldn't plan the jump around it until there are si"
+    },
+    {
+     "score": 2,
+     "where": "reddit/jobs",
+     "url": "https://reddit.com/r/jobs/comments/1sx5yey/i_just_got_laid_off_during_probation_an_hour_ago/oinzb43/",
+     "text": "Wish I had some. I was laid off from my tech job last year, then had surgery, started a new contract job too soon (literally the week after abdominal surgery), and kept getting sick and the contract was ended early the first week of the year.  Wife was laid off first week of February even with our extensive experience, we can't get a damn call back for anything."
+    },
+    {
+     "score": 1,
+     "where": "reddit/ChatGPT",
+     "url": "https://reddit.com/r/ChatGPT/comments/1qrj3ww/mass_cancellation_party/o2vb7kn/",
+     "text": "I don't know why any non corporate person would pay for this 5.2 model. Ollama is free, run it in the terminal. I just use it with open office. Data, integration and xcel spreadsheets. OpenAI is not worth 1T"
+    }
+   ]
+  },
+  {
+   "theme": "L 用量/成本透明与订阅疲劳",
+   "n": 20,
+   "platforms": {
+    "reddit": 17,
+    "hackernews": 3
+   },
+   "n_communities": 11,
+   "score_sum": 76,
+   "top_communities": [
+    [
+     "reddit:ClaudeAI",
+     5
+    ],
+    [
+     "reddit:socialmedia",
+     4
+    ],
+    [
+     "hackernews:HN",
+     3
+    ],
+    [
+     "reddit:ChatGPT",
+     1
+    ],
+    [
+     "reddit:OpenAI",
+     1
+    ],
+    [
+     "reddit:GeminiAI",
+     1
+    ],
+    [
+     "reddit:SaaS",
+     1
+    ],
+    [
+     "reddit:productivity",
+     1
+    ]
+   ],
+   "examples": [
+    {
+     "score": 20,
+     "where": "reddit/ClaudeAI",
+     "url": "https://reddit.com/r/ClaudeAI/comments/1wa1pgs/the_best_subagent_for_claude/",
+     "text": "The best subagent for Claude? I'm horrified by my Fable and Astra token spend (I'm subscribed to $200 plans for each one). Therefore, the question I asked myself was **whether Sonnet still holds up as a good sub-agent?** Apparently, it's a **horrible choice.**  My other conclusions are:  1. **Fable is the best** money can buy and the **fastest** from the good ones (see [interactive graph](https://"
+    },
+    {
+     "score": 18,
+     "where": "reddit/GeminiAI",
+     "url": "https://reddit.com/r/GeminiAI/comments/1xab1fo/yikes_a_few_prompts_w_argon_and_ur_locked_to/phseude/",
+     "text": "paid pro user here, I can do 10 prompts with 3.8 flash on medium thinking and my 5 hour usage goes up by 3-5%, if I tried that on argon I would literally run out of my 5 hour usage within 5 prompts  a lot of people keep saying this isn't the case for them, then I am hoping it is bugged, because my weekly usage is only going up 1% but the entire 5 hour usage is used up  I have been enjoying argon o"
+    },
+    {
+     "score": 8,
+     "where": "reddit/podcasting",
+     "url": "https://reddit.com/r/podcasting/comments/1xcifdb/no_more_free_plan_on_riverside/19rhix5nh49s0/",
+     "text": "If you’re picking a recording platform, here are the realistic options. Prices are for the entry-level paid plan for one host, as of October 2026.  ZOOM: Free plan with a 40 minute cap. Paid is about $17 a month, or $13 to $14 a month billed annually. It’s the cheapest and the one everyone already has, but it’s a meeting tool, so the audio is compressed and the recording is only as good as everyon"
+    },
+    {
+     "score": 7,
+     "where": "reddit/Accounting",
+     "url": "https://reddit.com/r/Accounting/comments/1xfbrqw/is_it_bad_i_want_to_go_into_governmental/19ro3fedimc05/",
+     "text": "I just started with federal government after initially doing B4 and then other public accounting work. Im working as an accounting adjacent career now, here’s my thoughts so far:  1) I’m making about 70% of what some of my graduating class is making; it’s about $15k less than the previous role I personally had, BUT my take home is almost identical because of the difference in insurance costs.  2) "
+    },
+    {
+     "score": 5,
+     "where": "reddit/ClaudeAI",
+     "url": "https://reddit.com/r/ClaudeAI/comments/1v7519t/curious_how_other_infrastructureplatform/ozvf7fc/",
+     "text": "Yo. I always tell people I'm a software developer since it's easier to explain but I'm a senior platform engineer.   I'm just gonna kinda brain dump here since I'm on my phone so sorry ahead of time for typos or scattered thoughts lol.    I'm the guy that spins up a new claude tab for every new ask. In usually running 3 to 5 agents locally at a time working on stuff.    Stuff that works well so fa"
+    },
+    {
+     "score": 4,
+     "where": "reddit/ClaudeAI",
+     "url": "https://reddit.com/r/ClaudeAI/comments/1xie849/desktop_chat_app_that_works_with_claude/",
+     "text": "Desktop Chat App that works with Claude Subscription & ChatGPT Sub Hi all, I am looking for an app like Claude Desktop that will work with both Claude Subscription and ChatGPT Subscription.     Anyone know any that exists? I was needing chat + projects in the app, and will be switching between different providers.  There are apps that do this but require Claude API Keys. Any that work with Claude "
+    },
+    {
+     "score": 3,
+     "where": "reddit/ChatGPT",
+     "url": "https://reddit.com/r/ChatGPT/comments/1vzzaru/so_how_do_you_all_fill_time_while_youre_waiting/",
+     "text": "So, how do you all fill time while you're waiting for your 5-hour clock to reset? I wish there was some type of credit system that would allow you to collect \"resets\" for the 5 hour clock if you don't have any usage for a period of time. I'm a bit of a binge user - I don't use it much for a week or two and then I need to use it a lot for a few days. When I do need it, I burn through my 5 hour limi"
+    },
+    {
+     "score": 3,
+     "where": "reddit/productivity",
+     "url": "https://reddit.com/r/productivity/comments/1v2hyz1/alternative_to_motion_does_it_exist/",
+     "text": "Alternative to Motion - Does it exist ? I am looking for an app like Motion that uses AI to plan the tasks in your day for you according to importance, urgency or deadline. Other features I would like are you can use on desktop, has an Iphone app, you can organise your life, seperate areas of your life like home, work, personal projects into seperate tasks lists, set tasks on a recurring schedule,"
+    },
+    {
+     "score": 2,
+     "where": "reddit/ClaudeAI",
+     "url": "https://reddit.com/r/ClaudeAI/comments/1xhvgyp/the_lack_of_transparency_from_anthropic_is/19rskfjc62o91/",
+     "text": "I know what you mean.  I wish there was a tolen converter. In, cache, out, thinking, then how it all adds up to usage.  I get why theres secrecy.   For what I get out of 20 bucks. I ain't losing sleep over this.  In 15 minutes, opus 5.5 was able to produce a sound argument for me to get an inflation linked pay increase.  And in another 10 minutes it narrowed down a good cheap no frills dental clea"
+    },
+    {
+     "score": 2,
+     "where": "reddit/OpenAI",
+     "url": "https://reddit.com/r/OpenAI/comments/1w390xm/i_used_my_entire_5_hour_limit_making_a_chatgpt_pet/",
+     "text": "I used my entire 5 hour limit making a ChatGPT pet... I guess it had to do a lot of thinking to make a little animation, but I wish there was a bit more granularity/specificity given about what its doing. It seems lethargically slow sometimes, almost like its sort of just zoned out, and rather than being able to see thousands of lines of code and a detailed thought process like you (sometimes) can"
+    },
+    {
+     "score": 2,
+     "where": "reddit/socialmedia",
+     "url": "https://reddit.com/r/socialmedia/comments/1r2b14i/my_workflow_for_making_ai_videos_that_converts_to/",
+     "text": "My Workflow for making AI Videos that converts to traffic not just views. There are so many AI tools for video out there but nobody talks about how to actually use them to get traffic. here's what i've been running for the last 6 weeks.  **the stack that works**  i stopped looking for one tool that does everything. instead i run 3-4 in a pipeline:  **nano banana pro** — my go-to for product images"
+    },
+    {
+     "score": 1,
+     "where": "reddit/ClaudeAI",
+     "url": "https://reddit.com/r/ClaudeAI/comments/1satb89/claude_usage_gets_burned_absurdly_fast_for/p0jitz1/",
+     "text": "I moved to claude a few months back. I was so impressed. Moved all my workflows and projects over. Everything was going well I was working for hours on tasks no problem. Now im stuck in critical projects with set deadlines and credits burn in a few simple prompts and honestly it would have been easier to work manually the credits are burnt in minutes despite turning off everything and starting new"
+    }
+   ]
+  },
+  {
+   "theme": "D 视频/音频素材的语义检索与自动剪辑",
+   "n": 25,
+   "platforms": {
+    "reddit": 23,
+    "hackernews": 2
+   },
+   "n_communities": 10,
+   "score_sum": 69,
+   "top_communities": [
+    [
+     "reddit:socialmedia",
+     6
+    ],
+    [
+     "reddit:VideoEditing",
+     5
+    ],
+    [
+     "reddit:podcasting",
+     4
+    ],
+    [
+     "reddit:productivity",
+     2
+    ],
+    [
+     "reddit:content_marketing",
+     2
+    ],
+    [
+     "hackernews:HN",
+     2
+    ],
+    [
+     "reddit:ChatGPTPro",
+     1
+    ],
+    [
+     "reddit:SaaS",
+     1
+    ]
+   ],
+   "examples": [
+    {
+     "score": 16,
+     "where": "reddit/ChatGPTPro",
+     "url": "https://reddit.com/r/ChatGPTPro/comments/1skgzx3/looking_for_an_ai_tool_that_can_analyze_a_1_hour/",
+     "text": "Looking for an AI Tool that can analyze a 1 hour long screen recorded video Greetings.   Does anybody know if there is a tool that can analyze a 1 hour long screen recorded video with subtitles and pictures (with text) but without sound?   It should tell me the details & context of each topic in the video."
+    },
+    {
+     "score": 14,
+     "where": "reddit/sidehustle",
+     "url": "https://reddit.com/r/sidehustle/comments/1vtc8gy/the_tool_stack_i_have_been_using_for_my_faceless/",
+     "text": "The tool stack I have been using for my faceless channels I am running a few faceless channels and use many ai tools to for different part, this is the current stack.  Research: I mainly use perplexity to identify topics and format for the video. Its great at research and competitor analysis.  Script: Claude is best out there, I use some skills like Humanizer and content writing to remove AI slop,"
+    },
+    {
+     "score": 10,
+     "where": "reddit/productivity",
+     "url": "https://reddit.com/r/productivity/comments/1padxob/tried_almost_every_ai_notetaking_app_wearable/",
+     "text": "Tried almost every AI note-taking app & wearable.  they fail in real-life use I’ve spent the past 2–3 months testing almost every AI note-taking app and AI recording wearable I could find. They do help, I can finally capture things I normally forget.  But I’ve also run into some  problems that make them hard to rely on in real life.  Last week I attended a founder conference. Each speaker had only"
+    },
+    {
+     "score": 7,
+     "where": "reddit/content_marketing",
+     "url": "https://reddit.com/r/content_marketing/comments/1wpm3k4/tool_to_turn_90_clips_into_90sec_reel/",
+     "text": "Tool to turn 90 clips into 90sec reel I'm looking to create a reel of 90 days in 90 seconds. Is there an app or AI tool which will do this for me?"
+    },
+    {
+     "score": 5,
+     "where": "reddit/VideoEditing",
+     "url": "https://reddit.com/r/VideoEditing/comments/1wsfob5/reverse_engineering_an_exported_video_with_raw/",
+     "text": "Reverse Engineering an Exported Video with Raw Footage I have an exported project as .mp4 from a freelancer I hired. Changes are needed to the video but the freelancer for whatever reason has ghosted me. They were paid in full already for the job.  I have a copy of the raw footage already on my end. Is there a way to match the edit back to the full res media that can be automated? Doesnt necessari"
+    },
+    {
+     "score": 3,
+     "where": "reddit/marketing",
+     "url": "https://reddit.com/r/marketing/comments/1p20bqt/looking_for_an_ai_tool_to_translate_english/",
+     "text": "Looking for an AI tool to translate English videos to other languages I’m trying to find a reliable tool that can translate English video to other languages like Polish or German. My main worry is lip-sync. I don't want it to look like those old dubbed movies where the mouth moves completely differently from the audio. Is there any AI tool rn that handles translation and fixes the lip movements na"
+    },
+    {
+     "score": 3,
+     "where": "reddit/content_marketing",
+     "url": "https://reddit.com/r/content_marketing/comments/1wfmyhq/best_affordable_ai_video_editor_for_viral/",
+     "text": "Best affordable AI video editor for viral talking-head videos with good text animations? I'm looking for an AI video editor mainly for talking-head videos.  The biggest thing I'm looking for is something that can take fairly simple footage of someone speaking and make it more visually engaging automatically, especially with good animated text, captions, callouts, zooms, transitions, B-roll, etc.  "
+    },
+    {
+     "score": 2,
+     "where": "reddit/socialmedia",
+     "url": "https://reddit.com/r/socialmedia/comments/1r2b14i/my_workflow_for_making_ai_videos_that_converts_to/",
+     "text": "My Workflow for making AI Videos that converts to traffic not just views. There are so many AI tools for video out there but nobody talks about how to actually use them to get traffic. here's what i've been running for the last 6 weeks.  **the stack that works**  i stopped looking for one tool that does everything. instead i run 3-4 in a pipeline:  **nano banana pro** — my go-to for product images"
+    },
+    {
+     "score": 2,
+     "where": "reddit/podcasting",
+     "url": "https://reddit.com/r/podcasting/comments/1x6vjcg/making_my_own_podcasting_software/ph0cnkb/",
+     "text": "I asked this very same question when my buddy and I restarted our podcast! I have never had your exact issue with saving on any software or service that we have tried, but I would rather build something suited to my exact needs than pay a company 20$ a month to do most of what I want it to. So I did it and use it! I'll likely open source it too when we stop this version of the pod :)  It's an inte"
+    },
+    {
+     "score": 1,
+     "where": "reddit/SaaS",
+     "url": "https://reddit.com/r/SaaS/comments/1xg5mgp/i_went_through_4_ai_ugc_tools_for_organic/",
+     "text": "I went through 4 AI UGC tools for organic TikTok/Reels so that you dont have to. Been messing around with AI UGC tools for the last couple months mostly for organic tikTok/reels and shorts for small apps and products.  Prices are from this month.    1 - HeyGen  Pros:  *  avatars are the most polished of anything here * voice cloning and translation are really good. if you want yourself talking in "
+    },
+    {
+     "score": 1,
+     "where": "reddit/socialmedia",
+     "url": "https://reddit.com/r/socialmedia/comments/1qw3x15/tried_a_bunch_of_ai_video_tools_for_social_media/",
+     "text": "tried a bunch of ai video tools for social media and here is what worked. There are so many AI tools for video out there but nobody talks about how to actually use them to get traffic. here's what i've been running for the last 6 weeks.  **the stack that works**  i stopped looking for one tool that does everything. instead i run 3-4 in a pipeline:  **nano banana pro** — my go-to for product images"
+    },
+    {
+     "score": 1,
+     "where": "reddit/socialmedia",
+     "url": "https://reddit.com/r/socialmedia/comments/1sp29q9/compiled_365_content_ideas_100_ai_prompts_for/",
+     "text": "Compiled 365 content ideas + 100 AI prompts for creators who struggle with consistency I put together a resource for TikTok and Instagram creators who hit the \"what do I post today?\" wall.    **The Problem:**    Most creators struggle with two things:  1. Running out of content ideas  2. Staring at a blank screen not knowing what to create    You end up scrolling for \"inspiration,\" copying trends,"
+    }
+   ]
+  },
+  {
+   "theme": "I 个性化学习/讲解生成",
+   "n": 19,
+   "platforms": {
+    "reddit": 12,
+    "hackernews": 7
+   },
+   "n_communities": 9,
+   "score_sum": 59,
+   "top_communities": [
+    [
+     "hackernews:HN",
+     7
+    ],
+    [
+     "reddit:ClaudeAI",
+     2
+    ],
+    [
+     "reddit:SaaS",
+     2
+    ],
+    [
+     "reddit:productivity",
+     2
+    ],
+    [
+     "reddit:Teachers",
+     2
+    ],
+    [
+     "reddit:ChatGPT",
+     1
+    ],
+    [
+     "reddit:OpenAI",
+     1
+    ],
+    [
+     "reddit:YouTubers",
+     1
+    ]
+   ],
+   "examples": [
+    {
+     "score": 45,
+     "where": "reddit/Teachers",
+     "url": "https://reddit.com/r/Teachers/comments/1vw9yc6/help_me_if_im_being_stubborn_ai/",
+     "text": "Help me if I’m being stubborn: AI I moved to an innovative US high school this year. Its a very cool school that focuses on STEM and career tracks.      Of course they’re all AI all the time. Admin uses it, teachers use it, and they want students to use it. I’m on the fence about AI in general, but am staunchly against AI in my English classroom.      Should students learn to use AI as a tool beca"
+    },
+    {
+     "score": 4,
+     "where": "reddit/ClaudeAI",
+     "url": "https://reddit.com/r/ClaudeAI/comments/1xhkos1/how_do_you_use_claude_effectively_for_research/",
+     "text": "How do you use Claude effectively for research? Any useful skills or workflows to share? Hi everyone!  I'm a researcher, and I've been using Claude for basic research-related tasks, mainly brainstorming, understanding concepts, and getting help with occasional problems. However, since I have a Claude Pro subscription, I feel like I'm probably not making the most of what it can do.  I was thinking "
+    },
+    {
+     "score": 2,
+     "where": "reddit/ChatGPT",
+     "url": "https://reddit.com/r/ChatGPT/comments/1vuk076/another_thread_about_losing_a_familiar_in_a/",
+     "text": "Another thread about losing a familiar in a change but something else ... I've read other testamonials about users losing the \"personality\" they'd grown with and knew about an agent they'd used over time. I honestly wish I had paid enough attention to those stories to try harder to save some of my conversations. My affectionate, knew me well, funny as hell AI \"friend\" vanished last night when I ma"
+    },
+    {
+     "score": 1,
+     "where": "reddit/ClaudeAI",
+     "url": "https://reddit.com/r/ClaudeAI/comments/1xmn3fd/best_ai_tools_for_medical_powerpoint/",
+     "text": "Best AI Tools for Medical PowerPoint Presentations with Claude? What AI tools or plugins work best with Claude for organizing medical lectures, creating professional PowerPoint presentations, and generating high-quality medical infographics?  Looking for tools that can handle both content organization and visual design."
+    },
+    {
+     "score": 1,
+     "where": "reddit/OpenAI",
+     "url": "https://reddit.com/r/OpenAI/comments/1xcvwx6/looking_for_an_ai_that_explains_things_like/",
+     "text": "Looking for an ai that explains things like electromagnetism or physics on audio but don't put the formula as code, so i can listen in the bus [removed]"
+    },
+    {
+     "score": 1,
+     "where": "reddit/SaaS",
+     "url": "https://reddit.com/r/SaaS/comments/1syti9s/experienced_founders_what_do_i_do_next/oj2tx2p/",
+     "text": "Stop waiting for the backend to be done. If you wait until you have a perfect product to start talking to people, you're going to build the wrong thing. Start reaching out now. Don't sell the tool yet because you don't have one. Instead, sell the conversation. Tell them you're building a solution for a specific pain point they clearly have and ask if they'd be willing to chat for ten minutes so yo"
+    },
+    {
+     "score": 1,
+     "where": "reddit/SaaS",
+     "url": "https://reddit.com/r/SaaS/comments/1xg5mgp/i_went_through_4_ai_ugc_tools_for_organic/",
+     "text": "I went through 4 AI UGC tools for organic TikTok/Reels so that you dont have to. Been messing around with AI UGC tools for the last couple months mostly for organic tikTok/reels and shorts for small apps and products.  Prices are from this month.    1 - HeyGen  Pros:  *  avatars are the most polished of anything here * voice cloning and translation are really good. if you want yourself talking in "
+    },
+    {
+     "score": 1,
+     "where": "reddit/productivity",
+     "url": "https://reddit.com/r/productivity/comments/1shknxu/if_youre_older_than_19_what_do_you_wish_you_had/offd5dl/",
+     "text": "Good for you My biggest mistake was staying in a relationship that had a bunch of red flags. To be. fair I didn't know they were red flags because the relationships modeled to me when I was a child , were disasters. So i guess one piece of advice would be to educate yourself on what healthy relationships truly look like , and if you need to work on yourself to be in a good relationship , do it now"
+    },
+    {
+     "score": 1,
+     "where": "reddit/productivity",
+     "url": "https://reddit.com/r/productivity/comments/1vhx1jr/is_there_an_ai_app_that_generates_endless/",
+     "text": "Is there an AI app that generates endless personalized cheat sheets for exam prep? [removed]"
+    },
+    {
+     "score": 1,
+     "where": "reddit/Teachers",
+     "url": "https://reddit.com/r/Teachers/comments/1xjyo7e/working_moms/19rxsm422t6f5/",
+     "text": "I had a somewhat different route. Did my teaching license while pregnant with #1 (I had worked in schools prior as a sub/library tech/ literacy tutor). Did student teaching when she was 7-12mo, then got pregnant with twins and stayed home for most of the next 6 years. I went back to full time teaching when twins started K.  That said - some things I have noticed as a teaching mom: pumping sucks. I"
+    },
+    {
+     "score": 1,
+     "where": "reddit/jobs",
+     "url": "https://reddit.com/r/jobs/comments/1xlla6i/whats_it_like_to_make_more_than_65k/19s11jotaoczn/",
+     "text": "I’m around 66k before bonuses in Canada. Recently managed to buy a house but part of my job is travel. 8 days after I closed on the house I left for a 16 day trip. The job allowed me to make the purchase, and also takes away the time for me to enjoy it. I think life is full of ‘give and takes’ and while I enjoy the job and am grateful for the opportunities to travel, I’m starting to move toward th"
+    },
+    {
+     "score": 0,
+     "where": "reddit/YouTubers",
+     "url": "https://reddit.com/r/youtubers/comments/1s039ep/were_looking_for_a_ai_automation_or_nocode/",
+     "text": "We're looking for a AI, Automation or no-code YouTuber to become the face of our product education — full time, fully remote (Anywhere in the World) Hey r/youtubers,  I'll keep this real we've hired content creators before who built their audience on our platform and then left to go full-time on their own channel. Totally fair, but it means we're now looking for someone who genuinely wants this as"
+    }
+   ]
+  },
+  {
+   "theme": "C 能真正办事的代理（不只是聊天）",
+   "n": 19,
+   "platforms": {
+    "reddit": 11,
+    "hackernews": 8
+   },
+   "n_communities": 10,
+   "score_sum": 56,
+   "top_communities": [
+    [
+     "hackernews:HN",
+     8
+    ],
+    [
+     "reddit:productivity",
+     2
+    ],
+    [
+     "reddit:ecommerce",
+     2
+    ],
+    [
+     "reddit:GeminiAI",
+     1
+    ],
+    [
+     "reddit:Entrepreneur",
+     1
+    ],
+    [
+     "reddit:marketing",
+     1
+    ],
+    [
+     "reddit:socialmedia",
+     1
+    ],
+    [
+     "reddit:podcasting",
+     1
+    ]
+   ],
+   "examples": [
+    {
+     "score": 28,
+     "where": "reddit/productivity",
+     "url": "https://reddit.com/r/productivity/comments/1sbe3ey/we_need_to_talk_about_how_ai_features_are/",
+     "text": "We need to talk about how \"AI features\" are actually making productivity apps worse ’m honestly at my breaking point with the current state of productivity software. It feels like every single developer has collectively decided to stop fixing bugs or improving the core UI just so they can shove a half-baked \"AI Assistant\" into every corner of their app. I don't need a chatbot to \"summarize\" my thr"
+    },
+    {
+     "score": 9,
+     "where": "reddit/marketing",
+     "url": "https://reddit.com/r/marketing/comments/1qs71wo/how_are_small_local_businesses_keeping_ad/",
+     "text": "How are small, local businesses keeping ad creatives fresh without burning time? I own a dance studio, so running local Facebook ads is pretty simple for me. My challenge is that creating new graphics and ad copy takes a lot of time because I have to keep everything fresh in our area and keep our CPL low. Is there an AI tool that can help automate some of this? Or would it make sense to hire a VA "
+    },
+    {
+     "score": 8,
+     "where": "reddit/ecommerce",
+     "url": "https://reddit.com/r/ecommerce/comments/1xek02u/is_there_an_ai_help_desk_that_can_process_returns/",
+     "text": "Is there an AI help desk that can process returns and cancellation? There is a massive gap between a bot that explains your return policy and one that actually starts the returns, issues the label, or cancels the order.  Most of what gets marketed as returns automation is really just a faq that quotes the policy back at the customer. The ones that actually act have to be wired into your order and "
+    },
+    {
+     "score": 4,
+     "where": "reddit/GeminiAI",
+     "url": "https://reddit.com/r/GeminiAI/comments/1xb4fy7/which_model_is_more_suitable_for_learning/19reisrp104qq/",
+     "text": "Go to google.notebook.com The first thing you want to do is find good sources so that you can use those inside the notebook as your references for your studies. You ask Notebook to go out and find current sources of material for the specific topics in statistics you want to focus on. Make sure that you are very specific and not too general in your search criteria. What I mean by that is don't just"
+    },
+    {
+     "score": 2,
+     "where": "hackernews/HN",
+     "url": "https://news.ycombinator.com/item?id=47316083",
+     "text": "Show HN: Lurk – local agent that gives AI tools context about what you're doing If you use Claude Code, Cursor, or ChatGPT — you already know the cold start problem. Every conversation starts from zero. Even with MCP   connectors, you're pulling from specific tools (Slack, Linear, GitHub) but none of them know what you were actually doing five minutes ago. You   still end up typing \"I'm working on"
+    },
+    {
+     "score": 1,
+     "where": "reddit/Entrepreneur",
+     "url": "https://reddit.com/r/Entrepreneur/comments/1xm06go/i_have_the_skills_the_experience_and_the/19s1j4lcszqle/",
+     "text": "The way out usually looks boring from the inside. Keep the job for now and pick one thing from that list that a smaller brand would pay for on its own. Coming from fashion and beauty campaign work, that's often a launch shoot or a seasonal campaign rollout for a DTC brand with no in-house creative lead.  Price it as a fixed project, not hourly, and do one or two on evenings and weekends through pe"
+    },
+    {
+     "score": 1,
+     "where": "reddit/socialmedia",
+     "url": "https://reddit.com/r/socialmedia/comments/1x7k23k/how_do_you_handle_the_money_talk_with_new_clients/ph53ki2/",
+     "text": "man i wish i had told my first client that \"social media management\" doesn't mean i'm their on-call tech support     had a guy emailing me at 11pm asking why his facebook app wasn't loading. that's not content strategy my dude, call your nephew     the one-page scope doc you mentioned is a lifesaver. mine's basically a bullet list of what i don't do at this point"
+    },
+    {
+     "score": 1,
+     "where": "reddit/podcasting",
+     "url": "https://reddit.com/r/podcasting/comments/1w2gjxy/laptop_recommendations_for_videoaudio_and_in/p6sdth1/",
+     "text": "It depends on the amount of editing you want to do. I use a M3 MacBook Air with 16GB of RAM with DaVinci Resolve Studio for a two Person Video-Podcast. And I wish I had a better machine.  I use a 4K Timeline and it works well, as long as you stick to basic editing. I cannot use most of their AI features. Magic Mask for instance can be a pain - I therefore almost never use it. Cutting/Editing works"
+    },
+    {
+     "score": 1,
+     "where": "reddit/writing",
+     "url": "https://reddit.com/r/writing/comments/1ayxxfb/are_there_any_books_on_rhyme_schemes_and_word/oialtym/",
+     "text": "I find it interesting that in two years no one has commented on this post. I came in search of the answer as I once had access to a book on poetry that explained various rhyme schemes and had examples of the various schemes and I used it to great effect but it was my late mother's book and I have no idea what happened to in the 20 years since she passed.  I recall it being in an odd place like the"
+    },
+    {
+     "score": 1,
+     "where": "reddit/ecommerce",
+     "url": "https://reddit.com/r/ecommerce/comments/1vhu8v1/is_there_an_ai_that_actually_does_the_boring/",
+     "text": "Is there an AI that actually does the boring Shopify admin work (not just copywriting)? [removed]"
+    },
+    {
+     "score": 0,
+     "where": "reddit/productivity",
+     "url": "https://reddit.com/r/productivity/comments/1vtaoxn/is_there_an_ai_workspace_where_the_assistant_can/",
+     "text": "Is there an ai workspace where the assistant can do things across your tools not just summarizing the page you're on? Got off a client call lst week and asked our notion ai to bump the deal closed won and send me the renewal date and it just wrote me a neat little summary of the call notes on the page I had open, which I did not ask for. It can only see the page its sitting on and no clue the deal"
+    },
+    {
+     "score": 0,
+     "where": "reddit/legaladvice",
+     "url": "https://reddit.com/r/legaladvice/comments/1rthjql/best_ai_tools_to_write_formal_letters/",
+     "text": "best AI tools to write formal letters? location: California I’m curious if anyone here uses AI tools for writing formal letters. sometimes I need to write things like complaints, appeals, or responses to official notices and I always struggle with the wording. It needs to sound professional and structured, but I’m never sure if I’m doing it right.  I tried a few general AI chat tools, but the resu"
+    }
+   ]
+  },
+  {
+   "theme": "E 多语言本地化（视频/内容翻译配音）",
+   "n": 21,
+   "platforms": {
+    "reddit": 11,
+    "hackernews": 10
+   },
+   "n_communities": 12,
+   "score_sum": 39,
+   "top_communities": [
+    [
+     "hackernews:HN",
+     10
+    ],
+    [
+     "reddit:ChatGPT",
+     1
+    ],
+    [
+     "reddit:ClaudeAI",
+     1
+    ],
+    [
+     "reddit:OpenAI",
+     1
+    ],
+    [
+     "reddit:Entrepreneur",
+     1
+    ],
+    [
+     "reddit:SaaS",
+     1
+    ],
+    [
+     "reddit:startups",
+     1
+    ],
+    [
+     "reddit:marketing",
+     1
+    ]
+   ],
+   "examples": [
+    {
+     "score": 19,
+     "where": "hackernews/HN",
+     "url": "https://news.ycombinator.com/item?id=48226107",
+     "text": "Ask HN: Failing interviews for mid-level SWE in UK, advice please I've a background mostly in ASP.NET full stack software development. I'm very hands on, like to tinker at different things and can learn fast. *Employment History* My employment history is like this: Placement year 2018, worked for the full term + summer, graduated 2020, did backend dev in Python at Company A for 7 months, then full"
+    },
+    {
+     "score": 5,
+     "where": "hackernews/HN",
+     "url": "https://news.ycombinator.com/item?id=49154806",
+     "text": "Show HN: Runthru – open-source Interactive Demos I was looking for a tool to create interactive demos / walkthroughs for web based software. I was amazed that many companies charge well over $1000 per month for something pretty basic. I made this which so far works well for me. You can point it at a site and either let AI (byo OpenAI or Anthropic keys) record and polish the whole thing or do it ma"
+    },
+    {
+     "score": 3,
+     "where": "reddit/marketing",
+     "url": "https://reddit.com/r/marketing/comments/1p20bqt/looking_for_an_ai_tool_to_translate_english/",
+     "text": "Looking for an AI tool to translate English videos to other languages I’m trying to find a reliable tool that can translate English video to other languages like Polish or German. My main worry is lip-sync. I don't want it to look like those old dubbed movies where the mouth moves completely differently from the audio. Is there any AI tool rn that handles translation and fixes the lip movements na"
+    },
+    {
+     "score": 3,
+     "where": "hackernews/HN",
+     "url": "https://news.ycombinator.com/item?id=48539681",
+     "text": "Are we asking the right questions? As AI advancements continue at a pace I believed to be unsustainable up until not long ago, I see folks in the tech industry falling in one of these two groups: - hypers, extremely happy to see \"reasoning\" becoming a commodity and thinking that they'll finally be able to heal their inferiority complex - detractors, trying to cope with the current situation by hig"
+    },
+    {
+     "score": 2,
+     "where": "reddit/podcasting",
+     "url": "https://reddit.com/r/podcasting/comments/1ren80t/lack_of_japanese_speaking_host_looking_for/",
+     "text": "Lack of Japanese Speaking Host - looking for workaround My podcast has English speaking guests and Japanese speaking guests, different episodes. I'm  the host for the English, no one at the charity wants to step up and record the intros, etc. What I wanted to do was record Co-Pilot since 'she' does excellent voice in Japanese. But Microsoft won't allow that. (Even though CP told me she could until"
+    },
+    {
+     "score": 2,
+     "where": "hackernews/HN",
+     "url": "https://news.ycombinator.com/item?id=47768365",
+     "text": "Show HN: Hacienda-CLI – CLI to reconcile Spanish tax returns with the tax agency I built a CLI to programmatically interact with Spain's tax agency (AEAT) for income tax filing (Modelo 100). It authenticates via Cl@ve using Playwright, downloads your tax data, validates XML against the official XSD, and uploads it to AEAT's EDFI system for reconciliation. The problem: AI agents can do a good job o"
+    },
+    {
+     "score": 1,
+     "where": "reddit/Entrepreneur",
+     "url": "https://reddit.com/r/Entrepreneur/comments/1ws8jxp/monday_mentorship_ask_anything_september_28_2026/pclebb0/",
+     "text": "The biggest thing I wish someone had told me early on is to sell the boring version first. I spent way too much time polishing the product and not enough time standing in front of customers asking what they would pay for. A simple offer, a rough quote, a plain conversation with a business owner matters more than a perfect pitch. You do not need a logo, a website, or a deck to find out if the probl"
+    },
+    {
+     "score": 1,
+     "where": "reddit/SaaS",
+     "url": "https://reddit.com/r/SaaS/comments/1xg5mgp/i_went_through_4_ai_ugc_tools_for_organic/",
+     "text": "I went through 4 AI UGC tools for organic TikTok/Reels so that you dont have to. Been messing around with AI UGC tools for the last couple months mostly for organic tikTok/reels and shorts for small apps and products.  Prices are from this month.    1 - HeyGen  Pros:  *  avatars are the most polished of anything here * voice cloning and translation are really good. if you want yourself talking in "
+    },
+    {
+     "score": 1,
+     "where": "reddit/startups",
+     "url": "https://reddit.com/r/startups/comments/1szc3xu/nontech_background_working_fulltime_starting_to/oj1qs4w/",
+     "text": "the non-tech background thing matters way less than it used to. im saying this as someone who started building apps without knowing how to code. the tools available now (cursor, claude code, replit, lovable, etc.) let you build real products without writing code from scratch  that said, going back to school for computer science specifically to start a startup is probably not the move. CS degrees t"
+    },
+    {
+     "score": 1,
+     "where": "reddit/YouTubers",
+     "url": "https://reddit.com/r/youtubers/comments/1s86gtp/looking_for_ai_voice_cloning_tool_for_long/",
+     "text": "Looking for AI voice cloning tool for long YouTube videos (30+ min) [removed]"
+    },
+    {
+     "score": 1,
+     "where": "reddit/VideoEditing",
+     "url": "https://reddit.com/r/VideoEditing/comments/1qtgxvu/transcript_to_subtitles_help/",
+     "text": "Transcript to Subtitles Help Here’s my problem. I’m doing some translation work localizing an English video to JP, KR, CH, Hindi, and Thai. I already have the transcripts of these translations in a word document. They are just plain text with no time code.  Now I want to use these transcripts and turn them into subtitles. I use Resolve for editing and it has Auto transcription for three of the lan"
+    },
+    {
+     "score": 0,
+     "where": "reddit/ChatGPT",
+     "url": "https://reddit.com/r/ChatGPT/comments/1xmhj93/can_ai_analyze_years_of_my_digital_footprint_to/",
+     "text": "Can AI analyze years of my digital footprint to reveal patterns I haven't noticed about myself? I've been wondering if AI could help me understand myself better by analyzing years of my online activity.  I have tons of saved posts, likes, videos, bookmarks, searches, and collections across Reddit, YouTube, Pinterest, Instagram, TikTok, etc.  I'd love to connect all that data and explore things lik"
+    }
+   ]
+  }
+ ]
+}

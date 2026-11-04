@@ -1,161 +1,563 @@
 {
- "total_records": 311,
+ "total_records": 755,
  "by_platform": {
   "v2ex": 1,
   "lemmy": 15,
+  "reddit": 444,
   "hackernews": 295
  },
  "topics": [
   {
    "topic": "(未归类)",
-   "n": 104
-  },
-  {
-   "topic": "编程 / 无代码建应用",
-   "n": 70,
-   "score": 1307,
-   "pay_mentions": 15,
-   "n_platforms": 2,
-   "platforms": {
-    "lemmy": 1,
-    "hackernews": 69
-   },
-   "n_communities": 2,
-   "top_communities": [
-    [
-     "hackernews:HN",
-     69
-    ],
-    [
-     "lemmy:onehundredninetysix",
-     1
-    ]
-   ],
-   "samples_file": "samples_编程_无代码建应用.jsonl"
+   "n": 234
   },
   {
    "topic": "学习 / 辅导 / 个性化讲解",
-   "n": 45,
-   "score": 431,
-   "pay_mentions": 13,
-   "n_platforms": 2,
+   "n": 128,
+   "score": 1370,
+   "pay_mentions": 29,
+   "n_platforms": 3,
    "platforms": {
     "lemmy": 3,
+    "reddit": 83,
     "hackernews": 42
    },
-   "n_communities": 4,
+   "n_communities": 35,
    "top_communities": [
     [
      "hackernews:HN",
      42
     ],
     [
-     "lemmy:technology",
-     1
+     "reddit:Teachers",
+     8
     ],
     [
-     "lemmy:upliftingnews",
-     1
+     "reddit:productivity",
+     6
     ],
     [
-     "lemmy:196",
-     1
+     "reddit:ClaudeAI",
+     5
+    ],
+    [
+     "reddit:jobs",
+     5
+    ],
+    [
+     "reddit:ChatGPT",
+     4
+    ],
+    [
+     "reddit:OpenAI",
+     4
+    ],
+    [
+     "reddit:artificial",
+     4
+    ],
+    [
+     "reddit:GradSchool",
+     4
+    ],
+    [
+     "reddit:students",
+     4
     ]
    ],
    "samples_file": "samples_学习_辅导_个性化讲解.jsonl"
   },
   {
-   "topic": "搜索 / 研究 / 信息过滤",
-   "n": 44,
-   "score": 384,
-   "pay_mentions": 14,
+   "topic": "编程 / 无代码建应用",
+   "n": 118,
+   "score": 1771,
+   "pay_mentions": 27,
    "n_platforms": 3,
+   "platforms": {
+    "lemmy": 1,
+    "reddit": 48,
+    "hackernews": 69
+   },
+   "n_communities": 19,
+   "top_communities": [
+    [
+     "hackernews:HN",
+     69
+    ],
+    [
+     "reddit:ClaudeAI",
+     12
+    ],
+    [
+     "reddit:ChatGPTPro",
+     5
+    ],
+    [
+     "reddit:socialmedia",
+     5
+    ],
+    [
+     "reddit:OpenAI",
+     4
+    ],
+    [
+     "reddit:podcasting",
+     3
+    ],
+    [
+     "reddit:LocalLLaMA",
+     2
+    ],
+    [
+     "reddit:Entrepreneur",
+     2
+    ],
+    [
+     "reddit:SaaS",
+     2
+    ],
+    [
+     "reddit:startups",
+     2
+    ]
+   ],
+   "samples_file": "samples_编程_无代码建应用.jsonl"
+  },
+  {
+   "topic": "搜索 / 研究 / 信息过滤",
+   "n": 94,
+   "score": 1226,
+   "pay_mentions": 22,
+   "n_platforms": 4,
    "platforms": {
     "v2ex": 1,
     "lemmy": 2,
+    "reddit": 50,
     "hackernews": 41
    },
-   "n_communities": 4,
+   "n_communities": 32,
    "top_communities": [
     [
      "hackernews:HN",
      41
     ],
     [
-     "v2ex:create",
-     1
+     "reddit:ClaudeAI",
+     5
     ],
     [
-     "lemmy:upliftingnews",
-     1
+     "reddit:PhD",
+     5
     ],
     [
-     "lemmy:mildlyinfuriating",
-     1
+     "reddit:ChatGPT",
+     4
+    ],
+    [
+     "reddit:productivity",
+     3
+    ],
+    [
+     "reddit:podcasting",
+     3
+    ],
+    [
+     "reddit:OpenAI",
+     2
+    ],
+    [
+     "reddit:GeminiAI",
+     2
+    ],
+    [
+     "reddit:ChatGPTPro",
+     2
+    ],
+    [
+     "reddit:socialmedia",
+     2
     ]
    ],
    "samples_file": "samples_搜索_研究_信息过滤.jsonl"
   },
   {
    "topic": "可信 / 不胡编 / 带出处",
-   "n": 43,
-   "score": 15,
-   "pay_mentions": 7,
-   "n_platforms": 1,
+   "n": 84,
+   "score": 240,
+   "pay_mentions": 15,
+   "n_platforms": 2,
    "platforms": {
+    "reddit": 41,
     "hackernews": 43
    },
-   "n_communities": 1,
+   "n_communities": 26,
    "top_communities": [
     [
      "hackernews:HN",
      43
+    ],
+    [
+     "reddit:artificial",
+     5
+    ],
+    [
+     "reddit:ChatGPTPro",
+     3
+    ],
+    [
+     "reddit:productivity",
+     3
+    ],
+    [
+     "reddit:socialmedia",
+     3
+    ],
+    [
+     "reddit:ChatGPT",
+     2
+    ],
+    [
+     "reddit:ClaudeAI",
+     2
+    ],
+    [
+     "reddit:VideoEditing",
+     2
+    ],
+    [
+     "reddit:PhD",
+     2
+    ],
+    [
+     "reddit:legaladvice",
+     2
     ]
    ],
    "samples_file": "samples_可信_不胡编_带出处.jsonl"
   },
   {
    "topic": "文档 / PDF / 表格处理与数据录入",
-   "n": 31,
-   "score": 332,
-   "pay_mentions": 8,
-   "n_platforms": 2,
+   "n": 71,
+   "score": 513,
+   "pay_mentions": 12,
+   "n_platforms": 3,
    "platforms": {
     "lemmy": 2,
+    "reddit": 40,
     "hackernews": 29
    },
-   "n_communities": 3,
+   "n_communities": 23,
    "top_communities": [
     [
      "hackernews:HN",
      29
     ],
     [
-     "lemmy:mildlyinfuriating",
-     1
+     "reddit:Accounting",
+     5
     ],
     [
-     "lemmy:technology",
-     1
+     "reddit:productivity",
+     4
+    ],
+    [
+     "reddit:VideoEditing",
+     4
+    ],
+    [
+     "reddit:Entrepreneur",
+     3
+    ],
+    [
+     "reddit:legaladvice",
+     3
+    ],
+    [
+     "reddit:ClaudeAI",
+     2
+    ],
+    [
+     "reddit:ChatGPTPro",
+     2
+    ],
+    [
+     "reddit:socialmedia",
+     2
+    ],
+    [
+     "reddit:podcasting",
+     2
     ]
    ],
    "samples_file": "samples_文档_PDF_表格处理与数据录入.jsonl"
   },
   {
-   "topic": "隐私 / 本地运行 / 数据不出门",
-   "n": 28,
-   "score": 277,
-   "pay_mentions": 5,
+   "topic": "个人助理 / 邮件日程收件箱",
+   "n": 69,
+   "score": 371,
+   "pay_mentions": 17,
    "n_platforms": 2,
    "platforms": {
+    "reddit": 48,
+    "hackernews": 21
+   },
+   "n_communities": 25,
+   "top_communities": [
+    [
+     "hackernews:HN",
+     21
+    ],
+    [
+     "reddit:productivity",
+     8
+    ],
+    [
+     "reddit:socialmedia",
+     5
+    ],
+    [
+     "reddit:sales",
+     4
+    ],
+    [
+     "reddit:Teachers",
+     3
+    ],
+    [
+     "reddit:selfpublish",
+     3
+    ],
+    [
+     "reddit:realtors",
+     3
+    ],
+    [
+     "reddit:ChatGPT",
+     2
+    ],
+    [
+     "reddit:marketing",
+     2
+    ],
+    [
+     "reddit:PhD",
+     2
+    ]
+   ],
+   "samples_file": "samples_个人助理_邮件日程收件箱.jsonl"
+  },
+  {
+   "topic": "内容创作 / 社媒运营 / 剪辑",
+   "n": 68,
+   "score": 1002,
+   "pay_mentions": 17,
+   "n_platforms": 3,
+   "platforms": {
+    "lemmy": 3,
+    "reddit": 51,
+    "hackernews": 14
+   },
+   "n_communities": 28,
+   "top_communities": [
+    [
+     "hackernews:HN",
+     14
+    ],
+    [
+     "reddit:socialmedia",
+     10
+    ],
+    [
+     "reddit:VideoEditing",
+     5
+    ],
+    [
+     "reddit:SaaS",
+     4
+    ],
+    [
+     "reddit:NewTubers",
+     4
+    ],
+    [
+     "reddit:ChatGPT",
+     3
+    ],
+    [
+     "reddit:YouTubers",
+     3
+    ],
+    [
+     "reddit:GeminiAI",
+     2
+    ],
+    [
+     "reddit:content_marketing",
+     2
+    ],
+    [
+     "reddit:podcasting",
+     2
+    ]
+   ],
+   "samples_file": "samples_内容创作_社媒运营_剪辑.jsonl"
+  },
+  {
+   "topic": "客服 / 销售线索 / 小企业运营",
+   "n": 65,
+   "score": 437,
+   "pay_mentions": 24,
+   "n_platforms": 3,
+   "platforms": {
+    "lemmy": 1,
+    "reddit": 49,
+    "hackernews": 15
+   },
+   "n_communities": 28,
+   "top_communities": [
+    [
+     "hackernews:HN",
+     15
+    ],
+    [
+     "reddit:socialmedia",
+     5
+    ],
+    [
+     "reddit:Accounting",
+     5
+    ],
+    [
+     "reddit:smallbusiness",
+     3
+    ],
+    [
+     "reddit:Entrepreneur",
+     3
+    ],
+    [
+     "reddit:marketing",
+     3
+    ],
+    [
+     "reddit:LawFirm",
+     3
+    ],
+    [
+     "reddit:ChatGPTPro",
+     2
+    ],
+    [
+     "reddit:SaaS",
+     2
+    ],
+    [
+     "reddit:startups",
+     2
+    ]
+   ],
+   "samples_file": "samples_客服_销售线索_小企业运营.jsonl"
+  },
+  {
+   "topic": "购物 / 理财 / 生活事务",
+   "n": 65,
+   "score": 1507,
+   "pay_mentions": 24,
+   "n_platforms": 3,
+   "platforms": {
     "lemmy": 2,
+    "reddit": 46,
+    "hackernews": 17
+   },
+   "n_communities": 26,
+   "top_communities": [
+    [
+     "hackernews:HN",
+     17
+    ],
+    [
+     "reddit:smallbusiness",
+     6
+    ],
+    [
+     "reddit:Accounting",
+     5
+    ],
+    [
+     "reddit:productivity",
+     4
+    ],
+    [
+     "reddit:marketing",
+     3
+    ],
+    [
+     "reddit:personalfinance",
+     3
+    ],
+    [
+     "reddit:ChatGPT",
+     2
+    ],
+    [
+     "reddit:ClaudeAI",
+     2
+    ],
+    [
+     "reddit:SaaS",
+     2
+    ],
+    [
+     "reddit:Teachers",
+     2
+    ]
+   ],
+   "samples_file": "samples_购物_理财_生活事务.jsonl"
+  },
+  {
+   "topic": "隐私 / 本地运行 / 数据不出门",
+   "n": 60,
+   "score": 578,
+   "pay_mentions": 15,
+   "n_platforms": 3,
+   "platforms": {
+    "lemmy": 2,
+    "reddit": 32,
     "hackernews": 26
    },
-   "n_communities": 3,
+   "n_communities": 24,
    "top_communities": [
     [
      "hackernews:HN",
      26
+    ],
+    [
+     "reddit:LocalLLaMA",
+     5
+    ],
+    [
+     "reddit:ClaudeAI",
+     3
+    ],
+    [
+     "reddit:OpenAI",
+     2
+    ],
+    [
+     "reddit:artificial",
+     2
+    ],
+    [
+     "reddit:marketing",
+     2
+    ],
+    [
+     "reddit:recruiting",
+     2
+    ],
+    [
+     "reddit:jobs",
+     2
     ],
     [
      "lemmy:technology",
@@ -170,19 +572,52 @@
   },
   {
    "topic": "记忆与长期上下文 (AI 记住我/项目)",
-   "n": 25,
-   "score": 507,
-   "pay_mentions": 6,
-   "n_platforms": 2,
+   "n": 58,
+   "score": 753,
+   "pay_mentions": 12,
+   "n_platforms": 3,
    "platforms": {
     "lemmy": 1,
+    "reddit": 33,
     "hackernews": 24
    },
-   "n_communities": 2,
+   "n_communities": 20,
    "top_communities": [
     [
      "hackernews:HN",
      24
+    ],
+    [
+     "reddit:ChatGPT",
+     5
+    ],
+    [
+     "reddit:productivity",
+     5
+    ],
+    [
+     "reddit:ChatGPTPro",
+     3
+    ],
+    [
+     "reddit:OpenAI",
+     2
+    ],
+    [
+     "reddit:Teachers",
+     2
+    ],
+    [
+     "reddit:Accounting",
+     2
+    ],
+    [
+     "reddit:jobs",
+     2
+    ],
+    [
+     "reddit:personalfinance",
+     2
     ],
     [
      "lemmy:technology",
@@ -192,251 +627,359 @@
    "samples_file": "samples_记忆与长期上下文_AI_记住我_项目_.jsonl"
   },
   {
-   "topic": "求职 / 简历 / 申请自动化",
-   "n": 21,
-   "score": 187,
-   "pay_mentions": 7,
-   "n_platforms": 2,
-   "platforms": {
-    "lemmy": 1,
-    "hackernews": 20
-   },
-   "n_communities": 2,
-   "top_communities": [
-    [
-     "hackernews:HN",
-     20
-    ],
-    [
-     "lemmy:asklemmy",
-     1
-    ]
-   ],
-   "samples_file": "samples_求职_简历_申请自动化.jsonl"
-  },
-  {
-   "topic": "个人助理 / 邮件日程收件箱",
-   "n": 21,
-   "score": 6,
-   "pay_mentions": 7,
-   "n_platforms": 1,
-   "platforms": {
-    "hackernews": 21
-   },
-   "n_communities": 1,
-   "top_communities": [
-    [
-     "hackernews:HN",
-     21
-    ]
-   ],
-   "samples_file": "samples_个人助理_邮件日程收件箱.jsonl"
-  },
-  {
-   "topic": "购物 / 理财 / 生活事务",
-   "n": 19,
-   "score": 643,
-   "pay_mentions": 8,
-   "n_platforms": 2,
-   "platforms": {
-    "lemmy": 2,
-    "hackernews": 17
-   },
-   "n_communities": 3,
-   "top_communities": [
-    [
-     "hackernews:HN",
-     17
-    ],
-    [
-     "lemmy:technology",
-     1
-    ],
-    [
-     "lemmy:news",
-     1
-    ]
-   ],
-   "samples_file": "samples_购物_理财_生活事务.jsonl"
-  },
-  {
-   "topic": "内容创作 / 社媒运营 / 剪辑",
-   "n": 17,
-   "score": 716,
-   "pay_mentions": 5,
-   "n_platforms": 2,
-   "platforms": {
-    "lemmy": 3,
-    "hackernews": 14
-   },
-   "n_communities": 4,
-   "top_communities": [
-    [
-     "hackernews:HN",
-     14
-    ],
-    [
-     "lemmy:selfhosted",
-     1
-    ],
-    [
-     "lemmy:technology",
-     1
-    ],
-    [
-     "lemmy:asklemmy",
-     1
-    ]
-   ],
-   "samples_file": "samples_内容创作_社媒运营_剪辑.jsonl"
-  },
-  {
-   "topic": "客服 / 销售线索 / 小企业运营",
-   "n": 16,
-   "score": 139,
-   "pay_mentions": 5,
-   "n_platforms": 2,
-   "platforms": {
-    "lemmy": 1,
-    "hackernews": 15
-   },
-   "n_communities": 2,
-   "top_communities": [
-    [
-     "hackernews:HN",
-     15
-    ],
-    [
-     "lemmy:upliftingnews",
-     1
-    ]
-   ],
-   "samples_file": "samples_客服_销售线索_小企业运营.jsonl"
-  },
-  {
-   "topic": "文件 / 照片 / 知识库整理",
-   "n": 15,
-   "score": 168,
-   "pay_mentions": 3,
-   "n_platforms": 2,
-   "platforms": {
-    "lemmy": 1,
-    "hackernews": 14
-   },
-   "n_communities": 2,
-   "top_communities": [
-    [
-     "hackernews:HN",
-     14
-    ],
-    [
-     "lemmy:asklemmy",
-     1
-    ]
-   ],
-   "samples_file": "samples_文件_照片_知识库整理.jsonl"
-  },
-  {
    "topic": "价格 / 订阅疲劳 / 一个工具统一",
-   "n": 13,
-   "score": 5,
-   "pay_mentions": 7,
-   "n_platforms": 2,
+   "n": 48,
+   "score": 216,
+   "pay_mentions": 23,
+   "n_platforms": 3,
    "platforms": {
     "v2ex": 1,
+    "reddit": 35,
     "hackernews": 12
    },
-   "n_communities": 2,
+   "n_communities": 20,
    "top_communities": [
     [
      "hackernews:HN",
      12
     ],
     [
-     "v2ex:create",
-     1
+     "reddit:socialmedia",
+     5
+    ],
+    [
+     "reddit:productivity",
+     4
+    ],
+    [
+     "reddit:ClaudeAI",
+     3
+    ],
+    [
+     "reddit:ChatGPTPro",
+     3
+    ],
+    [
+     "reddit:SaaS",
+     3
+    ],
+    [
+     "reddit:OpenAI",
+     2
+    ],
+    [
+     "reddit:artificial",
+     2
+    ],
+    [
+     "reddit:podcasting",
+     2
+    ],
+    [
+     "reddit:selfpublish",
+     2
     ]
    ],
    "samples_file": "samples_价格_订阅疲劳_一个工具统一.jsonl"
   },
   {
-   "topic": "电脑 / 浏览器 / 手机操作代理 (代我点)",
-   "n": 13,
-   "score": 158,
-   "pay_mentions": 2,
-   "n_platforms": 2,
-   "platforms": {
-    "lemmy": 1,
-    "hackernews": 12
-   },
-   "n_communities": 2,
-   "top_communities": [
-    [
-     "hackernews:HN",
-     12
-    ],
-    [
-     "lemmy:mildlyinfuriating",
-     1
-    ]
-   ],
-   "samples_file": "samples_电脑_浏览器_手机操作代理_代我点_.jsonl"
-  },
-  {
    "topic": "健康 / 饮食 / 情绪陪伴",
-   "n": 8,
-   "score": 127,
-   "pay_mentions": 4,
-   "n_platforms": 2,
+   "n": 46,
+   "score": 462,
+   "pay_mentions": 9,
+   "n_platforms": 3,
    "platforms": {
     "lemmy": 1,
+    "reddit": 38,
     "hackernews": 7
    },
-   "n_communities": 2,
+   "n_communities": 23,
    "top_communities": [
     [
      "hackernews:HN",
      7
     ],
     [
+     "reddit:ADHD",
+     6
+    ],
+    [
+     "reddit:productivity",
+     5
+    ],
+    [
+     "reddit:ClaudeAI",
+     4
+    ],
+    [
+     "reddit:Teachers",
+     3
+    ],
+    [
+     "reddit:GradSchool",
+     3
+    ],
+    [
+     "reddit:legaladvice",
+     2
+    ],
+    [
      "lemmy:mildlyinfuriating",
+     1
+    ],
+    [
+     "reddit:ChatGPT",
+     1
+    ],
+    [
+     "reddit:artificial",
      1
     ]
    ],
    "samples_file": "samples_健康_饮食_情绪陪伴.jsonl"
   },
   {
-   "topic": "写作润色 / 去 AI 味 / 保持个人风格",
-   "n": 5,
-   "score": 2,
-   "pay_mentions": 1,
-   "n_platforms": 1,
+   "topic": "求职 / 简历 / 申请自动化",
+   "n": 39,
+   "score": 297,
+   "pay_mentions": 13,
+   "n_platforms": 3,
    "platforms": {
+    "lemmy": 1,
+    "reddit": 18,
+    "hackernews": 20
+   },
+   "n_communities": 11,
+   "top_communities": [
+    [
+     "hackernews:HN",
+     20
+    ],
+    [
+     "reddit:sales",
+     4
+    ],
+    [
+     "reddit:SaaS",
+     3
+    ],
+    [
+     "reddit:jobs",
+     3
+    ],
+    [
+     "reddit:socialmedia",
+     2
+    ],
+    [
+     "reddit:recruiting",
+     2
+    ],
+    [
+     "lemmy:asklemmy",
+     1
+    ],
+    [
+     "reddit:startups",
+     1
+    ],
+    [
+     "reddit:Accounting",
+     1
+    ],
+    [
+     "reddit:legaladvice",
+     1
+    ]
+   ],
+   "samples_file": "samples_求职_简历_申请自动化.jsonl"
+  },
+  {
+   "topic": "电脑 / 浏览器 / 手机操作代理 (代我点)",
+   "n": 36,
+   "score": 238,
+   "pay_mentions": 6,
+   "n_platforms": 3,
+   "platforms": {
+    "lemmy": 1,
+    "reddit": 23,
+    "hackernews": 12
+   },
+   "n_communities": 18,
+   "top_communities": [
+    [
+     "hackernews:HN",
+     12
+    ],
+    [
+     "reddit:Accounting",
+     4
+    ],
+    [
+     "reddit:ClaudeAI",
+     2
+    ],
+    [
+     "reddit:smallbusiness",
+     2
+    ],
+    [
+     "reddit:productivity",
+     2
+    ],
+    [
+     "reddit:NewTubers",
+     2
+    ],
+    [
+     "lemmy:mildlyinfuriating",
+     1
+    ],
+    [
+     "reddit:artificial",
+     1
+    ],
+    [
+     "reddit:ChatGPTPro",
+     1
+    ],
+    [
+     "reddit:Entrepreneur",
+     1
+    ]
+   ],
+   "samples_file": "samples_电脑_浏览器_手机操作代理_代我点_.jsonl"
+  },
+  {
+   "topic": "文件 / 照片 / 知识库整理",
+   "n": 36,
+   "score": 346,
+   "pay_mentions": 8,
+   "n_platforms": 3,
+   "platforms": {
+    "lemmy": 1,
+    "reddit": 21,
+    "hackernews": 14
+   },
+   "n_communities": 16,
+   "top_communities": [
+    [
+     "hackernews:HN",
+     14
+    ],
+    [
+     "reddit:productivity",
+     4
+    ],
+    [
+     "reddit:socialmedia",
+     4
+    ],
+    [
+     "reddit:VideoEditing",
+     2
+    ],
+    [
+     "lemmy:asklemmy",
+     1
+    ],
+    [
+     "reddit:ChatGPT",
+     1
+    ],
+    [
+     "reddit:ClaudeAI",
+     1
+    ],
+    [
+     "reddit:artificial",
+     1
+    ],
+    [
+     "reddit:ChatGPTPro",
+     1
+    ],
+    [
+     "reddit:Entrepreneur",
+     1
+    ]
+   ],
+   "samples_file": "samples_文件_照片_知识库整理.jsonl"
+  },
+  {
+   "topic": "写作润色 / 去 AI 味 / 保持个人风格",
+   "n": 12,
+   "score": 22,
+   "pay_mentions": 1,
+   "n_platforms": 2,
+   "platforms": {
+    "reddit": 7,
     "hackernews": 5
    },
-   "n_communities": 1,
+   "n_communities": 8,
    "top_communities": [
     [
      "hackernews:HN",
      5
+    ],
+    [
+     "reddit:LocalLLaMA",
+     1
+    ],
+    [
+     "reddit:sidehustle",
+     1
+    ],
+    [
+     "reddit:content_marketing",
+     1
+    ],
+    [
+     "reddit:NewTubers",
+     1
+    ],
+    [
+     "reddit:podcasting",
+     1
+    ],
+    [
+     "reddit:students",
+     1
+    ],
+    [
+     "reddit:legaladvice",
+     1
     ]
    ],
    "samples_file": "samples_写作润色_去_AI_味_保持个人风格.jsonl"
   },
   {
    "topic": "会议 / 通话 / 语音转录总结",
-   "n": 3,
-   "score": 0,
-   "pay_mentions": 1,
-   "n_platforms": 1,
+   "n": 9,
+   "score": 41,
+   "pay_mentions": 3,
+   "n_platforms": 2,
    "platforms": {
+    "reddit": 6,
     "hackernews": 3
    },
-   "n_communities": 1,
+   "n_communities": 4,
    "top_communities": [
+    [
+     "reddit:productivity",
+     3
+    ],
     [
      "hackernews:HN",
      3
+    ],
+    [
+     "reddit:podcasting",
+     2
+    ],
+    [
+     "reddit:VideoEditing",
+     1
     ]
    ],
    "samples_file": "samples_会议_通话_语音转录总结.jsonl"
