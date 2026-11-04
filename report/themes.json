@@ -1,21 +1,21 @@
 {
- "total": 776,
+ "total": 851,
  "by_platform": {
   "v2ex": 1,
   "lemmy": 15,
-  "reddit": 465,
+  "reddit": 540,
   "hackernews": 295
  },
  "themes": [
   {
    "theme": "A 识别/过滤 AI 生成内容（真人认证）",
-   "n": 47,
+   "n": 48,
    "platforms": {
-    "reddit": 20,
+    "reddit": 21,
     "hackernews": 27
    },
-   "n_communities": 11,
-   "score_sum": 1110,
+   "n_communities": 12,
+   "score_sum": 1111,
    "top_communities": [
     [
      "hackernews:HN",
@@ -127,14 +127,14 @@
   },
   {
    "theme": "J 小商家获客与内容持续生产",
-   "n": 46,
+   "n": 49,
    "platforms": {
     "lemmy": 2,
-    "reddit": 29,
+    "reddit": 32,
     "hackernews": 15
    },
-   "n_communities": 22,
-   "score_sum": 731,
+   "n_communities": 25,
+   "score_sum": 732,
    "top_communities": [
     [
      "hackernews:HN",
@@ -246,14 +246,14 @@
   },
   {
    "theme": "B 记住我/品牌语气的持久记忆",
-   "n": 42,
+   "n": 43,
    "platforms": {
     "lemmy": 1,
-    "reddit": 22,
+    "reddit": 23,
     "hackernews": 19
    },
-   "n_communities": 13,
-   "score_sum": 587,
+   "n_communities": 14,
+   "score_sum": 591,
    "top_communities": [
     [
      "hackernews:HN",
@@ -338,6 +338,12 @@
      "text": "Show HN: CoreMem – Portable context for AI agents CoreMem lets you build collections of context, called a mem, and share it with any AI agent via URL, a Chrome extension, MCP, Cursor/VS Code plugins, a skill, and more. Instead of re-explaining your project or goal when you switch agents or start new sessions, CoreMem keeps your context centrally organized so that any AI tool can read it. This orig"
     },
     {
+     "score": 4,
+     "where": "reddit/parenting",
+     "url": "https://reddit.com/r/Parenting/comments/1xkicmo/if_you_bought_an_expensive_kids_bike_for_you/19ry0lh63r5wg/",
+     "text": "I say spend the money for the 14\" bike. It is much easier to learn on a lighter, better bike. We have bought used 14\", 16\" and 20\" bikes. And then I can resell them for basically what I paid for them (although I did pay for tune ups on two of them, so there was some cost).   If you want your kid to have fun learning and be able to bike more than just a few houses, the lighter bikes are really impo"
+    },
+    {
      "score": 3,
      "where": "reddit/ChatGPT",
      "url": "https://reddit.com/r/ChatGPT/comments/1xdxg17/gpt6_for_creative_writing_and_making_stories/",
@@ -354,25 +360,19 @@
      "where": "reddit/Accounting",
      "url": "https://reddit.com/r/Accounting/comments/1swjyqk/what_repetitive_annoying_or_risky_tasks_in/oig7tno/",
      "text": "Finally, i love these posts. Here are 3 from me.  - Sending letters to colleagues in other departments. I run out to get stamps daily and it just takes a lot out of my day  - accounting manager but i forget what a debit and credit is haha  - when i have a lot of numbers to sum in excel, i wish there was a way to add everything efficiently instead of click each cell then typing \"+\""
-    },
-    {
-     "score": 2,
-     "where": "hackernews/HN",
-     "url": "https://news.ycombinator.com/item?id=46872109",
-     "text": "Show HN: Sandy – Accelerate AI agents: think once, replay forever I gave my AI agent a Sandevistan. What's the point of browser automation that's slower than a human? Watching it pause for seconds before every click drove me crazy. We build muscle memory for repetitive tasks—why can't AI? Traditional Agent Observe → LLM reasoning (slow) → Action → Observe → LLM... repeat Stops to think before ever"
     }
    ]
   },
   {
    "theme": "H 可信研究：带出处、不编造",
-   "n": 92,
+   "n": 103,
    "platforms": {
     "lemmy": 1,
-    "reddit": 45,
+    "reddit": 56,
     "hackernews": 46
    },
-   "n_communities": 28,
-   "score_sum": 527,
+   "n_communities": 34,
+   "score_sum": 555,
    "top_communities": [
     [
      "hackernews:HN",
@@ -399,11 +399,11 @@
      3
     ],
     [
-     "reddit:VideoEditing",
-     2
+     "reddit:projectmanagement",
+     3
     ],
     [
-     "reddit:PhD",
+     "reddit:VideoEditing",
      2
     ]
    ],
@@ -451,6 +451,12 @@
      "text": "I understand your point. What concerns me most is how difficult it can be for a small business to navigate a legal dispute when legal help is so expensive. I’m still trying to understand the claims and figure out the best way forward. I wish there were more accessible resources to help small businesses navigate situations like this. Thanks for sharing your perspective."
     },
     {
+     "score": 12,
+     "where": "reddit/languagelearning",
+     "url": "https://reddit.com/r/languagelearning/comments/1xjunw5/how_do_you_manage_it_with_a_family_b1b2/19rwkbnki7zxd/",
+     "text": "At your level, native content perhaps at slower speeds (like a podcast or video at 75%) should be comprehensible or close to it, so is there a way that you can replace English content you consume with French, and double up with other tasks you already do all day, like an RFI news podcast while cooking, French music playlist during exercise, or a downtime TV series in French ? Any chance the kiddos"
+    },
+    {
      "score": 10,
      "where": "reddit/ChatGPTPro",
      "url": "https://reddit.com/r/ChatGPTPro/comments/1sc5kau/best_ai_tool_to_format_and_export_a_codebase_into/",
@@ -473,24 +479,18 @@
      "where": "reddit/LawFirm",
      "url": "https://reddit.com/r/LawFirm/comments/1r87ygs/what_happens_when_wall_street_takes_over_your_law/o63sbjg/",
      "text": "I wish I had more insight into this question and it's something I'm exploring in follow-up stories. A lot of what I know comes from whistleblower reports, Bar discipline, and lawsuits, which say that various Arizona firms generally acted with a greater disregard for ethics standards -- e.g. not giving lawyers the resources they needed to properly represent their clients, playing fast and loose wit"
-    },
-    {
-     "score": 6,
-     "where": "reddit/ChatGPTPro",
-     "url": "https://reddit.com/r/ChatGPTPro/comments/1sh812j/ai_memory_rules_dont_work_heres_what_does/",
-     "text": "AI memory rules don't work. Here's what does Every AI coding tool now has memory. Claude Code has memory files. Cursor has .cursorrules. ChatGPT has persistent memory. You correct the AI, it \"learns,\" life is good.  Except it isn't.  I tracked my Claude Code session yesterday. Saved 7 correction rules. Violated 3 of them within the same session. The rules were there. Claude read them. Claude ignor"
     }
    ]
   },
   {
    "theme": "F 个人排程/督促/ADHD 执行教练",
-   "n": 48,
+   "n": 51,
    "platforms": {
-    "reddit": 39,
+    "reddit": 42,
     "hackernews": 9
    },
-   "n_communities": 20,
-   "score_sum": 340,
+   "n_communities": 22,
+   "score_sum": 344,
    "top_communities": [
     [
      "reddit:productivity",
@@ -517,11 +517,11 @@
      2
     ],
     [
-     "reddit:ChatGPT",
-     1
+     "reddit:automation",
+     2
     ],
     [
-     "reddit:ClaudeAI",
+     "reddit:ChatGPT",
      1
     ]
    ],
@@ -602,14 +602,14 @@
   },
   {
    "theme": "K 隐私/本地运行",
-   "n": 37,
+   "n": 39,
    "platforms": {
     "lemmy": 1,
-    "reddit": 21,
+    "reddit": 23,
     "hackernews": 15
    },
-   "n_communities": 17,
-   "score_sum": 228,
+   "n_communities": 18,
+   "score_sum": 261,
    "top_communities": [
     [
      "hackernews:HN",
@@ -632,15 +632,15 @@
      2
     ],
     [
+     "reddit:medicine",
+     2
+    ],
+    [
      "lemmy:technology",
      1
     ],
     [
      "reddit:ChatGPT",
-     1
-    ],
-    [
-     "reddit:ChatGPTPro",
      1
     ]
    ],
@@ -650,6 +650,12 @@
      "where": "lemmy/technology",
      "url": "https://feddit.ch/comment/4039092",
      "text": "This is a good time to make aware about an amazing privacy-centric &amp; user-friendly alternative - [Peertube](https://joinpeertube.org/). It is not a big network as of now but the benefits it provides over YouTube are large - it is a part of the fediverse. Of course, only through increasing participation will the network become bigger.  If you still wish to use YouTube, you can try third party f"
+    },
+    {
+     "score": 33,
+     "where": "reddit/medicine",
+     "url": "https://reddit.com/r/medicine/comments/1sc9uah/help_with_returning_to_12_hour_shifts_while/oe9ct4v/",
+     "text": "I went back as a PGY2 resident and was pumping on 28 hour shifts, doing milk handoffs, reducing nursing frequency. Let me start by saying, it’s not fun but it is doable.   Firstly, before you go back, space out how often you’re pumping. If you’re doing Q2 or Q3 then try to get to Q4 while at home or you’re in for a world of hurt your first couple shifts back.   Next, figure out how you’re going to"
     },
     {
      "score": 20,
@@ -710,24 +716,18 @@
      "where": "reddit/ChatGPTPro",
      "url": "https://reddit.com/r/ChatGPTPro/comments/1x1n8eo/how_to_backup_and_move_your_entire_chat_history/",
      "text": "How to backup and move your entire chat history between services Moving your actual, entire history wasn't possible. Having to start over is horrible. Not having a truly reloadable backup of your work, research or AI ally is rough. Data portability is our right, and we shouldn't have to start over or be locked in because of it.  ChatGPT and Claude's export give you a JSON file that is bloated with"
-    },
-    {
-     "score": 2,
-     "where": "reddit/artificial",
-     "url": "https://reddit.com/r/artificial/comments/1x8uns8/an_agent_can_figure_out_how_an_app_works_just_by/",
-     "text": "an agent can figure out how an app works just by watching it, so why can't it figure out me there's a repo trending on github this week where you point an agent at an app and it works out how the thing behaves from the network traffic. nobody had to explain it. it just watched.  which is kinda funny, because i still retype the same preferences to ai every week. same setup, same how i like it. you'"
     }
    ]
   },
   {
    "theme": "G 文档/票据/合同 自动处理",
-   "n": 59,
+   "n": 63,
    "platforms": {
-    "reddit": 43,
+    "reddit": 47,
     "hackernews": 16
    },
-   "n_communities": 23,
-   "score_sum": 155,
+   "n_communities": 27,
+   "score_sum": 160,
    "top_communities": [
     [
      "hackernews:HN",
@@ -830,22 +830,22 @@
      "text": "Wish I had some. I was laid off from my tech job last year, then had surgery, started a new contract job too soon (literally the week after abdominal surgery), and kept getting sick and the contract was ended early the first week of the year.  Wife was laid off first week of February even with our extensive experience, we can't get a damn call back for anything."
     },
     {
-     "score": 1,
-     "where": "reddit/ChatGPT",
-     "url": "https://reddit.com/r/ChatGPT/comments/1qrj3ww/mass_cancellation_party/o2vb7kn/",
-     "text": "I don't know why any non corporate person would pay for this 5.2 model. Ollama is free, run it in the terminal. I just use it with open office. Data, integration and xcel spreadsheets. OpenAI is not worth 1T"
+     "score": 2,
+     "where": "reddit/webdev",
+     "url": "https://reddit.com/r/webdev/comments/1x8w61g/macbook_purchase_decision_help/phg8v2n/",
+     "text": "If you have time look into running Linux on the i5. My main computer is a 2020 MacBook Pro with Linux Mint and it’s great.  Before I installed Linux on it I bought a new 2026 MacBook and now I can’t return it. But I wish I had started with Linux to save the money because my battery is excellent and very snappy.  Look into getting the cheaper model if money is tight. If you see it more as an invest"
     }
    ]
   },
   {
    "theme": "L 用量/成本透明与订阅疲劳",
-   "n": 20,
+   "n": 21,
    "platforms": {
-    "reddit": 17,
+    "reddit": 18,
     "hackernews": 3
    },
-   "n_communities": 11,
-   "score_sum": 76,
+   "n_communities": 12,
+   "score_sum": 84,
    "top_communities": [
     [
      "reddit:ClaudeAI",
@@ -900,6 +900,12 @@
      "text": "If you’re picking a recording platform, here are the realistic options. Prices are for the entry-level paid plan for one host, as of October 2026.  ZOOM: Free plan with a 40 minute cap. Paid is about $17 a month, or $13 to $14 a month billed annually. It’s the cheapest and the one everyone already has, but it’s a meeting tool, so the audio is compressed and the recording is only as good as everyon"
     },
     {
+     "score": 8,
+     "where": "reddit/languagelearning",
+     "url": "https://reddit.com/r/languagelearning/comments/1xdt7z2/i_feel_the_issue_with_the_fun_discussion_is/19rk8xlepqo0w/",
+     "text": "This take is oddly judgy.   I would like to offer a different experience than what you are describing. I am not trying to convert you to this method but I think my experience may offer some perspective on why people find value in this material outside of the fear of failure you are describing. Not that this doesn't play a part for some people, but I think some of us really need CI in order to buil"
+    },
+    {
      "score": 7,
      "where": "reddit/Accounting",
      "url": "https://reddit.com/r/Accounting/comments/1xfbrqw/is_it_bad_i_want_to_go_into_governmental/19ro3fedimc05/",
@@ -946,24 +952,254 @@
      "where": "reddit/socialmedia",
      "url": "https://reddit.com/r/socialmedia/comments/1r2b14i/my_workflow_for_making_ai_videos_that_converts_to/",
      "text": "My Workflow for making AI Videos that converts to traffic not just views. There are so many AI tools for video out there but nobody talks about how to actually use them to get traffic. here's what i've been running for the last 6 weeks.  **the stack that works**  i stopped looking for one tool that does everything. instead i run 3-4 in a pipeline:  **nano banana pro** — my go-to for product images"
+    }
+   ]
+  },
+  {
+   "theme": "E 多语言本地化（视频/内容翻译配音）",
+   "n": 33,
+   "platforms": {
+    "reddit": 23,
+    "hackernews": 10
+   },
+   "n_communities": 14,
+   "score_sum": 82,
+   "top_communities": [
+    [
+     "reddit:languagelearning",
+     11
+    ],
+    [
+     "hackernews:HN",
+     10
+    ],
+    [
+     "reddit:ChatGPT",
+     1
+    ],
+    [
+     "reddit:ClaudeAI",
+     1
+    ],
+    [
+     "reddit:OpenAI",
+     1
+    ],
+    [
+     "reddit:Entrepreneur",
+     1
+    ],
+    [
+     "reddit:SaaS",
+     1
+    ],
+    [
+     "reddit:startups",
+     1
+    ]
+   ],
+   "examples": [
+    {
+     "score": 19,
+     "where": "hackernews/HN",
+     "url": "https://news.ycombinator.com/item?id=48226107",
+     "text": "Ask HN: Failing interviews for mid-level SWE in UK, advice please I've a background mostly in ASP.NET full stack software development. I'm very hands on, like to tinker at different things and can learn fast. *Employment History* My employment history is like this: Placement year 2018, worked for the full term + summer, graduated 2020, did backend dev in Python at Company A for 7 months, then full"
+    },
+    {
+     "score": 11,
+     "where": "reddit/languagelearning",
+     "url": "https://reddit.com/r/languagelearning/comments/1srjp23/im_luca_lampariello_polyglot_language_coach/ohmpxut/",
+     "text": "Haha! 😃  Well..  If I actually woke up at 3 AM to grind through seven hours of Turkish, I’d be a burnt-out shell of a human by Wednesday morning.  I suspect I know where this \"rumor\" started (looking at you, Davide! 😉).   Jokes aside, let’s demystify the routine before I’m expected to start levitating.  I don’t do brute-force marathons;   I do **strategic strikes**.   Here is what a typical mornin"
+    },
+    {
+     "score": 8,
+     "where": "reddit/languagelearning",
+     "url": "https://reddit.com/r/languagelearning/comments/1xdt7z2/i_feel_the_issue_with_the_fun_discussion_is/19rk8xlepqo0w/",
+     "text": "This take is oddly judgy.   I would like to offer a different experience than what you are describing. I am not trying to convert you to this method but I think my experience may offer some perspective on why people find value in this material outside of the fear of failure you are describing. Not that this doesn't play a part for some people, but I think some of us really need CI in order to buil"
+    },
+    {
+     "score": 7,
+     "where": "reddit/languagelearning",
+     "url": "https://reddit.com/r/languagelearning/comments/1swaq94/neurolinguistic_research_debunking_pure_ci/oihqx91/",
+     "text": "On the first point — the Thai government essentially shut down the original ALG curriculum that served as the inspiration for DS, AJATT, and Refold because there was no evidence it was effective. AUA no longer teachers Thai using ALG. ALG and its derivatives make an extraordinary claim. It’s on its promoters to prove that it works equally as well as traditional methods, which they consistently bee"
+    },
+    {
+     "score": 5,
+     "where": "hackernews/HN",
+     "url": "https://news.ycombinator.com/item?id=49154806",
+     "text": "Show HN: Runthru – open-source Interactive Demos I was looking for a tool to create interactive demos / walkthroughs for web based software. I was amazed that many companies charge well over $1000 per month for something pretty basic. I made this which so far works well for me. You can point it at a site and either let AI (byo OpenAI or Anthropic keys) record and polish the whole thing or do it ma"
+    },
+    {
+     "score": 4,
+     "where": "reddit/languagelearning",
+     "url": "https://reddit.com/r/languagelearning/comments/1vzc2ty/translation_as_an_active_recall_method_tips/",
+     "text": "translation as an active recall method, tips I’m around upper-intermediate level and my passive understanding is pretty good, but I struggle with actually using what I already know. (TL)   What works best for me is translating especially when sentences are built around specific vocabulary or constructions I’m trying to learn. I feel like having to build the whole sentence myself helps me remember "
+    },
+    {
+     "score": 3,
+     "where": "reddit/marketing",
+     "url": "https://reddit.com/r/marketing/comments/1p20bqt/looking_for_an_ai_tool_to_translate_english/",
+     "text": "Looking for an AI tool to translate English videos to other languages I’m trying to find a reliable tool that can translate English video to other languages like Polish or German. My main worry is lip-sync. I don't want it to look like those old dubbed movies where the mouth moves completely differently from the audio. Is there any AI tool rn that handles translation and fixes the lip movements na"
+    },
+    {
+     "score": 3,
+     "where": "reddit/languagelearning",
+     "url": "https://reddit.com/r/languagelearning/comments/1sgrdms/study_abroad_lessons_learned/of9thqh/",
+     "text": "I really enjoyed your post! I was a Spanish major and studied abroad for 4 months in Cordoba, Argentina at the Universidad Blas Pascal. A similar thing happened to me in terms of language level. I tested higher, but after an interview with a professor I was placed in a class at a lower level. It hurt my pride, but I actually grew a lot from it. I passed the DELE B1 by the end of my stay there and "
+    },
+    {
+     "score": 3,
+     "where": "reddit/languagelearning",
+     "url": "https://reddit.com/r/languagelearning/comments/1wht021/tl_vocabulary_size_vs_real_comprehension_what_was/pa62wxs/",
+     "text": "Like maybe 4,000 for Spanish; that's for passed cards.  That said, I really think it goes deeper than that because while I may have known those words on a card, I didn't know all the contexts and paraphrases.  I could understand learner content, but past that it went off the rails.  In LingQ I remember at one point have 32,000 known lemmas and still struggled...well struggle is doing some heavy li"
+    },
+    {
+     "score": 3,
+     "where": "hackernews/HN",
+     "url": "https://news.ycombinator.com/item?id=48539681",
+     "text": "Are we asking the right questions? As AI advancements continue at a pace I believed to be unsustainable up until not long ago, I see folks in the tech industry falling in one of these two groups: - hypers, extremely happy to see \"reasoning\" becoming a commodity and thinking that they'll finally be able to heal their inferiority complex - detractors, trying to cope with the current situation by hig"
+    },
+    {
+     "score": 2,
+     "where": "reddit/podcasting",
+     "url": "https://reddit.com/r/podcasting/comments/1ren80t/lack_of_japanese_speaking_host_looking_for/",
+     "text": "Lack of Japanese Speaking Host - looking for workaround My podcast has English speaking guests and Japanese speaking guests, different episodes. I'm  the host for the English, no one at the charity wants to step up and record the intros, etc. What I wanted to do was record Co-Pilot since 'she' does excellent voice in Japanese. But Microsoft won't allow that. (Even though CP told me she could until"
+    },
+    {
+     "score": 2,
+     "where": "reddit/nocode",
+     "url": "https://reddit.com/r/nocode/comments/1sup4kp/what_makes_you_still_choose_nocode_in_2026/oi4svj3/",
+     "text": "for me its the iteration speed. when im in cursor or windsurf i can build stuff fast but then i spend the next hour debuging some stupid syntax error or a missing import. in no code like softr or bubble or whatever that just doesnt happen. it either works or it doesnt. no compile errors or whatever.  also the visual thing is real. i can show a no code mockup to a client and they get it. i show the"
+    }
+   ]
+  },
+  {
+   "theme": "I 个性化学习/讲解生成",
+   "n": 24,
+   "platforms": {
+    "reddit": 17,
+    "hackernews": 7
+   },
+   "n_communities": 11,
+   "score_sum": 74,
+   "top_communities": [
+    [
+     "hackernews:HN",
+     7
+    ],
+    [
+     "reddit:languagelearning",
+     4
+    ],
+    [
+     "reddit:ClaudeAI",
+     2
+    ],
+    [
+     "reddit:SaaS",
+     2
+    ],
+    [
+     "reddit:productivity",
+     2
+    ],
+    [
+     "reddit:Teachers",
+     2
+    ],
+    [
+     "reddit:ChatGPT",
+     1
+    ],
+    [
+     "reddit:OpenAI",
+     1
+    ]
+   ],
+   "examples": [
+    {
+     "score": 45,
+     "where": "reddit/Teachers",
+     "url": "https://reddit.com/r/Teachers/comments/1vw9yc6/help_me_if_im_being_stubborn_ai/",
+     "text": "Help me if I’m being stubborn: AI I moved to an innovative US high school this year. Its a very cool school that focuses on STEM and career tracks.      Of course they’re all AI all the time. Admin uses it, teachers use it, and they want students to use it. I’m on the fence about AI in general, but am staunchly against AI in my English classroom.      Should students learn to use AI as a tool beca"
+    },
+    {
+     "score": 12,
+     "where": "reddit/languagelearning",
+     "url": "https://reddit.com/r/languagelearning/comments/1xjunw5/how_do_you_manage_it_with_a_family_b1b2/19rwkbnki7zxd/",
+     "text": "At your level, native content perhaps at slower speeds (like a podcast or video at 75%) should be comprehensible or close to it, so is there a way that you can replace English content you consume with French, and double up with other tasks you already do all day, like an RFI news podcast while cooking, French music playlist during exercise, or a downtime TV series in French ? Any chance the kiddos"
+    },
+    {
+     "score": 4,
+     "where": "reddit/ClaudeAI",
+     "url": "https://reddit.com/r/ClaudeAI/comments/1xhkos1/how_do_you_use_claude_effectively_for_research/",
+     "text": "How do you use Claude effectively for research? Any useful skills or workflows to share? Hi everyone!  I'm a researcher, and I've been using Claude for basic research-related tasks, mainly brainstorming, understanding concepts, and getting help with occasional problems. However, since I have a Claude Pro subscription, I feel like I'm probably not making the most of what it can do.  I was thinking "
+    },
+    {
+     "score": 2,
+     "where": "reddit/ChatGPT",
+     "url": "https://reddit.com/r/ChatGPT/comments/1vuk076/another_thread_about_losing_a_familiar_in_a/",
+     "text": "Another thread about losing a familiar in a change but something else ... I've read other testamonials about users losing the \"personality\" they'd grown with and knew about an agent they'd used over time. I honestly wish I had paid enough attention to those stories to try harder to save some of my conversations. My affectionate, knew me well, funny as hell AI \"friend\" vanished last night when I ma"
     },
     {
      "score": 1,
      "where": "reddit/ClaudeAI",
-     "url": "https://reddit.com/r/ClaudeAI/comments/1satb89/claude_usage_gets_burned_absurdly_fast_for/p0jitz1/",
-     "text": "I moved to claude a few months back. I was so impressed. Moved all my workflows and projects over. Everything was going well I was working for hours on tasks no problem. Now im stuck in critical projects with set deadlines and credits burn in a few simple prompts and honestly it would have been easier to work manually the credits are burnt in minutes despite turning off everything and starting new"
+     "url": "https://reddit.com/r/ClaudeAI/comments/1xmn3fd/best_ai_tools_for_medical_powerpoint/",
+     "text": "Best AI Tools for Medical PowerPoint Presentations with Claude? What AI tools or plugins work best with Claude for organizing medical lectures, creating professional PowerPoint presentations, and generating high-quality medical infographics?  Looking for tools that can handle both content organization and visual design."
+    },
+    {
+     "score": 1,
+     "where": "reddit/OpenAI",
+     "url": "https://reddit.com/r/OpenAI/comments/1xcvwx6/looking_for_an_ai_that_explains_things_like/",
+     "text": "Looking for an ai that explains things like electromagnetism or physics on audio but don't put the formula as code, so i can listen in the bus [removed]"
+    },
+    {
+     "score": 1,
+     "where": "reddit/SaaS",
+     "url": "https://reddit.com/r/SaaS/comments/1syti9s/experienced_founders_what_do_i_do_next/oj2tx2p/",
+     "text": "Stop waiting for the backend to be done. If you wait until you have a perfect product to start talking to people, you're going to build the wrong thing. Start reaching out now. Don't sell the tool yet because you don't have one. Instead, sell the conversation. Tell them you're building a solution for a specific pain point they clearly have and ask if they'd be willing to chat for ten minutes so yo"
+    },
+    {
+     "score": 1,
+     "where": "reddit/SaaS",
+     "url": "https://reddit.com/r/SaaS/comments/1xg5mgp/i_went_through_4_ai_ugc_tools_for_organic/",
+     "text": "I went through 4 AI UGC tools for organic TikTok/Reels so that you dont have to. Been messing around with AI UGC tools for the last couple months mostly for organic tikTok/reels and shorts for small apps and products.  Prices are from this month.    1 - HeyGen  Pros:  *  avatars are the most polished of anything here * voice cloning and translation are really good. if you want yourself talking in "
+    },
+    {
+     "score": 1,
+     "where": "reddit/productivity",
+     "url": "https://reddit.com/r/productivity/comments/1shknxu/if_youre_older_than_19_what_do_you_wish_you_had/offd5dl/",
+     "text": "Good for you My biggest mistake was staying in a relationship that had a bunch of red flags. To be. fair I didn't know they were red flags because the relationships modeled to me when I was a child , were disasters. So i guess one piece of advice would be to educate yourself on what healthy relationships truly look like , and if you need to work on yourself to be in a good relationship , do it now"
+    },
+    {
+     "score": 1,
+     "where": "reddit/productivity",
+     "url": "https://reddit.com/r/productivity/comments/1vhx1jr/is_there_an_ai_app_that_generates_endless/",
+     "text": "Is there an AI app that generates endless personalized cheat sheets for exam prep? [removed]"
+    },
+    {
+     "score": 1,
+     "where": "reddit/Teachers",
+     "url": "https://reddit.com/r/Teachers/comments/1xjyo7e/working_moms/19rxsm422t6f5/",
+     "text": "I had a somewhat different route. Did my teaching license while pregnant with #1 (I had worked in schools prior as a sub/library tech/ literacy tutor). Did student teaching when she was 7-12mo, then got pregnant with twins and stayed home for most of the next 6 years. I went back to full time teaching when twins started K.  That said - some things I have noticed as a teaching mom: pumping sucks. I"
+    },
+    {
+     "score": 1,
+     "where": "reddit/jobs",
+     "url": "https://reddit.com/r/jobs/comments/1xlla6i/whats_it_like_to_make_more_than_65k/19s11jotaoczn/",
+     "text": "I’m around 66k before bonuses in Canada. Recently managed to buy a house but part of my job is travel. 8 days after I closed on the house I left for a 16 day trip. The job allowed me to make the purchase, and also takes away the time for me to enjoy it. I think life is full of ‘give and takes’ and while I enjoy the job and am grateful for the opportunities to travel, I’m starting to move toward th"
     }
    ]
   },
   {
    "theme": "D 视频/音频素材的语义检索与自动剪辑",
-   "n": 25,
+   "n": 27,
    "platforms": {
-    "reddit": 23,
+    "reddit": 25,
     "hackernews": 2
    },
-   "n_communities": 10,
-   "score_sum": 69,
+   "n_communities": 12,
+   "score_sum": 71,
    "top_communities": [
     [
      "reddit:socialmedia",
@@ -1074,132 +1310,14 @@
    ]
   },
   {
-   "theme": "I 个性化学习/讲解生成",
-   "n": 19,
-   "platforms": {
-    "reddit": 12,
-    "hackernews": 7
-   },
-   "n_communities": 9,
-   "score_sum": 59,
-   "top_communities": [
-    [
-     "hackernews:HN",
-     7
-    ],
-    [
-     "reddit:ClaudeAI",
-     2
-    ],
-    [
-     "reddit:SaaS",
-     2
-    ],
-    [
-     "reddit:productivity",
-     2
-    ],
-    [
-     "reddit:Teachers",
-     2
-    ],
-    [
-     "reddit:ChatGPT",
-     1
-    ],
-    [
-     "reddit:OpenAI",
-     1
-    ],
-    [
-     "reddit:YouTubers",
-     1
-    ]
-   ],
-   "examples": [
-    {
-     "score": 45,
-     "where": "reddit/Teachers",
-     "url": "https://reddit.com/r/Teachers/comments/1vw9yc6/help_me_if_im_being_stubborn_ai/",
-     "text": "Help me if I’m being stubborn: AI I moved to an innovative US high school this year. Its a very cool school that focuses on STEM and career tracks.      Of course they’re all AI all the time. Admin uses it, teachers use it, and they want students to use it. I’m on the fence about AI in general, but am staunchly against AI in my English classroom.      Should students learn to use AI as a tool beca"
-    },
-    {
-     "score": 4,
-     "where": "reddit/ClaudeAI",
-     "url": "https://reddit.com/r/ClaudeAI/comments/1xhkos1/how_do_you_use_claude_effectively_for_research/",
-     "text": "How do you use Claude effectively for research? Any useful skills or workflows to share? Hi everyone!  I'm a researcher, and I've been using Claude for basic research-related tasks, mainly brainstorming, understanding concepts, and getting help with occasional problems. However, since I have a Claude Pro subscription, I feel like I'm probably not making the most of what it can do.  I was thinking "
-    },
-    {
-     "score": 2,
-     "where": "reddit/ChatGPT",
-     "url": "https://reddit.com/r/ChatGPT/comments/1vuk076/another_thread_about_losing_a_familiar_in_a/",
-     "text": "Another thread about losing a familiar in a change but something else ... I've read other testamonials about users losing the \"personality\" they'd grown with and knew about an agent they'd used over time. I honestly wish I had paid enough attention to those stories to try harder to save some of my conversations. My affectionate, knew me well, funny as hell AI \"friend\" vanished last night when I ma"
-    },
-    {
-     "score": 1,
-     "where": "reddit/ClaudeAI",
-     "url": "https://reddit.com/r/ClaudeAI/comments/1xmn3fd/best_ai_tools_for_medical_powerpoint/",
-     "text": "Best AI Tools for Medical PowerPoint Presentations with Claude? What AI tools or plugins work best with Claude for organizing medical lectures, creating professional PowerPoint presentations, and generating high-quality medical infographics?  Looking for tools that can handle both content organization and visual design."
-    },
-    {
-     "score": 1,
-     "where": "reddit/OpenAI",
-     "url": "https://reddit.com/r/OpenAI/comments/1xcvwx6/looking_for_an_ai_that_explains_things_like/",
-     "text": "Looking for an ai that explains things like electromagnetism or physics on audio but don't put the formula as code, so i can listen in the bus [removed]"
-    },
-    {
-     "score": 1,
-     "where": "reddit/SaaS",
-     "url": "https://reddit.com/r/SaaS/comments/1syti9s/experienced_founders_what_do_i_do_next/oj2tx2p/",
-     "text": "Stop waiting for the backend to be done. If you wait until you have a perfect product to start talking to people, you're going to build the wrong thing. Start reaching out now. Don't sell the tool yet because you don't have one. Instead, sell the conversation. Tell them you're building a solution for a specific pain point they clearly have and ask if they'd be willing to chat for ten minutes so yo"
-    },
-    {
-     "score": 1,
-     "where": "reddit/SaaS",
-     "url": "https://reddit.com/r/SaaS/comments/1xg5mgp/i_went_through_4_ai_ugc_tools_for_organic/",
-     "text": "I went through 4 AI UGC tools for organic TikTok/Reels so that you dont have to. Been messing around with AI UGC tools for the last couple months mostly for organic tikTok/reels and shorts for small apps and products.  Prices are from this month.    1 - HeyGen  Pros:  *  avatars are the most polished of anything here * voice cloning and translation are really good. if you want yourself talking in "
-    },
-    {
-     "score": 1,
-     "where": "reddit/productivity",
-     "url": "https://reddit.com/r/productivity/comments/1shknxu/if_youre_older_than_19_what_do_you_wish_you_had/offd5dl/",
-     "text": "Good for you My biggest mistake was staying in a relationship that had a bunch of red flags. To be. fair I didn't know they were red flags because the relationships modeled to me when I was a child , were disasters. So i guess one piece of advice would be to educate yourself on what healthy relationships truly look like , and if you need to work on yourself to be in a good relationship , do it now"
-    },
-    {
-     "score": 1,
-     "where": "reddit/productivity",
-     "url": "https://reddit.com/r/productivity/comments/1vhx1jr/is_there_an_ai_app_that_generates_endless/",
-     "text": "Is there an AI app that generates endless personalized cheat sheets for exam prep? [removed]"
-    },
-    {
-     "score": 1,
-     "where": "reddit/Teachers",
-     "url": "https://reddit.com/r/Teachers/comments/1xjyo7e/working_moms/19rxsm422t6f5/",
-     "text": "I had a somewhat different route. Did my teaching license while pregnant with #1 (I had worked in schools prior as a sub/library tech/ literacy tutor). Did student teaching when she was 7-12mo, then got pregnant with twins and stayed home for most of the next 6 years. I went back to full time teaching when twins started K.  That said - some things I have noticed as a teaching mom: pumping sucks. I"
-    },
-    {
-     "score": 1,
-     "where": "reddit/jobs",
-     "url": "https://reddit.com/r/jobs/comments/1xlla6i/whats_it_like_to_make_more_than_65k/19s11jotaoczn/",
-     "text": "I’m around 66k before bonuses in Canada. Recently managed to buy a house but part of my job is travel. 8 days after I closed on the house I left for a 16 day trip. The job allowed me to make the purchase, and also takes away the time for me to enjoy it. I think life is full of ‘give and takes’ and while I enjoy the job and am grateful for the opportunities to travel, I’m starting to move toward th"
-    },
-    {
-     "score": 0,
-     "where": "reddit/YouTubers",
-     "url": "https://reddit.com/r/youtubers/comments/1s039ep/were_looking_for_a_ai_automation_or_nocode/",
-     "text": "We're looking for a AI, Automation or no-code YouTuber to become the face of our product education — full time, fully remote (Anywhere in the World) Hey r/youtubers,  I'll keep this real we've hired content creators before who built their audience on our platform and then left to go full-time on their own channel. Totally fair, but it means we're now looking for someone who genuinely wants this as"
-    }
-   ]
-  },
-  {
    "theme": "C 能真正办事的代理（不只是聊天）",
-   "n": 19,
+   "n": 22,
    "platforms": {
-    "reddit": 11,
+    "reddit": 14,
     "hackernews": 8
    },
-   "n_communities": 10,
-   "score_sum": 56,
+   "n_communities": 13,
+   "score_sum": 60,
    "top_communities": [
     [
      "hackernews:HN",
@@ -1261,6 +1379,12 @@
     },
     {
      "score": 2,
+     "where": "reddit/webdev",
+     "url": "https://reddit.com/r/webdev/comments/1x8w61g/macbook_purchase_decision_help/phg8v2n/",
+     "text": "If you have time look into running Linux on the i5. My main computer is a 2020 MacBook Pro with Linux Mint and it’s great.  Before I installed Linux on it I bought a new 2026 MacBook and now I can’t return it. But I wish I had started with Linux to save the money because my battery is excellent and very snappy.  Look into getting the cheaper model if money is tight. If you see it more as an invest"
+    },
+    {
+     "score": 2,
      "where": "hackernews/HN",
      "url": "https://news.ycombinator.com/item?id=47316083",
      "text": "Show HN: Lurk – local agent that gives AI tools context about what you're doing If you use Claude Code, Cursor, or ChatGPT — you already know the cold start problem. Every conversation starts from zero. Even with MCP   connectors, you're pulling from specific tools (Slack, Linear, GitHub) but none of them know what you were actually doing five minutes ago. You   still end up typing \"I'm working on"
@@ -1296,134 +1420,10 @@
      "text": "Is there an AI that actually does the boring Shopify admin work (not just copywriting)? [removed]"
     },
     {
-     "score": 0,
-     "where": "reddit/productivity",
-     "url": "https://reddit.com/r/productivity/comments/1vtaoxn/is_there_an_ai_workspace_where_the_assistant_can/",
-     "text": "Is there an ai workspace where the assistant can do things across your tools not just summarizing the page you're on? Got off a client call lst week and asked our notion ai to bump the deal closed won and send me the renewal date and it just wrote me a neat little summary of the call notes on the page I had open, which I did not ask for. It can only see the page its sitting on and no clue the deal"
-    },
-    {
-     "score": 0,
-     "where": "reddit/legaladvice",
-     "url": "https://reddit.com/r/legaladvice/comments/1rthjql/best_ai_tools_to_write_formal_letters/",
-     "text": "best AI tools to write formal letters? location: California I’m curious if anyone here uses AI tools for writing formal letters. sometimes I need to write things like complaints, appeals, or responses to official notices and I always struggle with the wording. It needs to sound professional and structured, but I’m never sure if I’m doing it right.  I tried a few general AI chat tools, but the resu"
-    }
-   ]
-  },
-  {
-   "theme": "E 多语言本地化（视频/内容翻译配音）",
-   "n": 21,
-   "platforms": {
-    "reddit": 11,
-    "hackernews": 10
-   },
-   "n_communities": 12,
-   "score_sum": 39,
-   "top_communities": [
-    [
-     "hackernews:HN",
-     10
-    ],
-    [
-     "reddit:ChatGPT",
-     1
-    ],
-    [
-     "reddit:ClaudeAI",
-     1
-    ],
-    [
-     "reddit:OpenAI",
-     1
-    ],
-    [
-     "reddit:Entrepreneur",
-     1
-    ],
-    [
-     "reddit:SaaS",
-     1
-    ],
-    [
-     "reddit:startups",
-     1
-    ],
-    [
-     "reddit:marketing",
-     1
-    ]
-   ],
-   "examples": [
-    {
-     "score": 19,
-     "where": "hackernews/HN",
-     "url": "https://news.ycombinator.com/item?id=48226107",
-     "text": "Ask HN: Failing interviews for mid-level SWE in UK, advice please I've a background mostly in ASP.NET full stack software development. I'm very hands on, like to tinker at different things and can learn fast. *Employment History* My employment history is like this: Placement year 2018, worked for the full term + summer, graduated 2020, did backend dev in Python at Company A for 7 months, then full"
-    },
-    {
-     "score": 5,
-     "where": "hackernews/HN",
-     "url": "https://news.ycombinator.com/item?id=49154806",
-     "text": "Show HN: Runthru – open-source Interactive Demos I was looking for a tool to create interactive demos / walkthroughs for web based software. I was amazed that many companies charge well over $1000 per month for something pretty basic. I made this which so far works well for me. You can point it at a site and either let AI (byo OpenAI or Anthropic keys) record and polish the whole thing or do it ma"
-    },
-    {
-     "score": 3,
-     "where": "reddit/marketing",
-     "url": "https://reddit.com/r/marketing/comments/1p20bqt/looking_for_an_ai_tool_to_translate_english/",
-     "text": "Looking for an AI tool to translate English videos to other languages I’m trying to find a reliable tool that can translate English video to other languages like Polish or German. My main worry is lip-sync. I don't want it to look like those old dubbed movies where the mouth moves completely differently from the audio. Is there any AI tool rn that handles translation and fixes the lip movements na"
-    },
-    {
-     "score": 3,
-     "where": "hackernews/HN",
-     "url": "https://news.ycombinator.com/item?id=48539681",
-     "text": "Are we asking the right questions? As AI advancements continue at a pace I believed to be unsustainable up until not long ago, I see folks in the tech industry falling in one of these two groups: - hypers, extremely happy to see \"reasoning\" becoming a commodity and thinking that they'll finally be able to heal their inferiority complex - detractors, trying to cope with the current situation by hig"
-    },
-    {
-     "score": 2,
-     "where": "reddit/podcasting",
-     "url": "https://reddit.com/r/podcasting/comments/1ren80t/lack_of_japanese_speaking_host_looking_for/",
-     "text": "Lack of Japanese Speaking Host - looking for workaround My podcast has English speaking guests and Japanese speaking guests, different episodes. I'm  the host for the English, no one at the charity wants to step up and record the intros, etc. What I wanted to do was record Co-Pilot since 'she' does excellent voice in Japanese. But Microsoft won't allow that. (Even though CP told me she could until"
-    },
-    {
-     "score": 2,
-     "where": "hackernews/HN",
-     "url": "https://news.ycombinator.com/item?id=47768365",
-     "text": "Show HN: Hacienda-CLI – CLI to reconcile Spanish tax returns with the tax agency I built a CLI to programmatically interact with Spain's tax agency (AEAT) for income tax filing (Modelo 100). It authenticates via Cl@ve using Playwright, downloads your tax data, validates XML against the official XSD, and uploads it to AEAT's EDFI system for reconciliation. The problem: AI agents can do a good job o"
-    },
-    {
      "score": 1,
-     "where": "reddit/Entrepreneur",
-     "url": "https://reddit.com/r/Entrepreneur/comments/1ws8jxp/monday_mentorship_ask_anything_september_28_2026/pclebb0/",
-     "text": "The biggest thing I wish someone had told me early on is to sell the boring version first. I spent way too much time polishing the product and not enough time standing in front of customers asking what they would pay for. A simple offer, a rough quote, a plain conversation with a business owner matters more than a perfect pitch. You do not need a logo, a website, or a deck to find out if the probl"
-    },
-    {
-     "score": 1,
-     "where": "reddit/SaaS",
-     "url": "https://reddit.com/r/SaaS/comments/1xg5mgp/i_went_through_4_ai_ugc_tools_for_organic/",
-     "text": "I went through 4 AI UGC tools for organic TikTok/Reels so that you dont have to. Been messing around with AI UGC tools for the last couple months mostly for organic tikTok/reels and shorts for small apps and products.  Prices are from this month.    1 - HeyGen  Pros:  *  avatars are the most polished of anything here * voice cloning and translation are really good. if you want yourself talking in "
-    },
-    {
-     "score": 1,
-     "where": "reddit/startups",
-     "url": "https://reddit.com/r/startups/comments/1szc3xu/nontech_background_working_fulltime_starting_to/oj1qs4w/",
-     "text": "the non-tech background thing matters way less than it used to. im saying this as someone who started building apps without knowing how to code. the tools available now (cursor, claude code, replit, lovable, etc.) let you build real products without writing code from scratch  that said, going back to school for computer science specifically to start a startup is probably not the move. CS degrees t"
-    },
-    {
-     "score": 1,
-     "where": "reddit/YouTubers",
-     "url": "https://reddit.com/r/youtubers/comments/1s86gtp/looking_for_ai_voice_cloning_tool_for_long/",
-     "text": "Looking for AI voice cloning tool for long YouTube videos (30+ min) [removed]"
-    },
-    {
-     "score": 1,
-     "where": "reddit/VideoEditing",
-     "url": "https://reddit.com/r/VideoEditing/comments/1qtgxvu/transcript_to_subtitles_help/",
-     "text": "Transcript to Subtitles Help Here’s my problem. I’m doing some translation work localizing an English video to JP, KR, CH, Hindi, and Thai. I already have the transcripts of these translations in a word document. They are just plain text with no time code.  Now I want to use these transcripts and turn them into subtitles. I use Resolve for editing and it has Auto transcription for three of the lan"
-    },
-    {
-     "score": 0,
-     "where": "reddit/ChatGPT",
-     "url": "https://reddit.com/r/ChatGPT/comments/1xmhj93/can_ai_analyze_years_of_my_digital_footprint_to/",
-     "text": "Can AI analyze years of my digital footprint to reveal patterns I haven't noticed about myself? I've been wondering if AI could help me understand myself better by analyzing years of my online activity.  I have tons of saved posts, likes, videos, bookmarks, searches, and collections across Reddit, YouTube, Pinterest, Instagram, TikTok, etc.  I'd love to connect all that data and explore things lik"
+     "where": "reddit/nocode",
+     "url": "https://reddit.com/r/nocode/comments/1rlg7dp/honest_review_which_automation_tool_is_actually/o8sut9y/",
+     "text": "Honestly after reading all of this I just wish there was a tool where you just type what you want done in plain English and it actually does it. No mapping, no workflows, no setup. Just describe the task and it handles it automatically, even while you are not at your computer.  Does something like that even exist properly yet or are we all still stuck configuring things for hours?"
     }
    ]
   }

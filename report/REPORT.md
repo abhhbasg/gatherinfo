@@ -1,6 +1,6 @@
-# 社交媒体上的 AI 工具需求与商机报告（第一版）
+# 社交媒体上的 AI 工具需求与商机报告（第二版）
 
-> 数据时间：2025-11 至 2026-11 ｜ 生成日期：2026-11-04 ｜ 状态：**初版**（Reddit 52 个版块完成 43 个，其中 40 个有命中，其余仍在采集）
+> 数据时间：2025-11 至 2026-11 ｜ 生成日期：2026-11-04 ｜ 状态：**第二版**（Reddit 52 个版块全部完成）
 
 ---
 
@@ -26,11 +26,11 @@
 
 | 平台 | 采集工具（GitHub 开源 / 开放接口） | 有效样本 |
 |---|---|---|
-| Reddit | [Arctic Shift](https://github.com/ArthurHeitmann/arctic_shift) 存档 API，覆盖 43 个版块（AI 类 8 个 + 职业/生活类 35 个） | 465 |
+| Reddit | [Arctic Shift](https://github.com/ArthurHeitmann/arctic_shift) 存档 API，覆盖 52 个版块（AI 类 8 个 + 职业/生活类 44 个），其中 49 个有命中 | 540 |
 | Hacker News | [HN Algolia Search API](https://hn.algolia.com/api) | 295 |
 | Lemmy | [Lemmy](https://github.com/LemmyNet/lemmy) 联邦社区开放 API | 15 |
 | V2EX | 官方公开 API（只能拿到帖子正文，拿不到回复） | 1 |
-| **合计** | | **776** |
+| **合计** | | **851** |
 
 **筛选方法：** 先抓取包含 *wish there was / is there an AI / would pay for / looking for a tool / 求一个 / 有没有* 等"需求句式"的评论和帖子，再要求文中提到 AI，最后按主题归类，并人工阅读高赞原文。
 
@@ -47,18 +47,18 @@
 
 | 主题 | 条数 | 平台数 | 覆盖社区数 |
 |---|---:|---:|---:|
-| 可信研究：带出处、不编造 | 92 | 3 | 28 |
-| 文档 / 票据 / 合同自动处理 | 59 | 2 | 23 |
-| 小商家获客与内容持续生产 | 46 | 3 | 22 |
-| 个人排程 / 督促 / ADHD 执行教练 | 48 | 2 | 20 |
-| 隐私 / 本地运行 | 37 | 3 | 17 |
-| 记住我 / 品牌语气的持久记忆 | 42 | 3 | 13 |
-| 多语言本地化（视频翻译配音） | 21 | 2 | 12 |
-| 识别 / 过滤 AI 生成内容 | 47 | 2 | 11 |
-| 用量 / 成本透明、订阅疲劳 | 20 | 2 | 11 |
-| 视频 / 音频素材语义检索与自动剪辑 | 25 | 2 | 10 |
-| 能真正办事的代理 | 19 | 2 | 10 |
-| 个性化学习 / 讲解生成 | 19 | 2 | 9 |
+| 可信研究：带出处、不编造 | 103 | 3 | 34 |
+| 文档 / 票据 / 合同自动处理 | 63 | 2 | 27 |
+| 小商家获客与内容持续生产 | 49 | 3 | 25 |
+| 个人排程 / 督促 / ADHD 执行教练 | 51 | 2 | 22 |
+| 隐私 / 本地运行 | 39 | 3 | 18 |
+| 记住我 / 品牌语气的持久记忆 | 43 | 3 | 14 |
+| 多语言本地化（视频翻译配音） | 33 | 2 | 14 |
+| 能真正办事的代理 | 22 | 2 | 13 |
+| 识别 / 过滤 AI 生成内容 | 48 | 2 | 12 |
+| 用量 / 成本透明、订阅疲劳 | 21 | 2 | 12 |
+| 视频 / 音频素材语义检索与自动剪辑 | 27 | 2 | 12 |
+| 个性化学习 / 讲解生成 | 24 | 2 | 11 |
 
 > "识别/过滤 AI 内容"条数不算最多，但单帖热度最高（教师版块单帖 625 赞），而且出现在彼此毫不相关的人群里，所以排第一。
 
@@ -121,6 +121,8 @@
 - *"有没有能真正做 Shopify 后台杂活（而不只是写文案）的 AI？"* — [r/ecommerce](https://reddit.com/r/ecommerce/comments/1vhu8v1/is_there_an_ai_that_actually_does_the_boring/)
 - **效率工具用户**：开完客户会，让 Notion AI 把交易改成"已成交"并发来续约日期，它只会总结当前页面。 — r/productivity
 - **小商家**：舞蹈工作室老板没时间持续做新的广告图和文案。 — [r/marketing](https://reddit.com/r/marketing/comments/1qs71wo/how_are_small_local_businesses_keeping_ad/)
+- **无代码用户**：比较完一圈自动化工具后说，*"真希望有个工具，我用大白话说要做什么，它就真的做完，不用连线、不用搭流程。"* — [r/nocode](https://reddit.com/r/nocode/comments/1rlg7dp/honest_review_which_automation_tool_is_actually/o8sut9y/)
+- **自动化版块**：*"有没有 AI 能盯着我的屏幕，看到那个烦人的弹窗按钮就帮我点掉？"* — [r/automation](https://reddit.com/r/automation/comments/1uwgbhw/ai_for_pressing_a_stupid_button/)
 
 **本质：** 用户已经不缺"会说话的 AI"，缺的是**接进业务系统、能动手的 AI**。真正的门槛和护城河在**集成**（订单、物流、CRM、广告后台）。
 
@@ -132,6 +134,9 @@
 
 - 有人花 2–3 个月测遍了 AI 笔记 App 和录音硬件：开一天会下来，手机发烫，留下 20–30 份转录稿，*"我根本不想读，又是好几个小时的工作。"* — [r/productivity](https://reddit.com/r/productivity/comments/1padxob/tried_almost_every_ai_notetaking_app_wearable/)
 - HN：*"真希望有个 AI 能替我看视频和播客，写成一篇像样的文章，不是转录稿，而是读起来顺畅的文章。"* 发帖人自述有 ADHD。
+
+- **项目经理**：用 Copilot 写会议纪要，总得自己再改一遍，经常不准、漏掉细节，而这些细节有时很关键。 — [r/projectmanagement](https://reddit.com/r/projectmanagement/comments/1sd67ko/how_to_type_up_minutes_quickly/oeilvo1/)
+- **医生**：希望医护人员能标出关键信息，让 AI 据此写出院小结，因为同行真正需要的往往只有两三句话。 — [r/medicine](https://reddit.com/r/medicine/comments/1svj0vf/best_sources_to_learn_about_real_strengths_and/oiaqzl3/)；还有医生在问能否做**本地运行**的 AI 预写病历工具。 — [r/medicine](https://reddit.com/r/medicine/comments/1sbx0l9/has_anyone_tried_to_build_a_local_ai_precharting/)
 
 **本质：** 转写已经是基础功能，用户要的是**跨多份材料的综合**：一整天、一个项目、一个系列的要点、矛盾和待办。差异化在"综合"这一层。
 
@@ -151,7 +156,7 @@
 
 ## 五、反向信号：用户在拒绝什么
 
-1. **AI 功能臃肿。** r/productivity 一篇高赞帖：开发者不修 bug，到处塞半成品"AI 助手"，*"我不需要聊天机器人总结我三行的待办清单。"* → **做减法、做准一件事**的产品更受欢迎。
+1. **AI 功能臃肿。** r/productivity 一篇高赞帖：开发者不修 bug，到处塞半成品"AI 助手"，*"我不需要聊天机器人总结我三行的待办清单。"* → 项目管理版块也有人专门找*"不用 AI、或者能把 AI 关掉"*的工具（[r/projectmanagement](https://reddit.com/r/projectmanagement/comments/1xgbc20/anyone_use_evergantt/)）。**做减法、做准一件事**的产品更受欢迎。
 2. **"AI 味"和 AI 垃圾内容。** 多个社区都在主动排斥 AI 生成的内容（Etsy、HN、自出版、招聘）。这既是风险，也是机会 1 的来源。
 3. **用量和成本不透明。** AI 重度用户抱怨额度和 token 消耗看不懂，想要一个客户端同时用多家订阅。这个需求更偏开发者，适合做小而美的工具。
 
@@ -163,7 +168,7 @@
 2. **对排名前两位的机会做低成本验证：**
    - 机会 1：做一个"过程留痕写作链接"的落地页，回到 r/Teachers 这类社区收集等候名单。
    - 机会 2：做一个本地视频按内容搜索的演示，放到剪辑、播客社区测反应。
-3. **Reddit 剩余版块采集完成后**（医疗、网页开发、无代码、自动化、Excel、项目管理、语言学习、家长），我会出第二版报告，更新统计数字。
+3. **扩大样本**：当前每个 Reddit 版块只取了部分时间窗口。如果某个机会进入验证阶段，可以针对相关版块拉全年数据，看需求是在增长还是消退。
 
 ---
 
