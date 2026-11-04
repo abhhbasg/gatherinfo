@@ -77,13 +77,14 @@ SUBS = [
     "personalfinance", "ecommerce", "shopify", "AmazonSeller", "Etsy", "nursing", "medicine",
     "webdev", "nocode", "automation", "excel", "projectmanagement", "languagelearning", "parenting",
 ]
-QUERIES = ["wish", "is there", "pay for", "tool that", "looking for"]
+QUERIES = ["wish", "pay for", "is there"]
 WINDOWS = [("2025-11-01", "2026-02-01"), ("2026-02-01", "2026-05-01"),
            ("2026-05-01", "2026-08-01"), ("2026-08-01", "2026-11-05")]
 
 def _reddit_sub(sub):
     recs = []
-    jobs = [("comments", q, w) for q in QUERIES for w in WINDOWS] + [("posts", q, WINDOWS[0][0:1] + ("2026-11-05",)) for q in QUERIES]
+    jobs = ([("comments", q, w) for q in QUERIES[:2] for w in (WINDOWS[1], WINDOWS[3])]
+            + [("posts", q, ("2025-11-01", "2026-11-05")) for q in ("is there an ai", "ai tool")])
     for kind, q, (a, b) in jobs:
         field = "body" if kind == "comments" else "query"
         url = (f"https://arctic-shift.photon-reddit.com/api/{kind}/search?"
@@ -100,11 +101,13 @@ def _reddit_sub(sub):
 def reddit(f):
     from concurrent.futures import ThreadPoolExecutor
     n = 0
-    with ThreadPoolExecutor(2) as ex:
-        for sub, recs in ex.map(_reddit_sub, SUBS):
+    done = set(re.findall(r"r/(\S+): fetched", open(OUT / "reddit_done.log").read())) if (OUT / "reddit_done.log").exists() else set()
+    with ThreadPoolExecutor(1) as ex:
+        for sub, recs in ex.map(_reddit_sub, [s for s in SUBS if s not in done]):
             got = sum(emit(f, r) for r in recs)
             f.flush(); n += got
             print(f"reddit r/{sub}: fetched {len(recs)} kept {got}", file=sys.stderr)
+            with open(OUT / "reddit_done.log", "a") as g: g.write(f"r/{sub}: fetched {len(recs)} kept {got}\n")
     return n
 
 # ---------------- Hacker News (Algolia) ----------------
@@ -181,5 +184,5 @@ def lemmy(f):
 if __name__ == "__main__":
     which = sys.argv[1:] or ["reddit", "hn", "v2ex", "lemmy"]
     for w in which:
-        with open(OUT / f"raw_{w}.jsonl", "w") as f:
+        with open(OUT / f"raw_{w}.jsonl", "a" if w == "reddit" else "w") as f:
             {"reddit": reddit, "hn": hn, "v2ex": v2ex, "lemmy": lemmy}[w](f)
