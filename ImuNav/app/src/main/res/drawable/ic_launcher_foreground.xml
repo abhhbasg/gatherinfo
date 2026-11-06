@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Artificial horizon inside a compass ring. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp" android:height="108dp"
+    android:viewportWidth="108" android:viewportHeight="108">
+    <path android:fillColor="#00000000" android:strokeColor="#4DD0E1" android:strokeWidth="3"
+        android:pathData="M54,30a24,24 0,1 1,0 48a24,24 0,1 1,0 -48z" />
+    <path android:fillColor="#4DD0E1"
+        android:pathData="M33.5,60 L74.5,52 A21,21 0,0 1,33.5 60z" />
+    <path android:fillColor="#00000000" android:strokeColor="#FFB74D" android:strokeWidth="3"
+        android:strokeLineCap="round"
+        android:pathData="M42,54 L50,54 L54,58 L58,54 L66,54" />
+    <path android:fillColor="#FF5252" android:pathData="M54,22 L58,30 L50,30z" />
+</vector>
