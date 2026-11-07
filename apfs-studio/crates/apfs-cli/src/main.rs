@@ -200,7 +200,7 @@ fn cmd_ls(c: &Container, v: &Volume, path: &str, recursive: bool, depth: usize) 
                     "{indent}{}{:o} {:>10} {} {}{}{}",
                     kind_char(i.mode),
                     i.mode & 0o7777,
-                    if i.is_dir() { format!("{}", i.nchildren_or_nlink) } else { human(i.size()) },
+                    if i.is_dir() { format!("{}", i.nchildren_or_nlink) } else { human(v.file_size(c, &i)) },
                     fmt_time(i.mod_time),
                     e.name,
                     if i.is_compressed() { " [compressed]" } else { "" },

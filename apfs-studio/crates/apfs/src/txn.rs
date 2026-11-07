@@ -933,7 +933,17 @@ impl<'a> Txn<'a> {
     // -----------------------------------------------------------------------
 
     /// Writes everything and makes it durable with a new checkpoint.
-    pub fn commit(mut self) -> Result<()> {
+    pub fn commit(self) -> Result<()> {
+        self.commit_inner().map(|_| ())
+    }
+
+    /// Commits and immediately starts a new transaction on the same container.
+    pub fn commit_continue(self) -> Result<Txn<'a>> {
+        let c = self.commit_inner()?;
+        Txn::begin(c)
+    }
+
+    fn commit_inner(mut self) -> Result<&'a mut Container> {
         let xid = self.xid;
         let bs = self.c.block_size as usize;
         let c: &Container = self.c;
@@ -1100,7 +1110,9 @@ impl<'a> Txn<'a> {
         // --- checkpoint --------------------------------------------------------
         let next_oid = self.next_oid;
         let eph = std::mem::take(&mut self.ephemeral);
-        write_checkpoint(self.c, xid, next_oid, nx_omap_oid, eph)
+        let cm = self.c;
+        write_checkpoint(cm, xid, next_oid, nx_omap_oid, eph)?;
+        Ok(cm)
     }
 }
 

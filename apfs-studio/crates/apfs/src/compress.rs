@@ -51,8 +51,11 @@ pub fn uses_resource_fork(algo: u32) -> bool {
     matches!(algo, CMP_ZLIB_RSRC | CMP_LZVN_RSRC | CMP_PLAIN_RSRC | CMP_LZFSE_RSRC | CMP_LZBITMAP_RSRC)
 }
 
+/// Upper bound for data decoded in one piece (inline payloads, single blocks).
+pub const MAX_UNIT: usize = 256 << 20;
+
 fn zlib(src: &[u8], expect: usize) -> Result<Vec<u8>> {
-    let mut out = Vec::with_capacity(expect);
+    let mut out = Vec::with_capacity(expect.min(1 << 20));
     flate2::read::ZlibDecoder::new(src)
         .take(expect as u64 + 1)
         .read_to_end(&mut out)
@@ -60,9 +63,15 @@ fn zlib(src: &[u8], expect: usize) -> Result<Vec<u8>> {
     Ok(out)
 }
 
+/// Decodes LZFSE with an output bound so corrupted size fields cannot
+/// trigger huge allocations.
 fn lzfse(src: &[u8], expect: usize) -> Result<Vec<u8>> {
-    let mut out = Vec::with_capacity(expect);
-    lzfse_rust::decode_bytes(src, &mut out).map_err(|e| Error::Corrupt(format!("LZFSE data error: {e}")))?;
+    let mut out = Vec::with_capacity(expect.min(1 << 20));
+    let mut dec = lzfse_rust::LzfseRingDecoder::default();
+    dec.reader_bytes(src)
+        .take(expect as u64 + 1)
+        .read_to_end(&mut out)
+        .map_err(|e| Error::Corrupt(format!("LZFSE data error: {e}")))?;
     Ok(out)
 }
 
@@ -74,15 +83,19 @@ fn lzvn(src: &[u8], expect: usize) -> Result<Vec<u8>> {
     w.extend_from_slice(&(src.len() as u32).to_le_bytes());
     w.extend_from_slice(src);
     w.extend_from_slice(b"bvx$");
-    let mut out = Vec::with_capacity(expect);
-    lzfse_rust::decode_bytes(&w, &mut out).map_err(|e| Error::Corrupt(format!("LZVN data error: {e}")))?;
-    Ok(out)
+    lzfse(&w, expect).map_err(|e| match e {
+        Error::Corrupt(m) => Error::Corrupt(m.replace("LZFSE", "LZVN")),
+        e => e,
+    })
 }
 
 /// Decodes one compressed unit (an inline payload or a single fork block).
 pub fn decode_unit(algo: u32, src: &[u8], expect: usize) -> Result<Vec<u8>> {
     if expect == 0 {
         return Ok(Vec::new());
+    }
+    if expect > MAX_UNIT {
+        return Err(Error::Unsupported(format!("compressed unit of {expect} bytes")));
     }
     if src.is_empty() {
         return Err(Error::Corrupt("empty compressed block".into()));
@@ -144,7 +157,7 @@ pub fn fork_block_table(algo: u32, fork_head: &dyn Fn(u64, usize) -> Result<Vec<
             let data_off = be32_at(&h, 0)? as u64;
             let t = fork_head(data_off + 4, 4)?;
             let n = u32_at(&t, 0)? as usize;
-            if n > 1 << 24 {
+            if n > 1 << 24 || (n as u64) * 8 > fork_len {
                 return Err(Error::Corrupt("compressed resource fork block count too large".into()));
             }
             let tbl = fork_head(data_off + 8, n * 8)?;
@@ -166,7 +179,7 @@ pub fn fork_block_table(algo: u32, fork_head: &dyn Fn(u64, usize) -> Result<Vec<
         CMP_LZVN_RSRC | CMP_LZFSE_RSRC | CMP_PLAIN_RSRC | CMP_LZBITMAP_RSRC => {
             let first = fork_head(0, 4)?;
             let tsize = u32_at(&first, 0)? as usize;
-            if tsize < 8 || tsize % 4 != 0 || tsize as u64 > fork_len {
+            if tsize < 8 || tsize % 4 != 0 || tsize as u64 > fork_len || tsize > (nblocks + 1) * 4 + 4096 {
                 return Err(Error::Corrupt("bad compressed block table".into()));
             }
             let t = fork_head(0, tsize)?;

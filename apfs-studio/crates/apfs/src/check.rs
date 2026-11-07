@@ -200,6 +200,11 @@ const T_FQ: u8 = 4;
 fn check_inner(c: &Container, r: &mut CheckReport) -> Result<()> {
     let bs = c.block_size as u64;
     let sb = c.superblock().to_vec();
+    let dev_blocks = c.device().len() / bs;
+    if c.block_count > dev_blocks {
+        r.err(format!("container claims {} blocks but the device holds only {dev_blocks}", c.block_count));
+        return Ok(());
+    }
     let mut usage = Usage::new(c.block_count);
     usage.mark(r, 0, 1, T_META, "block zero");
     let desc_base = rd64(&sb, nx::XP_DESC_BASE);
@@ -237,11 +242,23 @@ fn check_inner(c: &Container, r: &mut CheckReport) -> Result<()> {
     let ring_base = rd64(d, sm::IP_BM_BASE);
     let ring_len = rd32(d, sm::IP_BM_BLOCK_COUNT) as u64;
     let ip_bm_size = rd32(d, sm::IP_BM_SIZE_IN_BLOCKS) as usize;
+    if ip_count > c.block_count || ip_bm_size as u64 > ip_count.div_ceil(bs * 8) + 1 || ring_len > 0xFFFE {
+        r.err("space manager internal pool geometry is invalid");
+        return Ok(());
+    }
     usage.mark(r, ring_base, ring_len, T_META, "internal pool bitmap ring");
     usage.mark(r, ip_base, ip_count, T_IP, "internal pool");
     let chunk_count = rd64(d, sm::DEV + sm::D_CHUNK_COUNT);
+    if chunk_count > c.block_count.div_ceil(bs * 8) + 1 {
+        r.err("space manager chunk count is invalid");
+        return Ok(());
+    }
     let cib_count = rd32(d, sm::DEV + sm::D_CIB_COUNT) as u64;
     let cab_count = rd32(d, sm::DEV + sm::D_CAB_COUNT) as u64;
+    if cib_count > chunk_count || cab_count > cib_count {
+        r.err("space manager chunk-info counts are invalid");
+        return Ok(());
+    }
     if (chunk_count + cib_count + cab_count) * 3 != ip_count {
         r.warn("internal pool size is not 3x the space manager structures");
     }

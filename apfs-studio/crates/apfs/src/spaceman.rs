@@ -153,7 +153,13 @@ impl Spaceman {
         let ip_bm_base = u64_at(&d, sm::IP_BM_BASE)?;
         let ip_bm_count = u32_at(&d, sm::IP_BM_BLOCK_COUNT)? as u64;
         let bm_off = u32_at(&d, sm::IP_BITMAP_OFFSET)? as usize;
-        if ip_bm_size == 0 || (ip_bm_size * bs * 8) < ip_count as usize || ip_bm_count == 0 {
+        if ip_bm_size == 0
+            || ip_count > block_count
+            || ip_bm_size as u64 > ip_count.div_ceil(bs as u64 * 8) + 1
+            || (ip_bm_size * bs * 8) < ip_count as usize
+            || ip_bm_count == 0
+            || ip_bm_count > 0xFFFE
+        {
             return Err(Error::Corrupt("internal pool bitmap geometry is invalid".into()));
         }
         let mut ip_bm = vec![0u8; ip_bm_size * bs];

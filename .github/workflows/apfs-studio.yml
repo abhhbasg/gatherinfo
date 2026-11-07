@@ -1,0 +1,58 @@
+name: APFS Studio
+
+on:
+  push:
+    paths: ["apfs-studio/**", ".github/workflows/apfs-studio.yml"]
+  pull_request:
+    paths: ["apfs-studio/**", ".github/workflows/apfs-studio.yml"]
+  workflow_dispatch:
+
+defaults:
+  run:
+    working-directory: apfs-studio
+
+jobs:
+  test:
+    name: Library tests (macOS-created images)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: apfs-studio
+      - name: Download test images
+        # Real APFS images created by macOS, from the fox-it/dissect.apfs test suite (Apache-2.0).
+        run: |
+          mkdir -p "$RUNNER_TEMP/img"
+          for f in case_insensitive case_sensitive case_insensitive_beta jhfs_converted large snapshot encrypted corrupt; do
+            curl -fsSL -o "$RUNNER_TEMP/img/$f.bin.gz" "https://media.githubusercontent.com/media/fox-it/dissect.apfs/main/tests/_data/$f.bin.gz"
+            gunzip -f "$RUNNER_TEMP/img/$f.bin.gz"
+          done
+      - name: Test
+        run: cargo test --release -p apfs
+        env:
+          APFS_TEST_IMAGES: ${{ runner.temp }}/img
+
+  windows:
+    name: Windows build
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: apfs-studio
+      - name: Build
+        run: cargo build --release -p apfs-studio -p apfs-cli
+      - name: Package
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force dist | Out-Null
+          Copy-Item target/release/APFS-Studio.exe dist/
+          Copy-Item target/release/apfs.exe dist/
+          Copy-Item README.md dist/
+      - uses: actions/upload-artifact@v4
+        with:
+          name: APFS-Studio-windows-x64
+          path: apfs-studio/dist/

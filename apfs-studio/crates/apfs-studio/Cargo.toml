@@ -1,8 +1,25 @@
 [package]
 name = "apfs-studio"
+description = "Modern Windows app to browse, read and write APFS disks and images"
 version.workspace = true
 edition.workspace = true
 license.workspace = true
 
+[[bin]]
+name = "APFS-Studio"
+path = "src/main.rs"
+
 [dependencies]
 apfs = { path = "../apfs" }
+eframe = { version = "0.31.1", default-features = false, features = ["default_fonts", "glow", "persistence", "x11", "wayland"] }
+egui_extras = { version = "0.31.1" }
+rfd = "0.15.3"
+chrono = { version = "0.4.39", default-features = false, features = ["clock", "std"] }
+crossbeam-channel = "0.5.14"
+unicode-normalization = "0.1"
+
+[target.'cfg(windows)'.dependencies]
+eframe = { version = "0.31.1", default-features = false, features = ["default_fonts", "glow", "wgpu", "persistence"] }
+windows-sys = { version = "0.59", features = ["Win32_Foundation", "Win32_UI_Shell", "Win32_UI_WindowsAndMessaging", "Win32_Security", "Win32_System_Threading"] }
+
+[build-dependencies]

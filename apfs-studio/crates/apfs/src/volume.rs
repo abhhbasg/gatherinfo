@@ -355,8 +355,8 @@ impl Volume {
         match &x.data {
             XattrData::Embedded(v) => Ok(v.clone()),
             XattrData::Stream { obj_id, dstream } => {
-                if dstream.size > 1 << 31 {
-                    return Err(Error::Unsupported("extended attribute larger than 2 GiB".into()));
+                if dstream.size > 64 << 20 {
+                    return Err(Error::Unsupported("reading extended attributes larger than 64 MiB at once".into()));
                 }
                 let s = Stream::new(self, c, *obj_id, dstream.size)?;
                 let mut buf = vec![0u8; dstream.size as usize];
@@ -408,6 +408,9 @@ impl Volume {
                         kind: ReaderKind::Fork { algo: h.algo, fork, table, cache: None },
                     });
                 }
+                if h.size > compress::MAX_UNIT as u64 {
+                    return Err(Error::Corrupt(format!("inline compressed file claims {} bytes", h.size)));
+                }
                 let data = if h.algo == compress::CMP_SPARSE {
                     vec![0u8; h.size as usize]
                 } else {
@@ -421,6 +424,31 @@ impl Volume {
             return Ok(FileReader { size: 0, kind: ReaderKind::Inline(Arc::new(Vec::new())) });
         }
         Ok(FileReader { size, kind: ReaderKind::Stream(Stream::new(self, c, inode.private_id, size)?) })
+    }
+
+    /// User-visible size of a file, reading the decmpfs header for
+    /// compressed files that do not record their uncompressed size.
+    pub fn file_size(&self, c: &Container, inode: &Inode) -> u64 {
+        if inode.is_compressed() && inode.internal_flags & INODE_HAS_UNCOMPRESSED_SIZE == 0 {
+            if let Ok(Some(x)) = self.xattr(c, inode.id, XATTR_DECMPFS) {
+                if let Ok(raw) = self.read_xattr(c, &x) {
+                    if let Ok(h) = compress::parse_header(&raw) {
+                        return h.size;
+                    }
+                }
+            }
+        }
+        inode.size()
+    }
+
+    /// Compression algorithm name for compressed files.
+    pub fn compression(&self, c: &Container, inode: &Inode) -> Option<&'static str> {
+        if !inode.is_compressed() {
+            return None;
+        }
+        let x = self.xattr(c, inode.id, XATTR_DECMPFS).ok()??;
+        let raw = self.read_xattr(c, &x).ok()?;
+        compress::parse_header(&raw).ok().map(|h| compress::algo_name(h.algo))
     }
 
     // --- snapshots -------------------------------------------------------------
@@ -614,7 +642,7 @@ impl FileReader {
 
     /// Reads the whole file into memory (use only for small files).
     pub fn read_all(&mut self, c: &Container) -> Result<Vec<u8>> {
-        if self.size > 1 << 32 {
+        if self.size > 1 << 31 {
             return Err(Error::Unsupported("file too large to buffer".into()));
         }
         let mut v = vec![0u8; self.size as usize];
