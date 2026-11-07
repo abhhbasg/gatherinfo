@@ -1,0 +1,17 @@
+[workspace]
+resolver = "2"
+members = ["crates/apfs", "crates/apfs-cli", "crates/apfs-studio"]
+
+[workspace.package]
+version = "0.1.0"
+edition = "2021"
+license = "MIT"
+
+[profile.release]
+opt-level = 3
+lto = "thin"
+codegen-units = 4
+panic = "unwind"
+
+[profile.dev.package."*"]
+opt-level = 2

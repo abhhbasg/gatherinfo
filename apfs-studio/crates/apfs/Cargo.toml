@@ -1,0 +1,19 @@
+[package]
+name = "apfs"
+description = "Robust APFS (Apple File System) reader/writer library"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[dependencies]
+flate2 = { version = "1", default-features = false, features = ["rust_backend"] }
+lzfse_rust = "0.2"
+unicode-normalization = "0.1"
+caseless = "0.2"
+lru = "0.12"
+uuid = "1"
+
+[target.'cfg(windows)'.dependencies]
+windows-sys = { version = "0.59", features = ["Win32_Foundation", "Win32_Storage_FileSystem", "Win32_System_IO", "Win32_System_Ioctl", "Win32_Security"] }
+
+[dev-dependencies]
