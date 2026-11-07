@@ -15,6 +15,9 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Explore
+import androidx.compose.material.icons.rounded.DirectionsCar
+import androidx.compose.material.icons.automirrored.rounded.DirectionsWalk
+import androidx.compose.material.icons.rounded.Timeline
 import androidx.compose.material.icons.rounded.Height
 import androidx.compose.material.icons.rounded.MyLocation
 import androidx.compose.material.icons.rounded.NorthEast
@@ -41,6 +44,7 @@ import com.imunav.app.ui.components.SpeedGauge
 import com.imunav.app.ui.components.StatusPill
 import com.imunav.app.ui.components.fmt
 import com.imunav.app.ui.theme.Instrument
+import com.imunav.fusion.MotionModel
 import com.imunav.fusion.NavMode
 import com.imunav.fusion.NavState
 import kotlin.math.sqrt
@@ -111,6 +115,8 @@ fun DashboardScreen(
             MetricTile("对地航迹", state.course.fmt(0), "°", tileMod, Icons.Rounded.NorthEast)
             MetricTile("位置精度", "±" + state.horizontalStd.fmt(1), "m", tileMod, Icons.Rounded.MyLocation, accent = accuracyColor(state.horizontalStd))
             MetricTile("里程", if (state.distance >= 1000) (state.distance / 1000).fmt(2) else state.distance.fmt(0), if (state.distance >= 1000) "km" else "m", tileMod, Icons.Rounded.Straighten)
+            MetricTile("步数", state.steps.toString(), "步", tileMod, Icons.AutoMirrored.Rounded.DirectionsWalk)
+            MetricTile("步频 / 步长", "${state.cadenceHz.fmt(1)}/${state.stepLength.fmt(2)}", "Hz/m", tileMod, Icons.Rounded.Timeline)
             MetricTile("东向速度", state.velocityEnu.x.fmt(2), "m/s", tileMod, Icons.Rounded.Speed)
             MetricTile("北向速度", state.velocityEnu.y.fmt(2), "m/s", tileMod, Icons.Rounded.Speed)
         }
@@ -142,6 +148,13 @@ private fun StatusRow(state: NavState, gnss: GnssInfo) {
                     icon = Icons.Rounded.Explore,
                 )
             }
+        }
+        when {
+            state.pdrActive && state.walking -> StatusPill("计步推算 PDR", Instrument.Good, icon = Icons.AutoMirrored.Rounded.DirectionsWalk)
+            state.pdrActive -> StatusPill("停步 · 速度归零", MaterialTheme.colorScheme.secondary, icon = Icons.AutoMirrored.Rounded.DirectionsWalk)
+            state.motionModel == MotionModel.VEHICLE -> StatusPill("车载约束", MaterialTheme.colorScheme.primary, icon = Icons.Rounded.DirectionsCar)
+            state.motionModel == MotionModel.FREE && state.mode == NavMode.INERTIAL -> StatusPill("无约束 · 快速漂移", Instrument.Bad)
+            else -> Unit
         }
         StatusPill(if (state.stationary) "静止 · ZUPT" else "运动中", if (state.stationary) MaterialTheme.colorScheme.secondary else MaterialTheme.colorScheme.primary, icon = if (state.stationary) Icons.Rounded.PauseCircle else Icons.Rounded.PlayCircle)
         if (gnss.permission) {

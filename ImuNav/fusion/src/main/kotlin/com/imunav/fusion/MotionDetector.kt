@@ -55,10 +55,28 @@ class MotionDetector(
         val still = std < accelStdThreshold && gyroOk
         stillTime = if (still) stillTime + dt else 0.0
         stationary = stillTime >= holdSeconds
+
+        // Looser test for a vehicle stopped with the engine idling: vibration is
+        // tolerated but the body must not rotate at all.
+        val loose = std < VEHICLE_ACCEL_STD && (gyrCount == 0 || gMax < VEHICLE_GYRO)
+        looseTime = if (loose) looseTime + dt else 0.0
+        stationaryLoose = looseTime >= 1.0
     }
+
+    private var looseTime = 0.0
+
+    /** Vehicle-stopped detector (tolerates engine vibration). */
+    var stationaryLoose = false
+        private set
 
     fun reset() {
         accCount = 0; accIdx = 0; gyrCount = 0; gyrIdx = 0
         stillTime = 0.0; stationary = false
+        looseTime = 0.0; stationaryLoose = false
+    }
+
+    companion object {
+        const val VEHICLE_ACCEL_STD = 0.35
+        const val VEHICLE_GYRO = 0.025
     }
 }

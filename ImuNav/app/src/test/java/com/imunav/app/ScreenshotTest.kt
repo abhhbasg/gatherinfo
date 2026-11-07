@@ -33,7 +33,7 @@ class ScreenshotTest {
         mode = NavMode.INERTIAL,
         euler = Euler(heading = 47.0, pitch = 6.5, roll = -12.0),
         velocityEnu = Vec3(9.1, 8.4, -0.12),
-        speed = 12.4,
+        speed = 1.35,
         verticalSpeed = -0.12,
         course = 47.3,
         linearAccelWorld = Vec3(0.4, 0.8, 0.1),
@@ -42,6 +42,7 @@ class ScreenshotTest {
         horizontalStd = 6.8,
         distance = 1534.0,
         secondsSinceGps = 23.0,
+        pdrActive = true, walking = true, steps = 1874, cadenceHz = 1.82, stepLength = 0.74, stepK = 0.512, walkHeadingOffsetDeg = -6.3,
         gyroHz = 100.0, accelHz = 100.0, magHz = 50.0,
         rawAccel = Vec3(0.12, 1.1, 9.75), rawGyro = Vec3(0.001, -0.002, 0.05), rawMag = Vec3(3.1, 24.0, -38.0),
         pressureHPa = 1011.42, baroAltitude = 15.5,
@@ -75,7 +76,7 @@ class ScreenshotTest {
         ImuNavTheme(darkTheme = true) {
             Surface(color = MaterialTheme.colorScheme.background) {
                 SensorsScreen(state, gnss, SensorAvailability("BMI260 Gyro", "BMI260 Accel", "AK09918 Mag", null),
-                    FusionConfig(vehicleMode = true), PaddingValues(), onSettings = {}, onRealign = {})
+                    FusionConfig(motionModel = com.imunav.fusion.MotionModel.AUTO), PaddingValues(), onSettings = {}, onRealign = {})
             }
         }
     }

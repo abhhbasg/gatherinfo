@@ -12,8 +12,34 @@ data class FusionConfig(
     val useGps: Boolean = true,
     val useZupt: Boolean = true,
     val useBarometer: Boolean = true,
-    /** Phone fixed in a vehicle: apply non-holonomic constraints (no sideways / vertical slip). */
-    val vehicleMode: Boolean = false,
+    val motionModel: MotionModel = MotionModel.AUTO,
+) {
+    val vehicleMode: Boolean get() = motionModel == MotionModel.VEHICLE
+}
+
+/**
+ * Prior knowledge about how the phone moves. Without GPS this is what keeps the
+ * error bounded: pure double integration of a phone accelerometer diverges in seconds.
+ */
+enum class MotionModel {
+    /** Pedestrian dead reckoning while steps are detected, plain INS otherwise. */
+    AUTO,
+    /** Always on foot: no steps means not moving. */
+    PEDESTRIAN,
+    /** Phone fixed in a car: no sideways/vertical slip, vibration-tolerant stop detection. */
+    VEHICLE,
+    /** Unconstrained strapdown INS (drifts quickly without GPS). */
+    FREE,
+}
+
+/** Learned sensor/motion parameters worth keeping between sessions. */
+data class Calibration(
+    val gyroBias: Vec3 = Vec3.ZERO,
+    val stepK: Double = StepDetector.DEFAULT_K,
+    /** Walking direction minus phone-pointing direction (rad), learned from GPS. */
+    val walkHeadingOffset: Double = 0.0,
+    /** Direction of travel in the body frame for vehicle mode, learned from GPS. */
+    val vehicleForwardAxis: Vec3? = null,
 )
 
 data class GpsFix(
@@ -61,6 +87,16 @@ data class NavState(
     val declinationDeg: Double = 0.0,
     val distance: Double = 0.0,
     val vehicleAxisLearned: Boolean = false,
+    val motionModel: MotionModel = MotionModel.AUTO,
+    /** Pedestrian dead reckoning is currently constraining velocity. */
+    val pdrActive: Boolean = false,
+    val walking: Boolean = false,
+    val steps: Int = 0,
+    val cadenceHz: Double = 0.0,
+    val stepLength: Double = 0.0,
+    val stepK: Double = StepDetector.DEFAULT_K,
+    val walkHeadingOffsetDeg: Double = 0.0,
+    val zaruActive: Boolean = false,
     val rawGyro: Vec3 = Vec3.ZERO,
     val rawAccel: Vec3 = Vec3.ZERO,
     val rawMag: Vec3 = Vec3.ZERO,
@@ -89,6 +125,15 @@ class FusionEngine(config: FusionConfig = FusionConfig()) {
     private val attitude = AttitudeFilter()
     private val ins = InsKalmanFilter()
     private val motion = MotionDetector()
+    private val steps = StepDetector()
+
+    /** Low-passed specific force in ENU; points straight up on average while walking. */
+    private var meanForceWorld = Vec3(0.0, 0.0, AttitudeFilter.GRAVITY)
+    private var walkOffset = 0.0
+    private var lastPdrNs = 0L
+    private var pdrActive = false
+    private var zaruActive = false
+    private var pendingCalibration: Calibration? = null
 
     private var gravity = AttitudeFilter.GRAVITY
 
@@ -136,9 +181,14 @@ class FusionEngine(config: FusionConfig = FusionConfig()) {
     private val accelRate = RateCounter()
     private val magRate = RateCounter()
 
+    /** Re-runs the initial alignment but keeps everything learned so far. */
     @Synchronized
     fun reset() {
+        val keep = calibrationLocked()
         attitude.reset()
+        steps.reset()
+        meanForceWorld = Vec3(0.0, 0.0, gravity)
+        pendingCalibration = keep
         ins.reset()
         motion.reset()
         lastGyroNs = 0; lastAccelNs = 0
@@ -147,7 +197,6 @@ class FusionEngine(config: FusionConfig = FusionConfig()) {
         origin = null; lastGpsNs = null; lastGpsAccuracy = null; gpsRejects = 0
         baroRef = null
         gpsLinearAccel = null; lastGpsVel = null
-        forwardAxis = null; forwardSamples = 0
         distance = 0.0
         track.clear(); gpsTrack.clear()
     }
@@ -176,6 +225,11 @@ class FusionEngine(config: FusionConfig = FusionConfig()) {
             else -> MOVING_ACCEL_WEIGHT to Vec3.ZERO
         }
         attitude.update(g, latestAccel, mag, dt, gravity, weight, comp)
+
+        val vehicleStopped = config.motionModel == MotionModel.VEHICLE && motion.stationaryLoose &&
+            ins.velocity.norm() < VEHICLE_STOP_SPEED
+        zaruActive = motion.stationary || vehicleStopped
+        if (zaruActive) attitude.zeroRateUpdate(g, dt)
     }
 
     @Synchronized
@@ -206,7 +260,10 @@ class FusionEngine(config: FusionConfig = FusionConfig()) {
         ins.predict(a, r, dt)
 
         val cfg = config
-        val still = motion.stationary
+        val model = cfg.motionModel
+        val hsNow = ins.velocity.let { sqrt(it.x * it.x + it.y * it.y) }
+        val still = motion.stationary ||
+            (model == MotionModel.VEHICLE && motion.stationaryLoose && hsNow < VEHICLE_STOP_SPEED)
         if (cfg.useZupt && still && timeNs - lastZuptNs > 50_000_000L) {
             lastZuptNs = timeNs
             val rv = 0.02 * 0.02
@@ -215,16 +272,49 @@ class FusionEngine(config: FusionConfig = FusionConfig()) {
             ins.observeState(InsKalmanFilter.VU, 0.0, rv)
         }
 
-        val fwd = forwardAxis
-        if (cfg.vehicleMode && fwd != null && forwardSamples >= 5 && !still &&
-            timeNs - lastNhcNs > 100_000_000L
-        ) {
+        // Gait analysis on gravity-aligned acceleration (independent of phone attitude).
+        val fWorld = r * a
+        if (dt > 0) meanForceWorld += (fWorld - meanForceWorld) * (dt / (TILT_AVG_SECONDS + dt))
+        steps.update(timeNs, fWorld.z - gravity, dt)
+        val walking = steps.walking(timeNs)
+        val pedestrianModel = model == MotionModel.PEDESTRIAN || model == MotionModel.AUTO
+        if (pedestrianModel && walking) attitude.correctTilt(meanForceWorld, WALK_TILT_GAIN, dt)
+
+        pdrActive = false
+        if (pedestrianModel && !still && timeNs - lastPdrNs > 200_000_000L) {
+            val recentlyWalked = steps.secondsSinceStep(timeNs) < AUTO_STOP_HOLD_S
+            val noBaro = !(cfg.useBarometer && baroAlt != null)
+            if (walking) {
+                // PDR: velocity = step length × cadence along the walking direction.
+                lastPdrNs = timeNs
+                val spd = steps.speed(timeNs)
+                val dir = walkHeading(r) + walkOffset
+                val rv = (0.15 + 0.12 * spd).let { it * it }
+                ins.observeState(InsKalmanFilter.VE, spd * sin(dir), rv)
+                ins.observeState(InsKalmanFilter.VN, spd * cos(dir), rv)
+                if (noBaro) ins.observeState(InsKalmanFilter.VU, 0.0, 0.25 * 0.25)
+                pdrActive = true
+            } else if (model == MotionModel.PEDESTRIAN || recentlyWalked) {
+                // On foot and no steps: not going anywhere, however the phone is waved around.
+                lastPdrNs = timeNs
+                val rv = 0.2 * 0.2
+                ins.observeState(InsKalmanFilter.VE, 0.0, rv)
+                ins.observeState(InsKalmanFilter.VN, 0.0, rv)
+                if (noBaro) ins.observeState(InsKalmanFilter.VU, 0.0, rv)
+                pdrActive = true
+            }
+        }
+
+        if (model == MotionModel.VEHICLE && !still && timeNs - lastNhcNs > 100_000_000L) {
             lastNhcNs = timeNs
-            // Two body axes perpendicular to the learned direction of travel.
+            val learned = forwardAxis?.takeIf { forwardSamples >= 5 }
+            // Until GPS has taught us the mounting, guess it from how the phone sits:
+            // top edge forward when lying flat, back facing forward when upright in a holder.
+            val fwd = learned ?: guessForwardAxis(r)
             val helper = if (abs(fwd.z) < 0.9) Vec3.UP else Vec3(1.0, 0.0, 0.0)
             val side = (fwd cross helper).normalized()
             val upB = (side cross fwd).normalized()
-            val rv = 0.3 * 0.3
+            val rv = if (learned != null) 0.3 * 0.3 else 0.6 * 0.6
             ins.observeVelocityAlong(r * side, 0.0, rv)
             ins.observeVelocityAlong(r * upB, 0.0, rv)
         }
@@ -309,6 +399,8 @@ class FusionEngine(config: FusionConfig = FusionConfig()) {
                 ins.observeState(InsKalmanFilter.VN, speed * cos(b), rv)
                 updateGpsAccel(fix.timeNs, Vec3(speed * sin(b), speed * cos(b), 0.0))
 
+                learnWalkingModel(speed, b, fix.bearingAccuracyDeg)
+
                 if (cfg.vehicleMode && speed > 4.0) {
                     val vw = Vec3(speed * sin(b), speed * cos(b), ins.x[InsKalmanFilter.VU])
                     val vb = attitude.q.toRotationMatrix().tTimes(vw).normalized()
@@ -330,6 +422,95 @@ class FusionEngine(config: FusionConfig = FusionConfig()) {
         addPoint(gpsTrack, TrackPoint(g.x, g.y))
     }
 
+    /** Calibrates step length and walking direction offset against GPS while walking. */
+    private fun learnWalkingModel(gpsSpeed: Double, bearingRad: Double, bearingAccDeg: Double?) {
+        val now = lastAccelNs
+        if (!steps.walking(now) || gpsSpeed < 0.8 || gpsSpeed > 3.0) return
+        if ((bearingAccDeg ?: 10.0) > 25.0) return
+        val r = attitude.q.toRotationMatrix()
+        val err = wrapPi(bearingRad - walkHeading(r) - walkOffset)
+        walkOffset = wrapPi(walkOffset + 0.1 * err)
+        val unit = steps.unitSpeed(now)
+        if (unit > 0.2) {
+            val target = (gpsSpeed / unit).coerceIn(0.3, 0.75)
+            steps.k += (target - steps.k) * 0.08
+        }
+    }
+
+    /** Horizontal direction the phone faces: top edge when flat, back side when upright. */
+    private fun walkHeading(r: Mat3): Double {
+        val top = r.column(1)
+        val back = -r.column(2)
+        return atan2(top.x + back.x, top.y + back.y)
+    }
+
+    private fun guessForwardAxis(r: Mat3): Vec3 {
+        val topHorizontal = abs(r.column(1).z) < 0.7
+        return if (topHorizontal) Vec3(0.0, 1.0, 0.0) else Vec3(0.0, 0.0, -1.0)
+    }
+
+    @Synchronized
+    fun calibration(): Calibration = calibrationLocked()
+
+    private fun calibrationLocked() = Calibration(
+        gyroBias = if (attitude.initialized) attitude.gyroBias else (pendingCalibration?.gyroBias ?: Vec3.ZERO),
+        stepK = steps.k,
+        walkHeadingOffset = walkOffset,
+        vehicleForwardAxis = forwardAxis?.takeIf { forwardSamples >= 5 },
+    )
+
+    /** Applies a previously saved calibration (immediately, or at alignment if not yet aligned). */
+    @Synchronized
+    fun setCalibration(c: Calibration) {
+        steps.k = c.stepK.coerceIn(0.3, 0.75)
+        walkOffset = c.walkHeadingOffset
+        if (c.vehicleForwardAxis != null && c.vehicleForwardAxis.norm() > 0.5) {
+            forwardAxis = c.vehicleForwardAxis.normalized(); forwardSamples = 5
+        }
+        if (attitude.initialized) attitude.setGyroBias(c.gyroBias) else pendingCalibration = c
+    }
+
+    private var distanceCalStart: Pair<Double, Int>? = null
+
+    /** Starts a "walk a known distance" step-length calibration (no GPS needed). */
+    @Synchronized
+    fun startStepCalibration() {
+        distanceCalStart = steps.unitDistance to steps.stepCount
+    }
+
+    /** Steps counted since [startStepCalibration], or null if none is running. */
+    @Synchronized
+    fun stepCalibrationProgress(): Pair<Int, Double>? = distanceCalStart?.let { (u, n) ->
+        (steps.stepCount - n) to (steps.unitDistance - u) * steps.k
+    }
+
+    /**
+     * Finishes the calibration given the true distance walked.
+     * @return the new step coefficient, or null if too few steps were recorded
+     */
+    @Synchronized
+    fun finishStepCalibration(actualMeters: Double): Double? {
+        val (u0, n0) = distanceCalStart ?: return null
+        distanceCalStart = null
+        val unit = steps.unitDistance - u0
+        if (steps.stepCount - n0 < 10 || unit <= 0 || actualMeters <= 0) return null
+        steps.k = (actualMeters / unit).coerceIn(0.3, 0.75)
+        return steps.k
+    }
+
+    @Synchronized
+    fun cancelStepCalibration() { distanceCalStart = null }
+
+    /** Forgets everything learned (step length, offsets, biases). */
+    @Synchronized
+    fun clearCalibration() {
+        steps.k = StepDetector.DEFAULT_K
+        walkOffset = 0.0
+        forwardAxis = null; forwardSamples = 0
+        pendingCalibration = null
+        if (attitude.initialized) attitude.setGyroBias(Vec3.ZERO)
+    }
+
     private fun updateGpsAccel(timeNs: Long, v: Vec3) {
         val prev = lastGpsVel
         val dt = (timeNs - lastGpsVelNs) * 1e-9
@@ -349,6 +530,9 @@ class FusionEngine(config: FusionConfig = FusionConfig()) {
         gravity = if (gMeasured in 9.6..10.0) gMeasured else AttitudeFilter.GRAVITY
         ins.gravity = gravity
         attitude.initialize(a, m)
+        pendingCalibration?.let { attitude.setGyroBias(it.gyroBias) }
+        pendingCalibration = null
+        meanForceWorld = Vec3(0.0, 0.0, gravity)
         ins.reset()
     }
 
@@ -403,6 +587,15 @@ class FusionEngine(config: FusionConfig = FusionConfig()) {
             declinationDeg = Math.toDegrees(attitude.declinationRad),
             distance = distance,
             vehicleAxisLearned = forwardAxis != null && forwardSamples >= 5,
+            motionModel = config.motionModel,
+            pdrActive = pdrActive,
+            walking = steps.walking(lastAccelNs),
+            steps = steps.stepCount,
+            cadenceHz = steps.cadenceHz,
+            stepLength = steps.lastStepLength,
+            stepK = steps.k,
+            walkHeadingOffsetDeg = Math.toDegrees(walkOffset),
+            zaruActive = zaruActive,
             rawGyro = latestGyro,
             rawAccel = latestAccel ?: Vec3.ZERO,
             rawMag = latestMag ?: Vec3.ZERO,
@@ -435,6 +628,10 @@ class FusionEngine(config: FusionConfig = FusionConfig()) {
     companion object {
         const val INIT_SAMPLES = 50
         const val MOVING_ACCEL_WEIGHT = 0.01
+        const val VEHICLE_STOP_SPEED = 3.0
+        const val TILT_AVG_SECONDS = 2.0
+        const val WALK_TILT_GAIN = 0.3
+        const val AUTO_STOP_HOLD_S = 3.0
         const val GPS_TIMEOUT_S = 3.0
         const val MAX_TRACK = 4000
     }

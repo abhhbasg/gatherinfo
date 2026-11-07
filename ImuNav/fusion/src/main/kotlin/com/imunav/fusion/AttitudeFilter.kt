@@ -132,6 +132,44 @@ class AttitudeFilter(
         q = q.integrate(omega, dt)
     }
 
+    /**
+     * Zero Angular Rate Update: while the device is at rest the gyro output *is* its
+     * bias, on all three axes, including yaw, which gravity can never observe. This is
+     * the main defence against heading drift when the magnetometer is off or disturbed.
+     */
+    fun zeroRateUpdate(gyro: Vec3, dt: Double, timeConstant: Double = 4.0) {
+        if (!initialized || dt <= 0) return
+        val a = (dt / timeConstant).coerceAtMost(1.0)
+        integral += (-gyro - integral) * a
+        val n = integral.norm()
+        if (n > MAX_BIAS) integral = integral * (MAX_BIAS / n)
+    }
+
+    /**
+     * Tilt correction from the *average* specific force in the navigation frame.
+     * While walking, accelerations are zero-mean over a stride, so the low-passed
+     * world-frame specific force points straight up; any horizontal component is
+     * tilt error. Unlike the raw accelerometer this is immune to the step impacts.
+     */
+    fun correctTilt(meanSpecificForceWorld: Vec3, gain: Double, dt: Double) {
+        if (!initialized || dt <= 0) return
+        val n = meanSpecificForceWorld.norm()
+        if (n < 1e-3) return
+        val r = q.toRotationMatrix()
+        val measuredUp = r.tTimes(meanSpecificForceWorld * (1.0 / n))
+        val estimatedUp = Vec3(r[2, 0], r[2, 1], r[2, 2])
+        val err = (measuredUp cross estimatedUp) * gain
+        q = q.integrate(err, dt)
+        if (ki > 0) integral += err * (ki * 0.5 * dt)
+    }
+
+    /** Seeds the gyro bias, e.g. from a calibration saved in a previous session. */
+    fun setGyroBias(bias: Vec3) {
+        integral = -bias
+        val n = integral.norm()
+        if (n > MAX_BIAS) integral = integral * (MAX_BIAS / n)
+    }
+
     /** Rotates the estimate about the vertical so that heading increases by [deltaRad]. */
     fun applyHeadingCorrection(deltaRad: Double) {
         q = (Quaternion.fromAxisAngle(Vec3.UP, -deltaRad) * q).normalized()

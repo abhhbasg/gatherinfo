@@ -46,6 +46,7 @@ fun ImuNavApp(viewModel: NavViewModel, onRequestLocation: () -> Unit) {
     val gnss by viewModel.gnss.collectAsStateWithLifecycle()
     val tracks by viewModel.tracks.collectAsStateWithLifecycle()
     val settings by viewModel.settings.collectAsStateWithLifecycle()
+    val stepCal by viewModel.stepCalibration.collectAsStateWithLifecycle()
     var tab by rememberSaveable { mutableIntStateOf(0) }
 
     Scaffold(
@@ -84,6 +85,11 @@ fun ImuNavApp(viewModel: NavViewModel, onRequestLocation: () -> Unit) {
                     state, gnss, viewModel.availability, settings, padding,
                     onSettings = viewModel::updateSettings,
                     onRealign = viewModel::realign,
+                    stepCalibration = stepCal,
+                    onStartStepCalibration = viewModel::startStepCalibration,
+                    onFinishStepCalibration = viewModel::finishStepCalibration,
+                    onCancelStepCalibration = viewModel::cancelStepCalibration,
+                    onClearCalibration = viewModel::clearCalibration,
                 )
             }
         }
