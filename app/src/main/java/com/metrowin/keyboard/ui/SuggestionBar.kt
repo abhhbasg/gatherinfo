@@ -51,7 +51,8 @@ class SuggestionBar(context: Context) : View(context) {
     private val paint = Paint(Paint.ANTI_ALIAS_FLAG).apply { textAlign = Paint.Align.CENTER }
     private val fill = Paint(Paint.ANTI_ALIAS_FLAG)
     private val icon = Paint(Paint.ANTI_ALIAS_FLAG)
-    private val tools = Tool.entries
+    // The tool the quick button already offers is not repeated in the toolbox.
+    private val tools get() = Tool.entries.filter { it != quick }
 
     fun setColors(c: KeyboardColors) { colors = c; invalidate() }
     fun setSlots(s: List<Slot?>) { if (s != slots) scroll = 0f; slots = s; if (!toolsOpen) invalidate() }

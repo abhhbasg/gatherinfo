@@ -58,9 +58,10 @@ class CalibrationActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         original = metrics()
         val root = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL }
-        root.addView(MetroUi.header(this, getString(R.string.calib_title)))
+        // On its side the screen is too short for a big title and a keyboard: the title goes, so the sentence stays in sight.
+        root.addView(MetroUi.header(this, getString(R.string.calib_title)).apply { if (land) visibility = android.view.View.GONE })
         body = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL; setPadding(dp(24f).toInt(), dp(12f).toInt(), dp(24f).toInt(), dp(12f).toInt()) }
-        root.addView(body, LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 0, 1f))
+        root.addView(android.widget.ScrollView(this).apply { addView(body) }, LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 0, 1f))
         setContentView(root)
         MetroUi.applyInsets(root)
         start(fresh = true)
