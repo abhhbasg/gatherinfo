@@ -6,7 +6,7 @@
   Software libero. Nessuna pubblicità, nessuna analisi, nessun tracker: ciò che scrivi resta sul tuo telefono.
 </p>
 
-<p align="center"><img alt="Versione 26.1S" src="https://img.shields.io/badge/versione-26.1S-1ba1e2"></p>
+<p align="center"><a href="https://github.com/developerkenshi-coder/MetroWin-Keyboard/releases/latest"><img alt="Ultima release" src="https://img.shields.io/github/v/release/developerkenshi-coder/MetroWin-Keyboard?label=release&color=1ba1e2"></a></p>
 
 <p align="center"><a href="README.md">English</a> · <b>Italiano</b></p>
 

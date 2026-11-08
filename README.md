@@ -8,7 +8,7 @@
 
 <p align="center">
   <a href="LICENSE"><img alt="License: GPL-3.0-or-later" src="https://img.shields.io/badge/license-GPL--3.0--or--later-1ba1e2"></a>
-  <img alt="Version 26.1S" src="https://img.shields.io/badge/version-26.1S-1ba1e2">
+  <a href="https://github.com/developerkenshi-coder/MetroWin-Keyboard/releases/latest"><img alt="Latest release" src="https://img.shields.io/github/v/release/developerkenshi-coder/MetroWin-Keyboard?label=release&color=1ba1e2"></a>
   <img alt="Android 8.0+" src="https://img.shields.io/badge/Android-8.0%2B-1ba1e2">
   <img alt="Languages: 17" src="https://img.shields.io/badge/layouts-17-1ba1e2">
 </p>
