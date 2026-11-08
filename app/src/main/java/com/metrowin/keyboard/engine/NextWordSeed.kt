@@ -11,6 +11,9 @@ class NextWordSeed(private val followers: Map<String, List<Pair<String, Int>>>) 
     /** The words that follow [previous] (null: the start of a sentence), most common first. */
     fun after(previous: String?): List<Pair<String, Int>> = followers[previous ?: START].orEmpty()
 
+    /** How often [word] follows [previous] in the shipped text; 0 if it is not among the common followers. */
+    fun count(previous: String?, word: String): Int = after(previous).firstOrNull { it.first == word }?.second ?: 0
+
     companion object {
         const val START = "^"
         val EMPTY = NextWordSeed(emptyMap())

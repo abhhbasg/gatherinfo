@@ -3,6 +3,9 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <com.metrowin.keyboard.settings.KeyboardPreview android:key="size_preview" />
     <Preference android:key="size_try" android:title="@string/pref_try_title" android:summary="@string/pref_try_summary" />
+    <Preference android:key="size_calibrate" android:title="@string/pref_calibrate_title" android:summary="@string/pref_calibrate_summary" />
+    <SwitchPreferenceCompat android:key="calibration_on" android:title="@string/pref_calibrate_on_title" android:summary="@string/pref_calibrate_on_summary" android:defaultValue="true" />
+    <Preference android:key="size_calibrate_reset" android:title="@string/pref_calibrate_reset_title" />
     <SeekBarPreference android:key="key_height" android:title="@string/pref_key_height_title" android:defaultValue="100" android:max="140" app:min="60" app:seekBarIncrement="5" app:showSeekBarValue="true" />
     <SeekBarPreference android:key="key_height_land" android:title="@string/pref_key_height_land_title" android:defaultValue="100" android:max="140" app:min="60" app:seekBarIncrement="5" app:showSeekBarValue="true" />
     <SeekBarPreference android:key="keyboard_width" android:title="@string/pref_width_title" android:summary="@string/pref_width_summary" android:defaultValue="100" android:max="100" app:min="55" app:seekBarIncrement="5" app:showSeekBarValue="true" />

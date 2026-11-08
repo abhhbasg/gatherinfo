@@ -1,0 +1,5 @@
+Calibrazione automatica: scrivi qualche frase e la tastiera impara dove cadono le dita, corregge i tocchi e adatta i tasti.
+Correzione intelligente: i refusi si correggono da dove è caduto il dito, dalle parole intorno e dalle correzioni annullate.
+Aggiornamenti: cerca una nuova versione ogni 12 ore, solo in questo repository, mostra il changelog e la installa.
+Backup e ripristino di tutto in un solo file.
+Nuova home in stile Windows Phone con pagine pivot e una pagina "Altri progetti".

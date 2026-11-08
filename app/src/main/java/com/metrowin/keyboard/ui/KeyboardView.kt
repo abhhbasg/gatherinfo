@@ -11,6 +11,8 @@ import android.graphics.Typeface
 import android.os.SystemClock
 import android.view.MotionEvent
 import android.view.View
+import com.metrowin.keyboard.calibration.Bias
+import com.metrowin.keyboard.calibration.Calibrator
 import com.metrowin.keyboard.engine.SwipePoint
 import com.metrowin.keyboard.layout.Key
 import com.metrowin.keyboard.layout.KeyType
@@ -43,6 +45,9 @@ interface KeyboardListener {
 
     /** Shift was held down: lock capitals. */
     fun onShiftLongPress()
+
+    /** Just before [onText] of a letter tapped on its key: how likely each key near the tap was the one meant (0..1), for the correction. */
+    fun onTouch(likelihood: Map<Char, Float>) {}
 }
 
 /**
@@ -65,6 +70,8 @@ class KeyboardView(context: Context) : View(context) {
     private var gapDp = 3f
     private var widthPct = 100
     private var align = "center"
+    private var bias: DoubleArray? = null
+    private var touchSigma = 0.4f              // how far, in key sizes, a tap typically lands from the centre of the key meant
     private var longPressMs = 200L
     private var longPressEnabled = true
     private var swipeEnabled = true
@@ -113,6 +120,22 @@ class KeyboardView(context: Context) : View(context) {
         this.spaceCursorEnabled = spaceCursor; this.showHints = hints; invalidate()
     }
     fun setSpaceLanguageSwitch(on: Boolean) { spaceSwitchesLanguage = on }
+    /** The touch correction learned by the calibration (see [Bias]); null for none. It changes only where touches land, never how the keys look. */
+    fun setBias(c: DoubleArray?) { bias = c }
+    fun setTouchSigma(sigma: Float) { touchSigma = sigma }
+
+    /** For each letter key near a tap, how likely it is the key meant: a Gaussian of the distance from the tap to the key centre in key sizes. */
+    private fun touchLikelihood(rawX: Float, rawY: Float): Map<Char, Float> {
+        val (x, y) = corrected(rawX, rawY)
+        val out = HashMap<Char, Float>()
+        for (k in page?.keys.orEmpty()) {
+            if (k.type != KeyType.CHAR || k.label.length != 1 || !k.label[0].isLetter()) continue
+            val d = hypot((x - k.centerX) / k.width, (y - k.centerY) / k.height)
+            val p = kotlin.math.exp(-d * d / (2 * touchSigma * touchSigma))
+            if (p > 0.05f) out[k.label[0].lowercaseChar()] = p
+        }
+        return out
+    }
     fun setMetrics(heightPct: Int, gapDp: Int, widthPct: Int, align: String) {
         if (this.heightPct == heightPct && this.gapDp == gapDp.toFloat() && this.widthPct == widthPct && this.align == align) return
         this.heightPct = heightPct; this.gapDp = gapDp.toFloat(); this.widthPct = widthPct; this.align = align
@@ -321,8 +344,18 @@ class KeyboardView(context: Context) : View(context) {
 
     // --- touch ------------------------------------------------------------------------------------------------------
 
-    private fun keyAt(x: Float, y: Float): Key? {
+    private fun corrected(x: Float, y: Float): Pair<Float, Float> {
+        val ref = page?.keys?.firstOrNull { it.type == KeyType.CHAR }
+        // While a calibration runs the keyboard uses what the calibration has learned so far, not the saved correction.
+        val running = Calibrator.current
+        val b = if (running != null) running.liveBias else bias
+        return if (b != null && ref != null) Bias.correct(x, y, width, height, ref.width, ref.height, b) else x to y
+    }
+
+    private fun keyAt(rawX: Float, rawY: Float): Key? {
         val keys = page?.keys ?: return null
+        // The learned correction of where the finger lands.
+        val (x, y) = corrected(rawX, rawY)
         var best: Key? = null
         var bestD = Float.MAX_VALUE
         for (k in keys) {
@@ -450,19 +483,26 @@ class KeyboardView(context: Context) : View(context) {
             when {
                 p.popupKey != null -> {
                     val k = p.popupKey!!
-                    k.popups.getOrNull(p.popupIndex)?.let { listener?.onPopupText(if (shift != 0) it.uppercase() else it) }
+                    k.popups.getOrNull(p.popupIndex)?.let {
+                        page?.let { pg -> Calibrator.current?.tap(p.downX, p.downY, pg.keys, width, height, k, it) }
+                        listener?.onPopupText(if (shift != 0) it.uppercase() else it)
+                    }
                 }
                 p.swiping -> {
                     p.path += SwipePoint(x, y)
                     fadingTrail = p.path.toList(); fadeStart = SystemClock.uptimeMillis()
-                    listener?.onSwipe(p.path)
+                    listener?.onSwipe(p.path.map { pt -> corrected(pt.x, pt.y).let { SwipePoint(it.first, it.second) } })
                 }
                 p.cursorMoved || p.longFired -> {}
                 p.startKey.type == KeyType.BACKSPACE -> {}
                 else -> {
                     val k = p.key ?: keyAt(x, y)
                     if (k != null) {
-                        if (k.type == KeyType.CHAR) listener?.onText(k, if (shift != 0) k.label.uppercase() else k.label)
+                        page?.let { Calibrator.current?.tap(p.downX, p.downY, it.keys, width, height, k, if (k.type == KeyType.CHAR) k.label else "") }
+                        if (k.type == KeyType.CHAR) {
+                            if (k.label.length == 1 && k.label[0].isLetter()) listener?.onTouch(touchLikelihood(p.downX, p.downY))
+                            listener?.onText(k, if (shift != 0) k.label.uppercase() else k.label)
+                        }
                         else listener?.onFunction(k, false)
                     }
                 }

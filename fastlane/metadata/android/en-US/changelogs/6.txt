@@ -1,0 +1,5 @@
+Automatic calibration: type a few sentences and the keyboard learns where your fingers land, then corrects your touches and sizes the keys.
+Smart correction: typos are fixed from where your finger landed, the words around and the corrections you undid.
+Updates: looks for a new version every 12 hours, only in this repository, shows the changelog and installs it.
+Backup and restore everything in one file.
+New Windows Phone style home with pivot pages, and an "Other projects" page.

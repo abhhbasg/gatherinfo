@@ -19,8 +19,14 @@ import java.io.File
 @GraphicsMode(GraphicsMode.Mode.NATIVE)
 class SettingsScreensTest {
     private val screens = listOf(
-        "Languages", "Appearance", "Size", "Typing", "Suggestions", "Feedback", "Clipboard", "Gif", "Translate", "Voice", "Launcher", "About",
+        "Languages", "Appearance", "Size", "Typing", "Suggestions", "Feedback", "Clipboard", "Gif", "Translate", "Voice", "Launcher", "Backup", "Update", "About", "Projects",
     ).map { "com.metrowin.keyboard.settings.${it}Fragment" }
+
+    @Test fun calibrationScreenOpens() {
+        val a = Robolectric.buildActivity(com.metrowin.keyboard.settings.CalibrationActivity::class.java).setup().get()
+        assertNotNull(a.findViewById<View>(R.id.header_title))
+        a.finish()
+    }
 
     @Test fun everyScreenOpens() {
         val activity = Robolectric.buildActivity(SettingsActivity::class.java).setup().get()
@@ -28,9 +34,12 @@ class SettingsScreensTest {
         for (name in screens) {
             val fragment = activity.supportFragmentManager.fragmentFactory.instantiate(activity.classLoader, name)
             activity.supportFragmentManager.beginTransaction().replace(R.id.settings_container, fragment).commitNow()
-            val list = (fragment as PreferenceFragmentCompat).listView
-            assertNotNull(name, list)
-            assertTrue("$name has rows", list.adapter!!.itemCount > 0)
+            // Most screens are preference lists; the projects page is its own layout.
+            if (fragment is PreferenceFragmentCompat) {
+                val list = fragment.listView
+                assertNotNull(name, list)
+                assertTrue("$name has rows", list.adapter!!.itemCount > 0)
+            } else assertNotNull(name, fragment.view)
             // Lay the list out and draw it, so a row that fails to bind shows up too.
             val root = activity.findViewById<View>(R.id.settings_root)
             root.measure(View.MeasureSpec.makeMeasureSpec(1080, View.MeasureSpec.EXACTLY), View.MeasureSpec.makeMeasureSpec(2000, View.MeasureSpec.EXACTLY))

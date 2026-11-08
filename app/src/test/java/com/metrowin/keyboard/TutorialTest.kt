@@ -66,7 +66,7 @@ class TutorialTest {
     @Test fun everyScreenOfTheSettingsIsListed() {
         // The settings index points to fragments by name; a typo would crash only when the screen is opened.
         val app = ApplicationProvider.getApplicationContext<KeyboardApp>()
-        val names = Regex("app:fragment=\"([^\"]+)\"").findAll(java.io.File("src/main/res/xml/prefs_root.xml").readText()).map { it.groupValues[1] }.toList()
+        val names = com.metrowin.keyboard.settings.Home.all
         assertTrue(names.size >= 11)
         for (n in names) Class.forName(n)
         assertNotNull(app)

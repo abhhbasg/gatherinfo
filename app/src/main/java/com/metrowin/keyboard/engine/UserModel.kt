@@ -9,14 +9,27 @@ import java.io.Writer
  * model grows past its limits. One model per language.
  */
 class UserModel(private val maxWords: Int = 20_000, private val maxPairs: Int = 60_000) {
+    private companion object { const val MAX_REJECTED = 2_000 }
+
     private val unigrams = HashMap<String, Int>()
     private val bigrams = HashMap<String, HashMap<String, Int>>()
     private var pairCount = 0
+    private val rejected = LinkedHashSet<String>()      // "typed<TAB>correction" pairs the user undid
 
     @Volatile var dirty = false
         private set
 
     @Synchronized fun count(word: String): Int = unigrams[word] ?: 0
+
+    /** The user took back the automatic correction of [typed] to [fix]: it is not made again. */
+    @Synchronized fun reject(typed: String, fix: String) {
+        if (rejected.add("$typed\t$fix")) {
+            if (rejected.size > MAX_REJECTED) rejected.remove(rejected.first())
+            dirty = true
+        }
+    }
+
+    @Synchronized fun isRejected(typed: String, fix: String) = rejected.contains("$typed\t$fix")
 
     @Synchronized fun learn(previous: String?, word: String) = learn(null, previous, word)
 
@@ -57,7 +70,7 @@ class UserModel(private val maxWords: Int = 20_000, private val maxPairs: Int = 
     }
 
     @Synchronized fun clear() {
-        unigrams.clear(); bigrams.clear(); pairCount = 0; dirty = true
+        unigrams.clear(); bigrams.clear(); pairCount = 0; rejected.clear(); dirty = true
     }
 
     @Synchronized fun isEmpty() = unigrams.isEmpty()
@@ -79,19 +92,21 @@ class UserModel(private val maxWords: Int = 20_000, private val maxPairs: Int = 
         }
     }
 
-    /** Text format: "U\tword\tcount" and "B\tprevious\tword\tcount", one per line. */
+    /** Text format: "U\tword\tcount", "B\tprevious\tword\tcount" and "X\ttyped\tcorrection" (undone corrections), one per line. */
     @Synchronized fun write(out: Writer) {
         for ((w, c) in unigrams) out.append("U\t").append(w).append('\t').append(c.toString()).append('\n')
         for ((p, m) in bigrams) for ((w, c) in m) out.append("B\t").append(p).append('\t').append(w).append('\t').append(c.toString()).append('\n')
+        for (r in rejected) out.append("X\t").append(r).append('\n')
         dirty = false
     }
 
     @Synchronized fun read(reader: BufferedReader) {
-        unigrams.clear(); bigrams.clear(); pairCount = 0
+        unigrams.clear(); bigrams.clear(); pairCount = 0; rejected.clear()
         reader.forEachLine { line ->
             val f = line.split('\t')
             when {
                 f.size == 3 && f[0] == "U" -> f[2].toIntOrNull()?.let { unigrams[f[1]] = it }
+                f.size == 3 && f[0] == "X" -> rejected.add(f[1] + "\t" + f[2])
                 f.size == 4 && f[0] == "B" -> f[3].toIntOrNull()?.let { bigrams.getOrPut(f[1]) { HashMap() }[f[2]] = it; pairCount++ }
             }
         }

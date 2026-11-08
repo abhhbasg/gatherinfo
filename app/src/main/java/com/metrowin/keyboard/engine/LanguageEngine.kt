@@ -14,7 +14,7 @@ class LanguageEngine(
     private val userFile: File,
     seed: NextWordSeed = NextWordSeed.EMPTY,
 ) {
-    val suggester = Suggester(dictionary, user, blocklist, layout.locale, seed)
+    val suggester = Suggester(dictionary, user, blocklist, layout.locale, seed, Corrector(KeyGrid.of(layout)))
     val swipe = SwipeDecoder(dictionary, user) { blocklist.contains(it) }
 
     /** Writes what was learned to the phone's storage, if anything changed. */

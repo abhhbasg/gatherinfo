@@ -8,6 +8,7 @@ import android.content.SharedPreferences
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.inputmethodservice.InputMethodService
+import android.os.Build
 import android.os.Handler
 import android.os.Looper
 import android.os.SystemClock
@@ -124,6 +125,12 @@ open class MetroWinIME : InputMethodService(), KeyboardListener, SuggestionBar.L
     private var emojiSearching = false
     private val emojiQuery = StringBuilder()
     private val composing = StringBuilder()
+
+    // Where each letter of the word being typed was tapped, for the correction (see Corrector). Kept as a log of the last letters typed
+    // that is checked against the word before use, so a word that was not typed key by key (a restored one) simply has no touch data.
+    private class Tapped(val ch: Char, val touch: Map<Char, Float>?)
+    private val tapped = ArrayList<Tapped>()
+    private var pendingTouch: Map<Char, Float>? = null
     private var prevWord: String? = null
     private var prevWord2: String? = null
     private var latest: WordSuggestions? = null
@@ -340,7 +347,7 @@ open class MetroWinIME : InputMethodService(), KeyboardListener, SuggestionBar.L
 
     private fun options() = SuggestOptions(
         autocorrect = prefs.autocorrect, nextWord = prefs.nextWord, phrases = prefs.phrases,
-        blockOffensive = prefs.blockOffensive, usePersonal = learningOn || prefs.learn,
+        blockOffensive = prefs.blockOffensive, usePersonal = learningOn || prefs.learn, smart = prefs.smartCorrect,
     )
 
     private fun backgroundBitmap(): Bitmap? {
@@ -364,6 +371,7 @@ open class MetroWinIME : InputMethodService(), KeyboardListener, SuggestionBar.L
         kb.setBackgroundImage(backgroundBitmap(), prefs.imageDim)
         val land = resources.configuration.orientation == android.content.res.Configuration.ORIENTATION_LANDSCAPE
         kb.setMetrics(if (land) prefs.keyHeightLand else prefs.keyHeight, prefs.keyGap, prefs.keyboardWidth, prefs.keyboardAlign)
+        kb.setBias(prefs.calibBias(land)); kb.setTouchSigma(prefs.calibSigma)
         kb.setBehavior(prefs.longPressSymbols, prefs.longPressMs, prefs.swipe && field == Field.TEXT, prefs.spaceCursor, prefs.keyHints, prefs.keyPreview)
         bar?.setQuickTool(Tool.from(prefs.quickTool)); bar?.setBadge(clipBadge && Tool.from(prefs.quickTool) == Tool.CLIPBOARD)
         clipboardPanel?.setImagesEnabled(prefs.clipboardImages)
@@ -380,7 +388,8 @@ open class MetroWinIME : InputMethodService(), KeyboardListener, SuggestionBar.L
         val layout = currentLayout()
         val several = activeLayouts().size > 1
         // The globe can be hidden to give the space bar its room; then holding the space bar changes language.
-        val multi = (several || shouldOfferSwitchingToNextInputMethod()) && prefs.languageKey
+        // shouldOfferSwitchingToNextInputMethod is from Android 9; on 8.x only our own languages can be switched.
+        val multi = (several || (Build.VERSION.SDK_INT >= 28 && shouldOfferSwitchingToNextInputMethod())) && prefs.languageKey
         val p = when (page) {
             Page.LETTERS -> KeyboardBuilder.letters(layout, prefs.numberRow, prefs.keyHints, multi)
             Page.SYMBOLS_1, Page.SYMBOLS_2 -> KeyboardBuilder.symbols(page, prefs.numberRow)
@@ -433,6 +442,8 @@ open class MetroWinIME : InputMethodService(), KeyboardListener, SuggestionBar.L
         feedback.press(key.type)
     }
 
+    override fun onTouch(likelihood: Map<Char, Float>) { pendingTouch = likelihood }
+
     override fun onText(key: Key, text: String) {
         lastSwipe = null
         typeText(text)
@@ -465,7 +476,7 @@ open class MetroWinIME : InputMethodService(), KeyboardListener, SuggestionBar.L
 
     private fun switchLanguage() {
         val all = activeLayouts()
-        if (all.size <= 1) { switchToNextInputMethod(false); return }
+        if (all.size <= 1) { if (Build.VERSION.SDK_INT >= 28) switchToNextInputMethod(false); return }
         val i = all.indexOfFirst { it.id == currentLayout().id }
         setLanguage(all[(i + 1) % all.size])
     }
@@ -479,6 +490,10 @@ open class MetroWinIME : InputMethodService(), KeyboardListener, SuggestionBar.L
     // --- typing -----------------------------------------------------------------------------------------------------
 
     private fun typeText(text: String) {
+        try { typeTextNow(text) } finally { pendingTouch = null }
+    }
+
+    private fun typeTextNow(text: String) {
         lastEdit = SystemClock.uptimeMillis()
         if (gifSearching) { typeIntoGifSearch(text); return }
         if (emojiSearching) { typeIntoEmojiSearch(text); return }
@@ -488,6 +503,8 @@ open class MetroWinIME : InputMethodService(), KeyboardListener, SuggestionBar.L
         val isWord = predictionOn && page == Page.LETTERS &&
             (text.all { Text.isWordChar(it) } || (text.length == 1 && Text.isApostrophe(text[0]) && layout.joinApostrophe && composing.isNotEmpty()))
         if (isWord) {
+            for ((i, ch) in text.withIndex()) tapped += Tapped(ch.lowercaseChar(), if (i == 0) pendingTouch else null)
+            if (tapped.size > 64) tapped.subList(0, 32).clear()
             composing.append(text)
             ic.setComposingText(composing, 1)
             autoSpace = false
@@ -559,6 +576,7 @@ open class MetroWinIME : InputMethodService(), KeyboardListener, SuggestionBar.L
         val ic = currentInputConnection ?: return
         if (composing.isNotEmpty()) {
             composing.setLength(composing.length - 1)
+            tapped.removeLastOrNull()
             if (composing.isEmpty()) ic.commitText("", 1) else ic.setComposingText(composing, 1)
             updateSuggestions()
             return
@@ -575,7 +593,7 @@ open class MetroWinIME : InputMethodService(), KeyboardListener, SuggestionBar.L
                 ic.setComposingText(composing, 1)
                 ic.endBatchEdit()
                 lastCorrection = null
-                if (learningOn) engine?.user?.learn(null, lc.typed.lowercase())
+                if (learningOn) engine?.user?.let { it.learn(null, lc.typed.lowercase()); it.reject(lc.typed.lowercase(), lc.corrected.lowercase()) }
                 updateSuggestions()
                 return
             }
@@ -628,10 +646,11 @@ open class MetroWinIME : InputMethodService(), KeyboardListener, SuggestionBar.L
         val seq = ++suggestSeq
         val opts = options()
         val p1 = prevWord; val p2 = prevWord2
+        val touch = touchOf(typed)
         worker.execute {
             if (seq != suggestSeq) return@execute
             if (typed.isNotEmpty()) {
-                val r = eng.suggester.forTyped(typed, p1, opts)
+                val r = eng.suggester.forTyped(typed, p1, opts, touch)
                 main.post { if (seq == suggestSeq) { latest = r; showWordSlots(r) } }
             } else {
                 val next = eng.suggester.nextWords(p1, p2, 3, opts)
@@ -639,6 +658,15 @@ open class MetroWinIME : InputMethodService(), KeyboardListener, SuggestionBar.L
                 main.post { if (seq == suggestSeq) { latest = null; showNextSlots(next, phrase) } }
             }
         }
+    }
+
+    /** The taps of the letters of [typed], if the word was typed key by key; null otherwise. */
+    private fun touchOf(typed: String): List<Map<Char, Float>?>? {
+        val n = typed.length
+        if (n == 0 || tapped.size < n) return null
+        val tail = tapped.subList(tapped.size - n, tapped.size)
+        if (tail.indices.any { tail[it].ch != typed[it].lowercaseChar() }) return null
+        return tail.map { it.touch }
     }
 
     private fun showWordSlots(r: WordSuggestions) {

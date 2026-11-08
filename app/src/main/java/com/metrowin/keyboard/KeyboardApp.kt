@@ -15,6 +15,11 @@ class KeyboardApp : Application() {
     val clipboard by lazy { ClipboardStore(File(filesDir, "clipboard"), { prefs.clipboardMax }) }
     private val engines = ConcurrentHashMap<String, LanguageEngine>()
 
+    override fun onCreate() {
+        super.onCreate()
+        runCatching { com.metrowin.keyboard.update.UpdateScheduler.sync(this) }
+    }
+
     /** The engine of [id], loading its dictionary on first use. Call from a background thread: a big dictionary takes a moment. */
     fun engine(id: String): LanguageEngine = engines.getOrPut(id) {
         LanguageEngine.load(this, layouts.get(id) ?: layouts.fallback(), prefs.customBlocked)

@@ -141,7 +141,7 @@ class WordDictionary(words: List<String>, freqs: List<Int>) {
             var first = true
             reader.lineSequence().forEach { raw ->
                 if (seen.size >= maxWords) return@forEach
-                var line = raw.trim().removePrefix("﻿")
+                var line = raw.trim().removePrefix("\uFEFF")
                 if (line.isEmpty() || line.startsWith("#")) return@forEach
                 if (first) { first = false; if (line.all { it.isDigit() }) return@forEach }
                 var count = -1

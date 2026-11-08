@@ -14,8 +14,8 @@ android {
         applicationId = "com.metrowin.keyboard"
         minSdk = 26
         targetSdk = 35
-        versionCode = 5
-        versionName = "0.3.0"
+        versionCode = 6
+        versionName = "26.1S"
     }
 
     // The key of the official release comes from keystore.properties in the root of the project (never committed): storeFile,
@@ -34,9 +34,10 @@ android {
 
     buildTypes {
         release {
-            // Not shrunk: the settings screens are created by name from XML, and a keyboard that fails on a renamed class is worth
-            // more than a smaller file (the app is a few MB).
-            isMinifyEnabled = false
+            // Shrunk and optimised; the few classes that are created by name (the settings screens) are kept in proguard-rules.pro.
+            isMinifyEnabled = true
+            isShrinkResources = true
+            proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
             isDebuggable = false
             signingConfig = when {
                 official != null -> official
@@ -65,7 +66,7 @@ android {
             isIncludeAndroidResources = true
         }
     }
-    lint { abortOnError = false }
+    lint { abortOnError = true }
 }
 
 dependencies {

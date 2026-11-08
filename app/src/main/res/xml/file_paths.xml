@@ -2,6 +2,8 @@
 <paths>
     <!-- GIFs prepared to be sent -->
     <cache-path name="gif_share" path="gif_share/" />
+    <!-- The new version of the keyboard, while it is checked and handed to the installer -->
+    <cache-path name="update" path="update/" />
     <!-- Pictures saved in the clipboard history -->
     <files-path name="clipboard" path="clipboard/" />
 </paths>

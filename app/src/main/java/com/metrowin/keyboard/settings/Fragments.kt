@@ -27,6 +27,7 @@ import androidx.preference.PreferenceScreen
 import androidx.preference.PreferenceViewHolder
 import androidx.recyclerview.widget.RecyclerView
 import com.metrowin.keyboard.ui.Fonts
+import com.metrowin.keyboard.ui.dp
 import androidx.preference.PreferenceFragmentCompat
 import com.metrowin.keyboard.K
 import com.metrowin.keyboard.KeyboardApp
@@ -46,6 +47,8 @@ abstract class BaseFragment(private val xml: Int, private val title: Int) : Pref
             super.onBindViewHolder(holder, position)
             val ctx = holder.itemView.context
             val item = getItem(position)
+            // The same 24 dp margin as the titles above and the home page, whether or not a row has a switch.
+            holder.itemView.setPadding(ctx.dp(24f).toInt(), holder.itemView.paddingTop, ctx.dp(24f).toInt(), holder.itemView.paddingBottom)
             val titleView = holder.findViewById(android.R.id.title) as? TextView
             val summaryView = holder.findViewById(android.R.id.summary) as? TextView
             if (item is PreferenceCategory) {
@@ -63,6 +66,17 @@ abstract class BaseFragment(private val xml: Int, private val title: Int) : Pref
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         setPreferencesFromResource(xml, rootKey)
         setup()
+        // No room kept for icons and no divider lines: a Windows Phone list is type on white.
+        fun flat(g: androidx.preference.PreferenceGroup) {
+            g.isIconSpaceReserved = false
+            for (i in 0 until g.preferenceCount) preferenceScreen.let { g.getPreference(i) }.let { p -> p.isIconSpaceReserved = false; if (p is androidx.preference.PreferenceGroup) flat(p) }
+        }
+        flat(preferenceScreen)
+    }
+
+    override fun onViewCreated(view: android.view.View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        setDivider(null)
     }
 
     abstract fun setup()
@@ -90,24 +104,35 @@ abstract class BaseFragment(private val xml: Int, private val title: Int) : Pref
     }
 }
 
-class RootFragment : BaseFragment(R.xml.prefs_root, R.string.app_name) {
-    override fun setup() {
-        click("setup_enable") { startActivity(Intent(Settings.ACTION_INPUT_METHOD_SETTINGS)) }
-        click("setup_select") { (requireContext().getSystemService(InputMethodManager::class.java)).showInputMethodPicker() }
-        click("setup_try") { startActivity(Intent(requireContext(), TestActivity::class.java)) }
-        click("setup_guide") { startActivity(Intent(requireContext(), OnboardingActivity::class.java)) }
-        click("setup_tutorial") { startActivity(Intent(requireContext(), TutorialActivity::class.java)) }
+/** A full backup of the app in one file, and its restore. */
+class BackupFragment : BaseFragment(R.xml.prefs_backup, R.string.screen_backup) {
+    private val create = registerForActivityResult(ActivityResultContracts.CreateDocument("application/zip")) { uri ->
+        if (uri == null) return@registerForActivityResult
+        val ctx = requireContext().applicationContext
+        background({ runCatching { ctx.contentResolver.openOutputStream(uri)!!.use { com.metrowin.keyboard.backup.Backup.write(ctx, it) } }.isSuccess }) { ok ->
+            toast(if (ok) R.string.backup_done else R.string.backup_failed)
+        }
     }
 
-    override fun onResume() {
-        super.onResume()
-        val pkg = requireContext().packageName
-        val imm = requireContext().getSystemService(InputMethodManager::class.java)
-        val enabled = imm.enabledInputMethodList.any { it.packageName == pkg }
-        val active = Settings.Secure.getString(requireContext().contentResolver, Settings.Secure.DEFAULT_INPUT_METHOD)?.startsWith("$pkg/") == true
-        findPreference<Preference>("setup_enable")?.summary = getString(if (enabled) R.string.setup_enabled else R.string.setup_disabled)
-        findPreference<Preference>("setup_select")?.summary = getString(if (active) R.string.setup_active else R.string.setup_inactive)
-        findPreference<Preference>("setup_tutorial")?.summary = getString(if (com.metrowin.keyboard.tutorial.Tutorial.hasNew(app.prefs.tutorialSeen)) R.string.setup_tutorial_new else R.string.setup_tutorial_summary)
+    private val pick = registerForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
+        if (uri == null) return@registerForActivityResult
+        AlertDialog.Builder(requireContext()).setTitle(R.string.backup_restore_title).setMessage(R.string.backup_restore_confirm)
+            .setPositiveButton(R.string.backup_restore_go) { _, _ -> restore(uri) }.setNegativeButton(R.string.cancel, null).show()
+    }
+
+    private fun restore(uri: android.net.Uri) {
+        val ctx = requireContext().applicationContext
+        background({ runCatching { ctx.contentResolver.openInputStream(uri)!!.use { com.metrowin.keyboard.backup.Backup.restore(ctx, it) } }.isSuccess }) { ok ->
+            if (!ok) { toast(R.string.backup_invalid); return@background }
+            toast(R.string.backup_restored)
+            // Everything that was loaded (settings, clipboard, dictionaries) is now out of date: the app starts again from the files.
+            android.os.Handler(ctx.mainLooper).postDelayed({ android.os.Process.killProcess(android.os.Process.myPid()) }, 1200)
+        }
+    }
+
+    override fun setup() {
+        click("backup_create") { create.launch("metrowin-keyboard-backup-" + java.text.SimpleDateFormat("yyyyMMdd", java.util.Locale.US).format(java.util.Date()) + ".zip") }
+        click("backup_restore") { pick.launch(arrayOf("application/zip", "application/octet-stream", "*/*")) }
     }
 }
 
@@ -247,7 +272,13 @@ class SizeFragment : BaseFragment(R.xml.prefs_size, R.string.screen_size) {
     // The preview redraws as soon as a slider or switch changes.
     private val listener = android.content.SharedPreferences.OnSharedPreferenceChangeListener { _, _ -> findPreference<KeyboardPreview>("size_preview")?.refresh() }
 
-    override fun setup() { click("size_try") { startActivity(Intent(requireContext(), TestActivity::class.java)) } }
+    override fun setup() {
+        click("size_try") { startActivity(Intent(requireContext(), TestActivity::class.java)) }
+        click("size_calibrate") { startActivity(Intent(requireContext(), CalibrationActivity::class.java)) }
+        click("size_calibrate_reset") {
+            app.prefs.sp.edit().remove(K.CALIB_BIAS).remove(K.CALIB_BIAS_LAND).remove(K.CALIB_SIGMA).apply(); toast(R.string.calib_reset_done)
+        }
+    }
     override fun onStart() { super.onStart(); app.prefs.sp.registerOnSharedPreferenceChangeListener(listener) }
     override fun onStop() { app.prefs.sp.unregisterOnSharedPreferenceChangeListener(listener); super.onStop() }
 }

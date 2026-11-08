@@ -37,7 +37,7 @@ data class LanguageLayout(
             val rows = ArrayList<List<String>>()
             val long = LinkedHashMap<String, List<String>>()
             for (raw in text.lineSequence()) {
-                val line = raw.trim().removePrefix("﻿")
+                val line = raw.trim().removePrefix("\uFEFF")
                 if (line.isEmpty() || line.startsWith("#")) continue
                 val eq = line.indexOf('=')
                 if (eq <= 0) continue

@@ -6,8 +6,11 @@
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
     <!-- Key vibration. -->
     <uses-permission android:name="android.permission.VIBRATE" />
-    <!-- Only to fetch GIFs from the source you chose, when you open the GIF panel. Nothing else uses the network. -->
+    <!-- GIFs and translation, from the service you chose, when you use them; and the update check, which asks only this keyboard's own repository on GitHub. -->
     <uses-permission android:name="android.permission.INTERNET" />
+    <!-- The update check: to install a new version of the keyboard that the user chose to download, and to keep the 12-hour check after a restart. -->
+    <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
 
     <queries>
         <package android:name="com.metrowin.launcher" />
@@ -49,6 +52,7 @@
 
         <activity android:name=".settings.TutorialActivity" android:exported="false" />
         <activity android:name=".settings.OnboardingActivity" android:exported="false" android:windowSoftInputMode="adjustResize" />
+        <activity android:name=".settings.CalibrationActivity" android:exported="false" android:windowSoftInputMode="stateAlwaysVisible|adjustResize" />
         <activity android:name=".settings.TestActivity" android:exported="false" android:windowSoftInputMode="stateAlwaysVisible|adjustResize" />
 
         <!-- Transparent helper: asks for the microphone and picks a picture, because a keyboard cannot show those dialogs itself. -->
@@ -78,6 +82,11 @@
         </receiver>
 
         <!-- GIFs and clipboard pictures handed to the app being typed in. -->
+        <service
+            android:name=".update.UpdateJob"
+            android:exported="false"
+            android:permission="android.permission.BIND_JOB_SERVICE" />
+
         <provider
             android:name="androidx.core.content.FileProvider"
             android:authorities="${applicationId}.files"
