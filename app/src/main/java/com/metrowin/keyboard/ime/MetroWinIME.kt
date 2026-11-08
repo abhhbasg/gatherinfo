@@ -209,7 +209,9 @@ open class MetroWinIME : InputMethodService(), KeyboardListener, SuggestionBar.L
         root.addView(frame, LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT))
         // Android 15 draws the keyboard window edge to edge, behind the navigation bar (or behind the launcher's own bar drawn there).
         ViewCompat.setOnApplyWindowInsetsListener(root) { _, insets ->
-            navInset = insets.getInsets(WindowInsetsCompat.Type.navigationBars() or WindowInsetsCompat.Type.displayCutout()).bottom
+            // Also the caption bar: with the three buttons in landscape the system reports the strip where it draws its keyboard buttons
+            // (the hide arrow and the language globe) there, not as a navigation bar, and it would cover the bottom row of keys.
+            navInset = insets.getInsets(WindowInsetsCompat.Type.systemBars() or WindowInsetsCompat.Type.displayCutout()).bottom
             insets
         }
         root.viewTreeObserver.addOnGlobalLayoutListener {
@@ -634,6 +636,9 @@ open class MetroWinIME : InputMethodService(), KeyboardListener, SuggestionBar.L
         val b = bar ?: return
         val eng = engine
         if (gifSearching || emojiSearching) return
+        // A panel (GIFs, clipboard, translation...) has the place of the keys: the bar must not go on offering the words of what was
+        // just typed above it, as if the keys were still there.
+        if (panel != Panel.NONE) { latest = null; suggestSeq++; b.setSlots(listOf(null, null, null)); return }
         // ":dog": the emoji for the word after a colon take the bar (the colon itself is already in the text, the word is being composed).
         val wanted = emojiWanted()
         if (wanted != null) {
