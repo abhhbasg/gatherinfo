@@ -27,7 +27,7 @@ class ProjectsFragment : Fragment() {
     private val open = listOf(
         Project(
             R.mipmap.ic_launcher, R.string.project_keyboard_title, R.string.project_keyboard_desc,
-            listOf(R.drawable.proj_keyboard_1, R.drawable.proj_keyboard_2, R.drawable.proj_keyboard_3), 84f,
+            listOf(R.drawable.proj_keyboard_1, R.drawable.proj_keyboard_2, R.drawable.proj_keyboard_3), 260f,
             R.string.project_open_github, "https://github.com/developerkenshi-coder/MetroWin-Keyboard",
         ),
         Project(
