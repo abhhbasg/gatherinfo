@@ -1,0 +1,3 @@
+In orizzontale la riga dei tasti in basso non è più coperta dai pulsanti di sistema, e la calibrazione sta su uno schermo basso.
+I suggerimenti non restano più sopra un pannello GIF, appunti o traduzione aperto.
+La barra degli strumenti non ripete più lo strumento del pulsante rapido.

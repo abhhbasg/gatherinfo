@@ -1,0 +1,3 @@
+Landscape: the bottom row of keys is no longer covered by the system's keyboard buttons, and the calibration fits on a short screen.
+The suggestions no longer stay above an open GIF, clipboard or translation panel.
+The toolbox no longer repeats the quick button's tool.

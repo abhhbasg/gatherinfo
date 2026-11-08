@@ -14,8 +14,8 @@ android {
         applicationId = "com.metrowin.keyboard"
         minSdk = 26
         targetSdk = 35
-        versionCode = 6
-        versionName = "26.1S"
+        versionCode = 7
+        versionName = "26.1.2S"
     }
 
     // The key of the official release comes from keystore.properties in the root of the project (never committed): storeFile,
