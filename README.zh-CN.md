@@ -29,12 +29,15 @@
 ## 功能
 
 **中文输入**
-- 选择 **简体中文** 后用拼音输入（`ü` 用 `v`）。输入时字母留在输入框里，候选栏显示对应的字词，可左右滑动。
-- 空格选第一个；点任意一个候选来选它，剩下的拼音继续选；回车直接输入字母。
-- 支持整句（`wojintianhengaoxing` → 我今天很高兴）、不完整的拼音（`zhongg` → 中国）、首字母简拼（`nh` → 你好）和用撇号分隔音节（`xi'an` → 西安，撇号在长按逗号键出现的条里）。
+- 选择 **简体中文** 用全拼输入（`ü` 用 `v`），或选择 **简体中文 (双拼)** 用微软双拼输入（每个音节两个键，`ing` 在第二行末尾的 `;` 键上）。
+- 首选通常就是整句：按每个词的常用程度和前后字的搭配来判断（`wojintianhengaoxing` → 我今天很高兴，最后一个音节没打完也行）。
+- 空格选第一个；点任意一个候选来选它，剩下的拼音继续选；候选栏末尾的箭头展开全部候选；回车直接输入字母。
+- 选完一个词后候选栏会联想接下来常用的词（`中国` → 人、人民…），并记住你自己的搭配习惯。
+- 支持不完整的拼音（`zhongg` → 中国）、首字母简拼（`nh` → 你好）、用撇号分隔音节（`xi'an` → 西安，撇号在长按逗号键出现的条里），以及可选的模糊音（zh/z、ch/c、sh/s、n/l，在 设置 → 建议 中开启）。
 - 逗号和句号键输入 `，` 和 `。`，符号页是中文标点，长按得到英文标点。
 - 你选过的词下次排在前面，由几次选择组成的短语会被记成一个词。这些只保存在手机上，密码框中不学习，可以导出备份，也可以清除。
-- 内置约 6 万个词和 GB 2312 的全部汉字。应用界面本身也有简体中文。
+- 内置约 17 万条词和读音（通用规范汉字表的 8105 个字的全部读音）。应用界面本身也有简体中文。
+- 候选栏和 Windows Phone 一样只放候选词；剪贴板、翻译、GIF 等工具按住笑脸键打开（也可以在 设置 → 输入 中把按钮放回候选栏）。
 
 **输入**
 - 滑行输入，长按按键输入重音字母、数字和符号（长按时间以毫秒计，默认 200），双击空格输入句号，句首自动大写，在空格键上滑动来移动光标。
@@ -91,7 +94,7 @@ cd MetroWin-Keyboard
 ./gradlew assembleRelease        # 需要 keystore.properties（见 app/build.gradle.kts）；测试构建可加 -PsignWithDebugKey=true
 ```
 
-中文词库由 `tools/build_pinyin.py` 生成（`pip install jieba pypinyin`）。
+中文词库由 `tools/build_pinyin.py` 生成（`pip install Pinyin2Hanzi wordfreq`，会从 GitHub 下载 rime-ice 词库）。
 
 ## 参与贡献
 
@@ -99,6 +102,6 @@ cd MetroWin-Keyboard
 
 ## 许可证和致谢
 
-GNU 通用公共许可证 v3.0 或更高版本（[LICENSE](LICENSE)）。字体为 Open Sans（SIL Open Font License 1.1）；中文词库来自 jieba 和 pypinyin（均为 MIT）。详见 [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md)。
+GNU 通用公共许可证 v3.0 或更高版本（[LICENSE](LICENSE)）。字体为 Open Sans（SIL Open Font License 1.1）；中文词库来自 rime-ice（GPL-3.0）、wordfreq（数据 CC BY-SA 4.0）和 Pinyin2Hanzi（MIT）。详见 [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md)。
 
 MetroWin Keyboard 是一个独立项目，与 Microsoft 或 Google 没有关联，也未获其认可；Windows Phone 是 Microsoft Corporation 的商标。

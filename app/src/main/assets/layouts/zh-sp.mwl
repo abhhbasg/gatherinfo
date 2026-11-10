@@ -1,0 +1,14 @@
+# 简体中文 (微软双拼): every syllable is two keys, "ing" on the ; key
+id=zh-sp
+name=简体中文 (双拼)
+locale=zh_CN
+label=双
+dict=zh
+input=shuangpin
+comma=，
+period=。
+row=q w e r t y u i o p
+row=a s d f g h j k l ;
+row=z x c v b n m
+long.，=、 ； ： ' ,
+long.。=？ ！ … · .

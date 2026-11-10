@@ -84,6 +84,7 @@ class ShotTest {
         val zh = app.layouts.get("zh")!!
         val pages = mapOf(
             "zh-pinyin" to KeyboardBuilder.letters(zh, false, false, true),
+            "zh-shuangpin" to KeyboardBuilder.letters(app.layouts.get("zh-sp")!!, false, false, true),
             "zh-symbols-1" to KeyboardBuilder.symbols(com.metrowin.keyboard.layout.Page.SYMBOLS_1, false, zh),
             "symbols-1" to KeyboardBuilder.symbols(com.metrowin.keyboard.layout.Page.SYMBOLS_1, false, app.layouts.get("en")),
             "symbols-2" to KeyboardBuilder.symbols(com.metrowin.keyboard.layout.Page.SYMBOLS_2, false, app.layouts.get("en")),
@@ -92,12 +93,16 @@ class ShotTest {
             val kb = KeyboardView(app)
             kb.setColors(c); kb.setPage(page); kb.setLanguageName(zh.name)
             val bar = SuggestionBar(app).also { it.setColors(c) }
-            bar.setSlots(listOf("你好吗", "你好", "你", "尼", "泥", "拟", "逆", "妮", "腻").mapIndexed { i, w -> Slot(w, best = i == 0) }, row = true)
+            bar.setSlots(listOf("你好吗", "你好", "你", "尼", "泥", "拟", "逆", "妮", "腻").mapIndexed { i, w -> Slot(w, best = i == 0) }, row = true, expandable = true)
             val col = LinearLayout(app).apply { orientation = LinearLayout.VERTICAL }
             col.addView(bar, LinearLayout.LayoutParams(1080, 150))
             col.addView(kb, LinearLayout.LayoutParams(1080, 780))
             render(col, 1080, 930, File(out, "$name.png"))
         }
+        // All the words of a Pinyin, in the place of the keys.
+        val cp = com.metrowin.keyboard.ui.CandidatePanel(app).also { it.setColors(c) }
+        cp.show(listOf("是", "时", "使", "事", "式", "市", "十", "实", "世", "试", "室", "石", "视", "师", "史", "示", "士", "势", "失", "诗", "释", "识", "食", "适", "似", "湿", "饰", "氏", "施", "狮"))
+        render(cp, 1080, 780, File(out, "zh-candidates.png"))
         val tut = TutorialPanel(app).also { it.setColors(c); it.open(Tutorial.startIndex(1)) }
         render(tut, 1080, 760, File(out, "panel-tutorial.png"))
         val tr = TranslatePanel(app, Translator(app.prefs), app.prefs).also { it.setColors(c) }

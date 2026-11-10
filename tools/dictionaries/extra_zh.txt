@@ -1,4 +1,4 @@
-# Everyday words that a word list made from written text holds too rarely, or not at all (greetings, chat). Format: word count
+# Everyday words and phrases that a word list keeps too rarely, or splits (greetings, chat). Format: word count per billion words
 你好 60000
 你好吗 12000
 您好 20000

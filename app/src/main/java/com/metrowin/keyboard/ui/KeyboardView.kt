@@ -46,6 +46,9 @@ interface KeyboardListener {
     /** Shift was held down: lock capitals. */
     fun onShiftLongPress()
 
+    /** The smiley key was held down: the toolbox (clipboard, translation, GIF…), which the Windows Phone bar has no button for. */
+    fun onEmojiLongPress() {}
+
     /** Just before [onText] of a letter tapped on its key: how likely each key near the tap was the one meant (0..1), for the correction. */
     fun onTouch(likelihood: Map<Char, Float>) {}
 }
@@ -433,6 +436,7 @@ class KeyboardView(context: Context) : View(context) {
         KeyType.CHAR -> longPressEnabled && key.popups.isNotEmpty()
         KeyType.SHIFT -> true
         KeyType.SPACE -> spaceSwitchesLanguage
+        KeyType.EMOJI -> true
         else -> false
     }
 
@@ -443,6 +447,7 @@ class KeyboardView(context: Context) : View(context) {
             if (k !== p.startKey) return
             p.longFired = true
             if (k.type == KeyType.SHIFT) { listener?.onShiftLongPress(); return }
+            if (k.type == KeyType.EMOJI) { performHapticFeedback(android.view.HapticFeedbackConstants.LONG_PRESS); listener?.onEmojiLongPress(); invalidate(); return }
             if (k.type == KeyType.SPACE) { performHapticFeedback(android.view.HapticFeedbackConstants.LONG_PRESS); listener?.onFunction(Key(KeyType.LANGUAGE), false); return }
             p.popupKey = k; p.popupIndex = 0
             performHapticFeedback(android.view.HapticFeedbackConstants.LONG_PRESS)

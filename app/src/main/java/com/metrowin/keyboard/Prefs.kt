@@ -81,6 +81,8 @@ object K {
     const val SOUND_FILE = "sound_file_set"
     const val BG_IMAGE_SET = "bg_image_set"
     const val QUICK_TOOL = "quick_tool"
+    const val BAR_BUTTONS = "bar_buttons"
+    const val PINYIN_FUZZY = "pinyin_fuzzy"
     const val LANGUAGE_KEY = "language_key"
     const val KEY_PREVIEW = "key_preview"
     const val BOTTOM_PADDING = "bottom_padding"
@@ -142,6 +144,10 @@ class Prefs(context: Context) {
         set(v) { putString(K.UPDATE_RELEASE, v) }
     val numberRow get() = b(K.NUMBER_ROW, false)
     val quickTool get() = s(K.QUICK_TOOL, "clipboard")
+    /** The three dots and the quick button on the bar. Off: the bar of Windows Phone, the toolbox by holding the smiley key. */
+    val barButtons get() = b(K.BAR_BUTTONS, false)
+    /** zh/z, ch/c, sh/s and n/l are the same when typing Chinese. */
+    val pinyinFuzzy get() = b(K.PINYIN_FUZZY, false)
     val languageKey get() = b(K.LANGUAGE_KEY, true)
     val keyPreview get() = b(K.KEY_PREVIEW, true)
     val bottomPadding get() = i(K.BOTTOM_PADDING, 0)

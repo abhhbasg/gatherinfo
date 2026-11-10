@@ -38,6 +38,8 @@ class LanguageEngine(
     companion object {
         /** The Chinese word lists already read: they come with the app and never change, so an engine that is rebuilt does not read them again. */
         private val pinyinWords = java.util.concurrent.ConcurrentHashMap<String, PinyinDictionary>()
+        private val pinyinPairs = java.util.concurrent.ConcurrentHashMap<String, PinyinPairs>()
+        private val pinyinUsers = java.util.concurrent.ConcurrentHashMap<String, PinyinUser>()
 
         fun dictionaryFile(c: Context, id: String) = File(File(c.filesDir, "dictionaries").apply { mkdirs() }, "$id.txt")
         fun userFile(c: Context, id: String) = File(File(c.filesDir, "user").apply { mkdirs() }, "$id.txt")
@@ -62,10 +64,15 @@ class LanguageEngine(
             val words = pinyinWords.getOrPut(dictId) {
                 runCatching { c.assets.open("pinyin/$dictId.txt").bufferedReader().use { PinyinDictionary.parse(it) } }.getOrDefault(PinyinDictionary.EMPTY)
             }
-            val picked = PinyinUser()
-            val pinyinFile = pinyinUserFile(c, layout.id)
-            if (pinyinFile.exists()) runCatching { pinyinFile.bufferedReader().use { picked.read(it) } }
-            return LanguageEngine(layout, dictionary, user, blocklist, file, seed, PinyinEngine(words, picked), pinyinFile)
+            val pairs = pinyinPairs.getOrPut(dictId) {
+                runCatching { c.assets.open("pinyin/$dictId.pairs").bufferedReader().use { PinyinPairs.parse(it) } }.getOrDefault(PinyinPairs.EMPTY)
+            }
+            // Full Pinyin and Shuangpin are two ways to type the same language: they learn into one file.
+            val pinyinFile = pinyinUserFile(c, dictId)
+            val picked = pinyinUsers.getOrPut(dictId) {
+                PinyinUser().also { u -> if (pinyinFile.exists()) runCatching { pinyinFile.bufferedReader().use { u.read(it) } } }
+            }
+            return LanguageEngine(layout, dictionary, user, blocklist, file, seed, PinyinEngine(words, picked, pairs), pinyinFile)
         }
 
         /** Saves a word list for [dictId]. Returns the number of words, or 0 if the file held no words (nothing is saved then). */

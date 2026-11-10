@@ -27,11 +27,16 @@ data class Slot(val text: String, val best: Boolean = false, val literal: Boolea
  * suggestions (or the tools, when the toolbox is open), and on the right a quick button goes straight to one tool (the clipboard
  * by default), with a dot when something new was copied. Also shows a short status text (a GIF search, "listening"). With more than
  * three slots (emoji found by ":dog", the Chinese words for the Pinyin typed) the middle is a row that slides sideways.
+ *
+ * Windows Phone's bar has no buttons: only the words, and for Chinese an arrow at the end that opens all of them. That is the
+ * default ([setButtons] false); the toolbox then opens by holding the smiley key and fills the whole bar.
  */
 class SuggestionBar(context: Context) : View(context) {
     interface Listener {
         fun onSlot(slot: Slot)
         fun onTool(tool: Tool)
+        /** The arrow at the end of a row of Chinese words: show all of them. */
+        fun onExpand() {}
     }
 
     var listener: Listener? = null
@@ -40,6 +45,8 @@ class SuggestionBar(context: Context) : View(context) {
     private var row = false
     private var rowEdges: FloatArray? = null
     private var toolsOpen = false
+    private var buttons = false
+    private var expandable = false
     private var status: String? = null
     private var voiceActive = false
     private var quick = Tool.CLIPBOARD
@@ -54,13 +61,13 @@ class SuggestionBar(context: Context) : View(context) {
     private val fill = Paint(Paint.ANTI_ALIAS_FLAG)
     private val icon = Paint(Paint.ANTI_ALIAS_FLAG)
     // The tool the quick button already offers is not repeated in the toolbox.
-    private val tools get() = Tool.entries.filter { it != quick }
+    private val tools get() = if (buttons) Tool.entries.filter { it != quick } else Tool.entries
 
     fun setColors(c: KeyboardColors) { colors = c; invalidate() }
     /** [row]: show the slots as a row that slides sideways, each as wide as its text, instead of three places. */
-    fun setSlots(s: List<Slot?>, row: Boolean = s.size > 3) {
+    fun setSlots(s: List<Slot?>, row: Boolean = s.size > 3, expandable: Boolean = false) {
         if (s != slots) scroll = 0f
-        slots = s; this.row = row; rowEdges = null
+        slots = s; this.row = row; this.expandable = expandable; rowEdges = null
         if (!toolsOpen) invalidate()
     }
 
@@ -70,6 +77,9 @@ class SuggestionBar(context: Context) : View(context) {
     fun setVoiceActive(on: Boolean) { voiceActive = on; invalidate() }
     fun setQuickTool(t: Tool) { if (quick != t) { quick = t; invalidate() } }
     fun setBadge(on: Boolean) { if (badge != on) { badge = on; invalidate() } }
+    /** The three dots and the quick button; without them the bar is the Windows Phone one. */
+    fun setButtons(show: Boolean) { if (buttons != show) { buttons = show; rowEdges = null; invalidate() } }
+    val toolboxOpen get() = toolsOpen
     fun toggleTools() { toolsOpen = !toolsOpen; invalidate() }
     fun closeTools() { if (toolsOpen) { toolsOpen = false; invalidate() } }
 
@@ -77,29 +87,36 @@ class SuggestionBar(context: Context) : View(context) {
         setMeasuredDimension(MeasureSpec.getSize(widthMeasureSpec), dp(46f).toInt())
 
     private fun buttonWidth() = height * 1.1f
+    private fun leftWidth() = if (buttons) buttonWidth() else 0f
+    private fun rightWidth() = when { buttons -> buttonWidth(); expandable && scrolling() -> buttonWidth() * 0.9f; else -> 0f }
 
     override fun onDraw(canvas: Canvas) {
         val c = colors ?: return
         canvas.drawColor(c.bar)
         val h = height.toFloat()
         val bw = buttonWidth()
-        if (pressedIndex == LEFT) highlight(canvas, c, 0f, bw)
-        icon.color = if (toolsOpen) c.accent else c.subtle
-        Icons.draw(canvas, Icon.ELLIPSIS, bw / 2f, h / 2f, h * 0.42f, icon)
+        val qx = width - rightWidth()
+        if (buttons) {
+            if (pressedIndex == LEFT) highlight(canvas, c, 0f, bw)
+            icon.color = if (toolsOpen) c.accent else c.subtle
+            Icons.draw(canvas, Icon.ELLIPSIS, bw / 2f, h / 2f, h * 0.42f, icon)
+            // The quick button, drawn where the Windows Phone app bar keeps its main action.
+            if (pressedIndex == QUICK) highlight(canvas, c, qx, width.toFloat())
+            icon.color = c.text
+            Icons.draw(canvas, quick.icon, qx + bw / 2f, h / 2f, h * 0.42f, icon)
+            if (badge) { fill.color = c.accent; canvas.drawCircle(qx + bw / 2f + h * 0.2f, h / 2f - h * 0.2f, h * 0.075f, fill) }
+        } else if (rightWidth() > 0f) {
+            if (pressedIndex == EXPAND) highlight(canvas, c, qx, width.toFloat())
+            icon.color = c.text
+            Icons.draw(canvas, Icon.CHEVRON_DOWN, qx + rightWidth() / 2f, h / 2f, h * 0.36f, icon)
+        }
 
-        // The quick button, drawn where the Windows Phone app bar keeps its main action.
-        val qx = width - bw
-        if (pressedIndex == QUICK) highlight(canvas, c, qx, width.toFloat())
-        icon.color = c.text
-        Icons.draw(canvas, quick.icon, qx + bw / 2f, h / 2f, h * 0.42f, icon)
-        if (badge) { fill.color = c.accent; canvas.drawCircle(qx + bw / 2f + h * 0.2f, h / 2f - h * 0.2f, h * 0.075f, fill) }
-
-        val x0 = bw
-        val w = width - 2 * bw
+        val x0 = leftWidth()
+        val w = width - leftWidth() - rightWidth()
         val text = status
         if (text != null) {
             drawText(canvas, text, x0 + w / 2f, h / 2f, w - PAD, c.text, false, false)
-            if (voiceActive) { icon.color = c.accent; Icons.draw(canvas, Icon.MIC, qx + bw / 2f, h / 2f, h * 0.42f, icon) }
+            if (voiceActive && buttons) { icon.color = c.accent; Icons.draw(canvas, Icon.MIC, qx + bw / 2f, h / 2f, h * 0.42f, icon) }
             return
         }
         if (toolsOpen) {
@@ -209,10 +226,10 @@ class SuggestionBar(context: Context) : View(context) {
     }
 
     private fun indexAt(x: Float): Int {
-        val bw = buttonWidth()
+        val bw = leftWidth()
         if (x < bw) return LEFT
-        if (x > width - bw) return QUICK
-        val w = width - 2 * bw
+        if (rightWidth() > 0f && x > width - rightWidth()) return if (buttons) QUICK else EXPAND
+        val w = width - bw - rightWidth()
         if (scrolling()) {
             val e = rowEdges(w)
             val at = x - bw + scroll
@@ -230,7 +247,7 @@ class SuggestionBar(context: Context) : View(context) {
             MotionEvent.ACTION_MOVE -> {
                 if (scrolling() && (dragging || (pressedIndex >= 0 && kotlin.math.abs(e.x - downX) > slop))) {
                     dragging = true; pressedIndex = NONE
-                    scroll = (scrollAtDown - (e.x - downX)).coerceIn(0f, maxScroll(width - 2 * buttonWidth()))
+                    scroll = (scrollAtDown - (e.x - downX)).coerceIn(0f, maxScroll(width - leftWidth() - rightWidth()))
                     invalidate()
                 } else if (indexAt(e.x) != pressedIndex) { pressedIndex = NONE; invalidate() }
             }
@@ -239,6 +256,7 @@ class SuggestionBar(context: Context) : View(context) {
                 if (!dragging && i == pressedIndex) when {
                     i == LEFT -> toggleTools()
                     i == QUICK -> listener?.onTool(quick)
+                    i == EXPAND -> listener?.onExpand()
                     status != null -> {}
                     toolsOpen -> listener?.onTool(tools[i])
                     else -> slots.getOrNull(i)?.let { listener?.onSlot(it) }
@@ -252,5 +270,5 @@ class SuggestionBar(context: Context) : View(context) {
 
     private val PAD get() = dp(12f)
 
-    private companion object { const val NONE = -9; const val LEFT = -1; const val QUICK = -2; const val MIN_SCALE = 0.55f }
+    private companion object { const val NONE = -9; const val LEFT = -1; const val QUICK = -2; const val EXPAND = -3; const val MIN_SCALE = 0.55f }
 }

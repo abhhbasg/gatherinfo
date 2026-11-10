@@ -17,7 +17,8 @@ import java.util.Locale
  * row=z x c v b n m
  * long.a=à á â ä
  * label=ITA               (optional: what the language key shows; default is the three letters of the language)
- * input=pinyin            (optional: the letters are Pinyin and the bar offers the Chinese words for them)
+ * input=pinyin            (optional: the letters are Pinyin and the bar offers the Chinese words for them;
+ *                         input=shuangpin: two keys a syllable, the Microsoft Shuangpin table)
  * comma=，                (optional: what the two keys beside the space bar type; default , and .)
  * period=。
  * ```
@@ -35,6 +36,8 @@ data class LanguageLayout(
     val keyLabel: String = defaultLabel(locale),
     /** The letters are Pinyin: they are held as the word being typed and the bar offers the Chinese words read so. */
     val pinyin: Boolean = false,
+    /** Pinyin typed with Microsoft Shuangpin: every syllable is two keys. */
+    val shuangpin: Boolean = false,
     /** What the keys left and right of the space bar type. */
     val comma: String = ",",
     val period: String = ".",
@@ -76,7 +79,8 @@ data class LanguageLayout(
                 longPress = long,
                 builtIn = builtIn,
                 keyLabel = map["label"]?.take(4)?.ifBlank { null } ?: defaultLabel(locale),
-                pinyin = map["input"] == "pinyin",
+                pinyin = map["input"] == "pinyin" || map["input"] == "shuangpin",
+                shuangpin = map["input"] == "shuangpin",
                 comma = map["comma"]?.ifBlank { null } ?: ",",
                 period = map["period"]?.ifBlank { null } ?: ".",
             )

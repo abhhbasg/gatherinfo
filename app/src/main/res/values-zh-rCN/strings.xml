@@ -283,7 +283,7 @@
     <string name="tut_suggestions_title">建议和纠错</string>
     <string name="tut_suggestions_body">输入时按键上方会出现三个词；带颜色的那个是按空格会插入的。一个词结束时会修正拼写错误，如果改错了，马上按退格键就能恢复你输入的内容。一个词之后会提示可能的下一个词，有时是用“…”标出的整个短语。不雅词语不会被建议。一切都只在这部手机上学习。</string>
     <string name="tut_toolbox_title">三个点和快捷按钮</string>
-    <string name="tut_toolbox_body">栏左侧的三个点打开工具箱：剪贴板、翻译、GIF、表情、语音、帮助和设置。右侧的按钮直接打开一个工具，默认是剪贴板，当你刚复制了内容时它会显示一个圆点。可在 设置 → 输入 中选择它打开哪个工具。</string>
+    <string name="tut_toolbox_body">按住笑脸键，工具箱会占满候选栏：剪贴板、翻译、GIF、表情、语音、帮助和设置；按下一个键时它会收起。和 Windows Phone 一样，候选栏本身只放候选词。如果你更喜欢，可以在 设置 → 输入 中把三个点放在栏左侧、把快捷按钮放在右侧，快捷按钮直接打开一个工具（默认是剪贴板），刚复制了内容时会显示一个圆点。</string>
     <string name="tut_clipboard_title">剪贴板</string>
     <string name="tut_clipboard_body">你复制的所有内容都会保留，只在这部手机上。点一条即可粘贴，图钉可永久保留，叉号可删除。复制的照片也会保留，在应用允许的地方会作为图片粘贴。保留多少条可在 设置 → 剪贴板 中选择。</string>
     <string name="tut_smartemoji_title">按名称查找表情</string>
@@ -301,9 +301,9 @@
     <string name="tut_size_title">大小和布局</string>
     <string name="tut_size_body">在 设置 → 大小和布局 中，可以让按键更高或更矮（横屏单独设置），让键盘变窄并靠左或靠右以便单手使用，调整按键间距，并显示数字行。</string>
     <string name="tut_languages_title">语言和词库</string>
-    <string name="tut_languages_body">开启你书写用的语言（设置 → 语言），并用语言键切换。内置十八种布局，包括简体中文拼音；你可以导入任何其他布局，以及任何语言的完整词库，以获得更好的纠错和预测。</string>
+    <string name="tut_languages_body">开启你书写用的语言（设置 → 语言），并用语言键切换。内置十八种语言，包括简体中文（全拼或微软双拼）；你可以导入任何其他布局，以及任何语言的完整词库，以获得更好的纠错和预测。</string>
     <string name="tut_pinyin_title">中文拼音</string>
-    <string name="tut_pinyin_body">选择“简体中文”后，输入拼音（ü 用 v），候选栏会显示对应的汉字和词语，可左右滑动。空格选第一个；点任意一个候选来选它，剩下的拼音继续选。回车直接输入字母。只打声母也行（“nh”出“你好”），长按逗号键里的撇号可分隔音节（xi\'an）。逗号和句号键输入“，”和“。”，符号页是中文标点，长按得到英文标点。你常选的词会排到前面，全部只在这部手机上学习。</string>
+    <string name="tut_pinyin_body">选择“简体中文”后输入拼音（ü 用 v），候选栏显示对应的字词：第一个往往是整句（“wojintianhengaoxing”出“我今天很高兴”），最后一个音节没打完也行。空格选第一个；点其他候选来选它，剩下的拼音继续选；栏末尾的箭头展开全部候选。回车直接输入字母。只打声母也行（“nh”出“你好”），长按逗号键出现的条里有撇号，用来分隔音节（xi\'an）。选完一个词后，候选栏会提示接下来常用的词。“简体中文（双拼）”用微软双拼输入：每个音节两个键，ing 在 ; 键上。模糊音（zh/z、ch/c、sh/s、n/l）在 设置 → 建议 中。逗号和句号键输入“，”和“。”。你选过的词下次排在前面，只在这部手机上学习。</string>
     <string name="tut_privacy_title">你的隐私</string>
     <string name="tut_privacy_body">没有跟踪器，没有统计分析。你输入的内容、键盘学到的内容和你的剪贴板都留在这部手机上，并被排除在系统备份之外。密码框中不学习任何内容。只有在你要求时才会为 GIF 和翻译联网，麦克风只用于语音输入。可在 设置 → 建议 中导出或清除已学内容。</string>
     <string name="tut_launcher_title">搭配 MetroWin Launcher</string>
@@ -475,4 +475,8 @@
     <string name="tut_update_title">更新</string>
     <string name="tut_update_body">键盘每 12 小时到它自己在 GitHub 上的仓库（且只到那里）查找新版本。有新版本时，“开始”页顶部会出现一块蓝色磁贴；设置 → 更新 会显示新增内容并下载安装。只有当它与你现有版本使用同一个密钥签名时，Android 才会安装。你可以关闭检查，或点“立即检查”。</string>
     <string name="update_missing">此版本的文件尚未发布。</string>
+    <string name="pref_bar_buttons_title">候选栏上的按钮</string>
+    <string name="pref_bar_buttons_summary">三个点和快捷按钮。关闭时候选栏和 Windows Phone 一样只有候选词，按住笑脸键打开工具箱。</string>
+    <string name="pref_pinyin_fuzzy_title">模糊音</string>
+    <string name="pref_pinyin_fuzzy_summary">中文：zh 与 z、ch 与 c、sh 与 s、n 与 l 视为相同</string>
 </resources>

@@ -60,6 +60,7 @@ class KeyboardPreview(context: Context, attrs: AttributeSet?) : Preference(conte
         kb.setLanguageName(layout.name)
         bar?.setColors(colors)
         bar?.setSlots(listOf(Slot("ciao"), Slot("MetroWin", best = true), Slot("tastiera")))
+        bar?.setButtons(p.barButtons)
         bar?.setQuickTool(com.metrowin.keyboard.ui.Tool.from(p.quickTool))
         kb.requestLayout()
     }

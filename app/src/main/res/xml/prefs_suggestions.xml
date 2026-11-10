@@ -4,6 +4,7 @@
     <SwitchPreferenceCompat android:key="suggestions" android:title="@string/pref_suggestions_title" android:summary="@string/pref_suggestions_summary" android:defaultValue="true" />
     <SwitchPreferenceCompat android:key="autocorrect" android:title="@string/pref_autocorrect_title" android:summary="@string/pref_autocorrect_summary" android:defaultValue="true" />
     <SwitchPreferenceCompat android:key="smart_correction" android:title="@string/pref_smart_correct_title" android:summary="@string/pref_smart_correct_summary" android:defaultValue="true" />
+    <SwitchPreferenceCompat android:key="pinyin_fuzzy" android:title="@string/pref_pinyin_fuzzy_title" android:summary="@string/pref_pinyin_fuzzy_summary" android:defaultValue="false" />
     <SwitchPreferenceCompat android:key="smart_emoji_search" android:title="@string/pref_smart_emoji_title" android:summary="@string/pref_smart_emoji_summary" android:defaultValue="true" />
     <SwitchPreferenceCompat android:key="next_word" android:title="@string/pref_next_word_title" android:summary="@string/pref_next_word_summary" android:defaultValue="true" />
     <SwitchPreferenceCompat android:key="phrase_completion" android:title="@string/pref_phrase_title" android:summary="@string/pref_phrase_summary" android:defaultValue="true" />

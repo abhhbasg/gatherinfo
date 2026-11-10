@@ -5,7 +5,7 @@ import android.graphics.Paint
 import android.graphics.Path
 import android.graphics.RectF
 
-enum class Icon { SHIFT, SHIFT_LOCK, BACKSPACE, ENTER, SEARCH, SEND, ARROW_RIGHT, CHECK, EMOJI, GLOBE, MIC, CLIPBOARD, GIF, SETTINGS, GRID, CLOSE, PIN, PLUS, TRASH, IMAGE, ELLIPSIS, SWAP, HELP, TRANSLATE, COPY, CHEVRON_LEFT, CHEVRON_RIGHT }
+enum class Icon { SHIFT, SHIFT_LOCK, BACKSPACE, ENTER, SEARCH, SEND, ARROW_RIGHT, CHECK, EMOJI, GLOBE, MIC, CLIPBOARD, GIF, SETTINGS, GRID, CLOSE, PIN, PLUS, TRASH, IMAGE, ELLIPSIS, SWAP, HELP, TRANSLATE, COPY, CHEVRON_LEFT, CHEVRON_RIGHT, CHEVRON_DOWN, CHEVRON_UP }
 
 /** The icons of the keyboard, drawn with paths in a -1..1 square so they are crisp at any size and take the colour of the theme. */
 object Icons {
@@ -191,6 +191,14 @@ object Icons {
             Icon.CHEVRON_RIGHT -> {
                 paint.style = Paint.Style.STROKE
                 path.reset(); path.moveTo(-0.35f, -0.75f); path.lineTo(0.4f, 0f); path.lineTo(-0.35f, 0.75f); c.drawPath(path, paint)
+            }
+            Icon.CHEVRON_DOWN -> {
+                paint.style = Paint.Style.STROKE
+                path.reset(); path.moveTo(-0.75f, -0.35f); path.lineTo(0f, 0.4f); path.lineTo(0.75f, -0.35f); c.drawPath(path, paint)
+            }
+            Icon.CHEVRON_UP -> {
+                paint.style = Paint.Style.STROKE
+                path.reset(); path.moveTo(-0.75f, 0.35f); path.lineTo(0f, -0.4f); path.lineTo(0.75f, 0.35f); c.drawPath(path, paint)
             }
             Icon.IMAGE -> {
                 paint.style = Paint.Style.STROKE

@@ -68,11 +68,12 @@ class PinyinTest {
     private fun offered() = ime.suggestionBar!!.slotsForTest().filterNotNull()
     private fun pick(word: String) { ime.onSlot(offered().first { it.text == word }); idle() }
 
-    private fun engine(user: PinyinUser = PinyinUser()) = PinyinEngine(words, user)
+    private fun engine(user: PinyinUser = PinyinUser()) = PinyinEngine(words, user, pairs)
 
     private companion object {
         /** The word list the app ships, read once for all the tests. */
         val words: PinyinDictionary by lazy { java.io.File("src/main/assets/pinyin/zh.txt").bufferedReader().use { PinyinDictionary.parse(it) } }
+        val pairs: com.metrowin.keyboard.engine.PinyinPairs by lazy { java.io.File("src/main/assets/pinyin/zh.pairs").bufferedReader().use { com.metrowin.keyboard.engine.PinyinPairs.parse(it) } }
     }
 
     // --- the engine -------------------------------------------------------------------------------------------------
@@ -164,7 +165,93 @@ class PinyinTest {
         assertTrue(offered().any { it.text == "吗" })
         pick("吗")
         assertEquals("你好吗", text)
-        assertTrue(offered().isEmpty())
+        // Nothing is being typed: the bar offers what may come next, not the words of the letters typed before.
+        assertTrue(offered().none { it.text == "吗" && it.best })
+    }
+
+    @Test fun afterAChoiceTheBarOffersWhatComesNext() {
+        type("zhongguo ")
+        assertEquals("中国", text)
+        val next = offered().map { it.text }
+        assertTrue(next.toString(), next.any { it == "人" || it == "人民" })
+        ime.onSlot(offered().first { it.text == "人" || it.text == "人民" }); idle()
+        assertTrue(text, text.startsWith("中国人"))
+        // A space ends it: with nothing offered, space is a space.
+        type(" ")
+        assertTrue(text.endsWith(" "))
+    }
+
+    @Test fun shuangpinTypesTwoKeysASyllable() {
+        app.prefs.sp.edit().putString(K.LANGUAGES, "zh-sp,en").putString(K.CURRENT_LANGUAGE, "zh-sp").commit()
+        start()
+        type("nihk")
+        // The field shows the Pinyin of the keys, the bar the words.
+        assertEquals("ni'hao", text)
+        assertEquals("你好", offered().first().text)
+        type(" ")
+        assertEquals("你好", text)
+        // "ing" is on the semicolon key, which the Shuangpin layout adds to the second row.
+        val row = KeyboardBuilder.letters(app.layouts.get("zh-sp")!!, false, true, false).rows[1].map { it.label }
+        assertEquals(";", row.last())
+        type("b;")
+        assertTrue(offered().take(3).any { it.text == "冰" || it.text == "兵" })
+    }
+
+    @Test fun shuangpinPicksLeaveTheRestOfTheKeys() {
+        app.prefs.sp.edit().putString(K.LANGUAGES, "zh-sp").putString(K.CURRENT_LANGUAGE, "zh-sp").commit()
+        start()
+        type("nihkma")
+        pick("你好")
+        assertEquals("你好ma", text)
+        pick("吗")
+        assertEquals("你好吗", text)
+    }
+
+    @Test fun theMicrosoftShuangpinTable() {
+        val syllables = words.syllables
+        val t = com.metrowin.keyboard.engine.Shuangpin.table(syllables)
+        val cases = mapOf(
+            "ni" to "ni", "hk" to "hao", "ol" to "ai", "or" to "er", "oa" to "a", "oh" to "ang", "vs" to "zhong", "uu" to "shu",
+            "id" to "chuang", "l;" to "ling", "ly" to "lv", "lt" to "lve", "jt" to "jue", "xm" to "xian", "iu" to "chu", "yr" to "yuan",
+            "jp" to "jun", "qq" to "qiu", "gw" to "gua", "jx" to "jie", "dv" to "dui", "bc" to "biao", "gs" to "gong",
+            "js" to "jiong", "ky" to "kuai", "rr" to "ruan", "vo" to "zhuo", "wz" to "wei", "yb" to "you", "xn" to "xin",
+        ).filterValues { it in syllables }
+        for ((code, syllable) in cases) assertEquals(code, syllable, t[code])
+        // Every syllable has its two keys, and no two syllables share them but "luo" and the rare "lo", where "luo" wins.
+        assertEquals("luo", t["lo"])
+        val encoded = syllables.filter { it != "lo" }.mapNotNull { s -> com.metrowin.keyboard.engine.Shuangpin.encode(s)?.let { it to s } }
+        assertTrue(encoded.size > 390)
+        assertEquals(encoded.map { it.first }.toSet().size, encoded.size)
+        for ((code, s) in encoded) assertEquals(s, t[code])
+    }
+
+    @Test fun fuzzyPinyinTakesZAsZh() {
+        val e = engine()
+        assertTrue(e.candidates("zongguo").take(3).none { it.text == "中国" })
+        e.fuzzy = true
+        assertTrue(e.candidates("zongguo").take(3).any { it.text == "中国" })
+        assertTrue(e.candidates("lihao").take(5).any { it.text == "你好" })
+    }
+
+    @Test fun theArrowShowsAllTheWords() {
+        type("shi")
+        ime.onExpand(); idle()
+        val panel = ime.candidatePanelForTest()!!
+        assertEquals(View.VISIBLE, panel.visibility)
+        assertTrue(panel.wordsForTest().size > 20)
+        // Picking one there writes it and folds the panel.
+        panel.onPick!!.invoke(1); idle()
+        assertEquals(1, text.length)
+        assertEquals(View.GONE, panel.visibility)
+    }
+
+    @Test fun holdingTheSmileyOpensTheToolboxAndAKeyClosesIt() {
+        val bar = ime.suggestionBar!!
+        assertFalse(bar.toolboxOpen)
+        ime.onEmojiLongPress()
+        assertTrue(bar.toolboxOpen)
+        ime.onPress(Key(KeyType.CHAR, "a"))
+        assertFalse(bar.toolboxOpen)
     }
 
     @Test fun aSignTakesTheFirstWordAndIsChinese() {
