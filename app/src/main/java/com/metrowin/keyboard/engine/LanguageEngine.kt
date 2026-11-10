@@ -13,24 +13,36 @@ class LanguageEngine(
     val blocklist: Blocklist,
     private val userFile: File,
     seed: NextWordSeed = NextWordSeed.EMPTY,
+    /** For a Pinyin layout: what turns the letters into Chinese words. */
+    val pinyin: PinyinEngine? = null,
+    private val pinyinFile: File? = null,
 ) {
     val suggester = Suggester(dictionary, user, blocklist, layout.locale, seed, Corrector(KeyGrid.of(layout)))
     val swipe = SwipeDecoder(dictionary, user) { blocklist.contains(it) }
 
     /** Writes what was learned to the phone's storage, if anything changed. */
     fun save() {
-        if (!user.dirty) return
+        if (user.dirty) write(userFile) { user.write(it) }
+        if (pinyin != null && pinyinFile != null && pinyin.user.dirty) write(pinyinFile) { pinyin.user.write(it) }
+    }
+
+    private fun write(file: File, body: (java.io.Writer) -> Unit) {
         runCatching {
-            userFile.parentFile?.mkdirs()
-            val tmp = File(userFile.path + ".tmp")
-            tmp.bufferedWriter().use { user.write(it) }
-            tmp.renameTo(userFile)
+            file.parentFile?.mkdirs()
+            val tmp = File(file.path + ".tmp")
+            tmp.bufferedWriter().use { body(it) }
+            tmp.renameTo(file)
         }
     }
 
     companion object {
+        /** The Chinese word lists already read: they come with the app and never change, so an engine that is rebuilt does not read them again. */
+        private val pinyinWords = java.util.concurrent.ConcurrentHashMap<String, PinyinDictionary>()
+
         fun dictionaryFile(c: Context, id: String) = File(File(c.filesDir, "dictionaries").apply { mkdirs() }, "$id.txt")
         fun userFile(c: Context, id: String) = File(File(c.filesDir, "user").apply { mkdirs() }, "$id.txt")
+        /** What the user chose while typing Pinyin; next to the learned words, so the backup and "forget what was learned" cover it. */
+        fun pinyinUserFile(c: Context, id: String) = File(File(c.filesDir, "user").apply { mkdirs() }, "$id.pinyin.txt")
 
         fun load(c: Context, layout: LanguageLayout, customBlocked: String): LanguageEngine {
             val dictId = layout.dictionaryId
@@ -46,7 +58,14 @@ class LanguageEngine(
             val user = UserModel()
             if (file.exists()) runCatching { file.bufferedReader().use { user.read(it) } }
             val seed = runCatching { c.assets.open("bigrams/$dictId.txt").bufferedReader().use { NextWordSeed.parse(it) } }.getOrDefault(NextWordSeed.EMPTY)
-            return LanguageEngine(layout, dictionary, user, blocklist, file, seed)
+            if (!layout.pinyin) return LanguageEngine(layout, dictionary, user, blocklist, file, seed)
+            val words = pinyinWords.getOrPut(dictId) {
+                runCatching { c.assets.open("pinyin/$dictId.txt").bufferedReader().use { PinyinDictionary.parse(it) } }.getOrDefault(PinyinDictionary.EMPTY)
+            }
+            val picked = PinyinUser()
+            val pinyinFile = pinyinUserFile(c, layout.id)
+            if (pinyinFile.exists()) runCatching { pinyinFile.bufferedReader().use { picked.read(it) } }
+            return LanguageEngine(layout, dictionary, user, blocklist, file, seed, PinyinEngine(words, picked), pinyinFile)
         }
 
         /** Saves a word list for [dictId]. Returns the number of words, or 0 if the file held no words (nothing is saved then). */

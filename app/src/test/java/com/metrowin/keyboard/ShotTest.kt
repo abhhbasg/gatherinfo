@@ -80,6 +80,24 @@ class ShotTest {
         }
         app.prefs.sp.edit().clear().putString(K.THEME_STYLE, "classic").commit()
         val c = KeyboardTheme.resolve(app, app.prefs, true, null)
+        // Chinese: the row of words for the Pinyin typed, and the two pages of symbols.
+        val zh = app.layouts.get("zh")!!
+        val pages = mapOf(
+            "zh-pinyin" to KeyboardBuilder.letters(zh, false, false, true),
+            "zh-symbols-1" to KeyboardBuilder.symbols(com.metrowin.keyboard.layout.Page.SYMBOLS_1, false, zh),
+            "symbols-1" to KeyboardBuilder.symbols(com.metrowin.keyboard.layout.Page.SYMBOLS_1, false, app.layouts.get("en")),
+            "symbols-2" to KeyboardBuilder.symbols(com.metrowin.keyboard.layout.Page.SYMBOLS_2, false, app.layouts.get("en")),
+        )
+        for ((name, page) in pages) {
+            val kb = KeyboardView(app)
+            kb.setColors(c); kb.setPage(page); kb.setLanguageName(zh.name)
+            val bar = SuggestionBar(app).also { it.setColors(c) }
+            bar.setSlots(listOf("你好吗", "你好", "你", "尼", "泥", "拟", "逆", "妮", "腻").mapIndexed { i, w -> Slot(w, best = i == 0) }, row = true)
+            val col = LinearLayout(app).apply { orientation = LinearLayout.VERTICAL }
+            col.addView(bar, LinearLayout.LayoutParams(1080, 150))
+            col.addView(kb, LinearLayout.LayoutParams(1080, 780))
+            render(col, 1080, 930, File(out, "$name.png"))
+        }
         val tut = TutorialPanel(app).also { it.setColors(c); it.open(Tutorial.startIndex(1)) }
         render(tut, 1080, 760, File(out, "panel-tutorial.png"))
         val tr = TranslatePanel(app, Translator(app.prefs), app.prefs).also { it.setColors(c) }

@@ -2,6 +2,7 @@
 id=fr
 name=Français
 locale=fr_FR
+label=FRA
 apostrophe=break
 row=a z e r t y u i o p
 row=q s d f g h j k l m

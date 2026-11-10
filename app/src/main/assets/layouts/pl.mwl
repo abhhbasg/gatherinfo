@@ -2,6 +2,7 @@
 id=pl
 name=Polski
 locale=pl_PL
+label=PLK
 apostrophe=join
 row=q w e r t y u i o p
 row=a s d f g h j k l

@@ -1,5 +1,6 @@
 package com.metrowin.keyboard.ui
 
+import com.metrowin.keyboard.layout.KeyboardBuilder
 import android.content.Context
 import android.view.Gravity
 import android.view.View
@@ -40,7 +41,7 @@ class TranslatePanel(context: Context, private val translator: Translator, priva
     private var detected: String? = null
     private var picking: Boolean? = null // null: not picking; true: source; false: target
 
-    private val back = IconButton(context, null, "ABC")
+    private val back = IconButton(context, null, KeyboardBuilder.LETTERS_LABEL)
     private val srcBtn = IconButton(context, null, "")
     private val swap = IconButton(context, Icon.SWAP)
     private val tgtBtn = IconButton(context, null, "")

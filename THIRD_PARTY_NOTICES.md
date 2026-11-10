@@ -19,6 +19,11 @@ a few words with apostrophes were added. This attribution is the credit CC BY-SA
 `app/src/main/assets/emoji/*.tsv` hold emoji names and keywords from [emojibase-data](https://emojibase.dev) (MIT), whose texts come from the Unicode
 CLDR (Unicode License v3), built by [`tools/build_emoji_index.py`](tools/build_emoji_index.py).
 
+`app/src/main/assets/pinyin/zh.txt`, the Chinese words and how they are read, is built by [`tools/build_pinyin.py`](tools/build_pinyin.py) from the word
+list of [jieba](https://github.com/fxsjy/jieba) (`dict.txt`, copyright 2013 Sun Junyi, MIT License) for the words and their counts, and from
+[pypinyin](https://github.com/mozillazg/python-pinyin) (copyright 2016 mozillazg, 闲耘, MIT License; its data comes from
+[pinyin-data](https://github.com/mozillazg/pinyin-data) and [phrase-pinyin-data](https://github.com/mozillazg/phrase-pinyin-data), both MIT) for the readings.
+
 ## Libraries
 
 AndroidX (core, appcompat, preference, recyclerview), Apache License 2.0. Tests only: JUnit (EPL 1.0), Robolectric (MIT), org.json (JSON License).

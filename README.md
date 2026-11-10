@@ -11,10 +11,10 @@
   <a href="https://github.com/developerkenshi-coder/MetroWin-Keyboard/releases/latest"><img alt="Latest release" src="https://img.shields.io/github/v/release/developerkenshi-coder/MetroWin-Keyboard?label=release&color=1ba1e2"></a>
   <img alt="Android 8.0+" src="https://img.shields.io/badge/Android-8.0%2B-1ba1e2">
   <a href="https://github.com/developerkenshi-coder/MetroWin-Keyboard/releases"><img alt="Downloads" src="https://img.shields.io/github/downloads/developerkenshi-coder/MetroWin-Keyboard/total?color=1ba1e2"></a>
-  <img alt="Languages: 17" src="https://img.shields.io/badge/layouts-17-1ba1e2">
+  <img alt="Languages: 18" src="https://img.shields.io/badge/layouts-18-1ba1e2">
 </p>
 
-<p align="center"><b>English</b> · <a href="README.it.md">Italiano</a></p>
+<p align="center"><b>English</b> · <a href="README.it.md">Italiano</a> · <a href="README.zh-CN.md">简体中文</a></p>
 
 <p align="center"><img src="docs/screenshots/looks.png" width="92%" alt="Classic, Modern Glass and Modern Droid"></p>
 
@@ -59,7 +59,9 @@ Android 8.0 (API 26) or newer.
 
 **Backup**: one file with everything the app keeps (settings, learned words, dictionaries, clipboard); restore it on another phone or after reinstalling with another signature.
 
-**Languages**: 17 layouts included (English, Italiano, Español, Français, Deutsch, Português, Nederlands, Polski, Türkçe, Русский, Українська, Ελληνικά, Čeština, Svenska, Română, العربية, עברית). Any other layout is a small text file ([docs/LAYOUTS.md](docs/LAYOUTS.md)); any dictionary can be imported (word lists, frequency lists, Hunspell `.dic`). Only small starter word lists are bundled (en, it, es, fr, de, pt), so import a full dictionary for the best predictions.
+**Languages**: 18 layouts included (English, Italiano, Español, Français, Deutsch, Português, Nederlands, Polski, Türkçe, Русский, Українська, Ελληνικά, Čeština, Svenska, Română, العربية, עברית, 简体中文). Any other layout is a small text file ([docs/LAYOUTS.md](docs/LAYOUTS.md)); any dictionary can be imported (word lists, frequency lists, Hunspell `.dic`). Only small starter word lists are bundled (en, it, es, fr, de, pt), so import a full dictionary for the best predictions.
+
+**Chinese**: 简体中文 is typed in Pinyin on the same keys. The bar shows the words for the letters and slides sideways; space takes the first, a tap takes any other and leaves the rest of the letters to be chosen. Whole sentences, the first letters of the syllables (`nh` → 你好), `v` for `ü` and the apostrophe (`xi'an`) are understood, the comma and full stop keys type `，` and `。`, and the words you choose come first next time. About 60,000 words and every character of GB 2312 are built in. The app itself is in Chinese too.
 
 **Looks**: *Classic* (flat Windows Phone), *Modern Glass*, *Modern Droid* (Material You colours on Android 12+), dark / light / system, 20 Windows Phone colours or your own, pure black, a photo behind the keys (its colour becomes the accent), and, optionally, a keyboard that follows the colour of the app under it.
 

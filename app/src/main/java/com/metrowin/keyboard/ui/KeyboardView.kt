@@ -167,6 +167,11 @@ class KeyboardView(context: Context) : View(context) {
 
     override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) { layoutKeys() }
 
+    /**
+     * Lays the rows out as Windows Phone does: every letter key has the same width, the one a key of the widest row of letters has,
+     * so a shorter row (the second row of a QWERTY keyboard) is set in from the sides instead of having wider keys; shift and
+     * backspace take the room the letters of their row leave. Rows of other keys (the bottom row) fill the width by their weights.
+     */
     private fun layoutKeys() {
         val p = page ?: return
         val w = width.toFloat(); val h = height.toFloat()
@@ -175,13 +180,27 @@ class KeyboardView(context: Context) : View(context) {
         val contentW = w * widthPct / 100f
         val offset = when (align) { "left" -> 0f; "right" -> w - contentW; else -> (w - contentW) / 2f }
         val rowH = (h - gap * (p.rows.size + 1) - dp(2f)) / p.rows.size
+        val widest = p.rows.filter { row -> row.all { it.type == KeyType.CHAR } }.maxOfOrNull { it.size } ?: 0
+        val letterW = if (widest > 0) (contentW - gap * (widest + 1)) / widest else 0f
         p.rows.forEachIndexed { r, row ->
-            val total = row.sumOf { it.weight.toDouble() }.toFloat()
-            val unit = (contentW - gap * (row.size + 1)) / total
-            var x = offset + gap
             val top = gap + r * (rowH + gap)
-            for (k in row) {
-                k.left = x; k.right = x + unit * k.weight; k.top = top; k.bottom = top + rowH
+            val letters = row.count { it.type == KeyType.CHAR }
+            val others = row.size - letters
+            val gaps = gap * (row.size + 1)
+            // What each other key of the row gets when the letters keep the common width; too little (a row with more letters
+            // than the widest row has room for) and the row falls back to sharing the width by weight.
+            val otherW = if (others > 0) (contentW - gaps - letters * letterW) / others else 0f
+            val sideKeys = others > 0 && row.all { it.type == KeyType.CHAR || it.type == KeyType.SHIFT || it.type == KeyType.BACKSPACE || it.type == KeyType.SYMBOLS_PAGE }
+            val uniform = letterW > 0f && ((others == 0 && letters <= widest) || (sideKeys && otherW >= letterW * 1.2f))
+            val total = row.sumOf { it.weight.toDouble() }.toFloat()
+            val unit = (contentW - gaps) / total
+            val rowW = if (uniform && others == 0) letters * letterW + (letters - 1) * gap else contentW - 2 * gap
+            var x = offset + (contentW - rowW) / 2f
+            for ((i, k) in row.withIndex()) {
+                val kw = if (!uniform) unit * k.weight else if (k.type == KeyType.CHAR) letterW else otherW
+                k.left = x; k.right = x + kw; k.top = top; k.bottom = top + rowH
+                k.touchLeft = if (i == 0) offset else k.left
+                k.touchRight = if (i == row.lastIndex) offset + contentW else k.right
                 x = k.right + gap
             }
         }
@@ -245,9 +264,17 @@ class KeyboardView(context: Context) : View(context) {
             KeyType.BACKSPACE -> Icons.draw(canvas, Icon.BACKSPACE, cx, cy, iconSize, iconPaint)
             KeyType.ENTER -> if (enterLabel != null) drawLabel(canvas, enterLabel!!, cx, cy, k.height * 0.30f, fg, true) else Icons.draw(canvas, enterIcon, cx, cy, iconSize, iconPaint)
             KeyType.EMOJI -> Icons.draw(canvas, Icon.EMOJI, cx, cy, iconSize, iconPaint)
-            KeyType.LANGUAGE -> Icons.draw(canvas, Icon.GLOBE, cx, cy, iconSize, iconPaint)
+            // The language key shows the language in three letters, as on Windows Phone ("ENU", "ITA"); the globe only when it has none.
+            KeyType.LANGUAGE -> if (k.label.isNotEmpty()) drawLabel(canvas, k.label, cx, cy, minOf(k.height * 0.28f, k.width * 0.36f), fg, false) else Icons.draw(canvas, Icon.GLOBE, cx, cy, iconSize, iconPaint)
             KeyType.SPACE -> if (languageName.isNotEmpty()) drawLabel(canvas, languageName, cx, cy, k.height * 0.26f, ColorMath.withAlpha(c.text, 0x90), false)
-            KeyType.SYMBOLS, KeyType.SYMBOLS_PAGE -> drawLabel(canvas, k.label, cx, cy, k.height * 0.30f, fg, false)
+            KeyType.SYMBOLS -> drawLabel(canvas, k.label, cx, cy, k.height * 0.30f, fg, false)
+            // The arrow to the other page of symbols.
+            KeyType.SYMBOLS_PAGE -> {
+                canvas.save()
+                if (k.label == "←") canvas.scale(-1f, 1f, cx, cy)
+                Icons.draw(canvas, Icon.ARROW_RIGHT, cx, cy, iconSize, iconPaint)
+                canvas.restore()
+            }
             KeyType.CHAR -> {
                 val label = if (shift != 0) k.label.uppercase() else k.label
                 drawLabel(canvas, label, cx, cy, k.height * (if (label.length > 1) 0.30f else 0.42f), fg, false)
@@ -359,6 +386,8 @@ class KeyboardView(context: Context) : View(context) {
         var best: Key? = null
         var bestD = Float.MAX_VALUE
         for (k in keys) {
+            // The room beside a row that is set in from the sides belongs to its first and last key.
+            if (k.touched(x, y)) return k
             val d = k.distanceSq(x, y)
             if (d == 0f) return k
             if (d < bestD) { bestD = d; best = k }

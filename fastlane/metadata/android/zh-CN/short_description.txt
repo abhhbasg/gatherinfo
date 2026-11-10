@@ -1,0 +1,1 @@
+Android 上的 Windows Phone 键盘。注重隐私，支持拼音、滑行输入、翻译、GIF 等。

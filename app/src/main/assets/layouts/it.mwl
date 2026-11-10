@@ -2,6 +2,7 @@
 id=it
 name=Italiano
 locale=it_IT
+label=ITA
 apostrophe=break
 row=q w e r t y u i o p
 row=a s d f g h j k l

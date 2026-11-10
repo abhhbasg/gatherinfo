@@ -1,5 +1,6 @@
 package com.metrowin.keyboard.ui
 
+import com.metrowin.keyboard.layout.KeyboardBuilder
 import android.content.Context
 import android.graphics.drawable.GradientDrawable
 import android.view.Gravity
@@ -37,7 +38,7 @@ class GifPanel(context: Context, private val repo: GifRepository, private val im
     private var generation = 0
 
     private val header = LinearLayout(context).apply { orientation = HORIZONTAL; gravity = Gravity.CENTER_VERTICAL }
-    private val back = IconButton(context, null, "ABC")
+    private val back = IconButton(context, null, KeyboardBuilder.LETTERS_LABEL)
     private val search = IconButton(context, Icon.SEARCH)
     private val chipsScroll = HorizontalScrollView(context).apply { isHorizontalScrollBarEnabled = false }
     private val chips = LinearLayout(context).apply { orientation = HORIZONTAL }

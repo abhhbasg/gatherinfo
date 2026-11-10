@@ -15,7 +15,7 @@ class Key(
     val popups: List<String> = emptyList(),
     /** Small text in the corner of the key (the digit under a letter, when the number row is hidden). */
     val hint: String? = null,
-    /** Keys that look like part of the frame rather than part of the keys: shift, backspace, ?123. */
+    /** Keys that look like part of the frame rather than part of the keys: shift, backspace, &123. */
     val special: Boolean = false,
 ) {
     var left = 0f
@@ -23,12 +23,18 @@ class Key(
     var right = 0f
     var bottom = 0f
 
+    /** Where a touch counts as this key: the key itself, and for the first and last key of a row that is set in from the sides
+     *  (the second row of letters, as on Windows Phone) also the room up to the side of the keyboard. */
+    var touchLeft = 0f
+    var touchRight = 0f
+
     val centerX get() = (left + right) / 2f
     val centerY get() = (top + bottom) / 2f
     val width get() = right - left
     val height get() = bottom - top
 
     fun contains(x: Float, y: Float) = x >= left && x < right && y >= top && y < bottom
+    fun touched(x: Float, y: Float) = x >= touchLeft && x < touchRight && y >= top && y < bottom
 
     /** Squared distance from a point to the key's rectangle (0 when inside), to pick the closest key for a touch in a gap. */
     fun distanceSq(x: Float, y: Float): Float {
@@ -92,23 +98,47 @@ object KeyboardBuilder {
             if (isLast) keys += Key(KeyType.BACKSPACE, weight = 1.5f, special = true)
             rows += keys
         }
-        rows += bottomRow("?123", KeyType.SYMBOLS, multiLanguage)
+        rows += bottomRow(SYMBOLS_LABEL, multiLanguage, layout)
         return KeyboardPage(rows)
     }
 
-    fun symbols(page: Page, showNumberRow: Boolean): KeyboardPage {
+    /** What the key that opens the digits and symbols shows, and the one that comes back to the letters: the Windows Phone labels. */
+    const val SYMBOLS_LABEL = "&123"
+    const val LETTERS_LABEL = "abcd"
+
+    /**
+     * Chinese punctuation for the symbol pages of a Chinese layout: the key types the full-width sign and holding it offers the
+     * plain one.
+     */
+    private val chinese: Map<String, String> = mapOf(
+        "(" to "（", ")" to "）", "!" to "！", ";" to "；", ":" to "：", "?" to "？", "\"" to "“", "'" to "‘", "\\" to "、",
+        "$" to "¥", "<" to "《", ">" to "》", "[" to "【", "]" to "】", "^" to "…", "_" to "—", "~" to "～",
+    )
+    private val chinesePopups: Map<String, List<String>> = mapOf("“" to listOf("”", "\""), "‘" to listOf("’", "'"), "《" to listOf("〈", "<"), "》" to listOf("〉", ">"))
+
+    /**
+     * The digits and symbols, in the Windows Phone order: the first page has what a sentence needs, the arrow opens the second.
+     * [layout] decides the punctuation (Chinese signs for a Chinese layout) and the two keys beside the space bar.
+     */
+    fun symbols(page: Page, showNumberRow: Boolean, layout: LanguageLayout? = null): KeyboardPage {
         val rows = ArrayList<List<Key>>()
-        fun chars(s: String) = s.split(' ').map { c -> Key(KeyType.CHAR, c, popups = withBase(c, symbolPopups[c].orEmpty())) }
+        val cjk = layout?.pinyin == true
+        fun key(c: String): Key {
+            val shown = if (cjk) chinese[c] ?: c else c
+            val more = if (shown != c) chinesePopups[shown] ?: listOf(c) else symbolPopups[c].orEmpty()
+            return Key(KeyType.CHAR, shown, popups = withBase(shown, more))
+        }
+        fun chars(s: String) = s.split(' ').map { key(it) }
         if (page == Page.SYMBOLS_1) {
             rows += chars("1 2 3 4 5 6 7 8 9 0")
-            rows += chars("@ # $ % & - + ( )")
-            rows += listOf(Key(KeyType.SYMBOLS_PAGE, "=\\<", 1.5f, special = true)) + chars("* \" ' : ; ! ?") + Key(KeyType.BACKSPACE, weight = 1.5f, special = true)
+            rows += chars("@ # $ % & ( ) - \\")
+            rows += listOf(Key(KeyType.SYMBOLS_PAGE, "→", 1.5f, special = true)) + chars("! ; : ' \" ? /") + Key(KeyType.BACKSPACE, weight = 1.5f, special = true)
         } else {
-            rows += chars("~ ` | • √ π ÷ × ¶ ∆")
-            rows += chars("£ ¢ € ¥ ^ ° = { }")
-            rows += listOf(Key(KeyType.SYMBOLS_PAGE, "?123", 1.5f, special = true)) + chars("\\ © ® ™ [ ] <") + Key(KeyType.BACKSPACE, weight = 1.5f, special = true)
+            rows += chars("[ ] { } < > ^ * + =")
+            rows += chars("_ | ~ ` ° • € £ ¥")
+            rows += listOf(Key(KeyType.SYMBOLS_PAGE, "←", 1.5f, special = true)) + chars("÷ × √ π © ® ™") + Key(KeyType.BACKSPACE, weight = 1.5f, special = true)
         }
-        rows += bottomRow("ABC", KeyType.SYMBOLS, false)
+        rows += bottomRow(LETTERS_LABEL, false, layout)
         return KeyboardPage(rows)
     }
 
@@ -123,13 +153,16 @@ object KeyboardBuilder {
         return KeyboardPage(rows)
     }
 
-    private fun bottomRow(toggleLabel: String, toggleType: KeyType, multiLanguage: Boolean): List<Key> = buildList {
-        add(Key(toggleType, toggleLabel, 1.5f, special = true))
+    private fun bottomRow(toggleLabel: String, multiLanguage: Boolean, layout: LanguageLayout?): List<Key> = buildList {
+        val comma = layout?.comma ?: ","
+        val period = layout?.period ?: "."
+        fun punctuation(c: String) = Key(KeyType.CHAR, c, 0.8f, popups = withBase(c, layout?.longPress?.get(c) ?: symbolPopups[c].orEmpty()))
+        add(Key(KeyType.SYMBOLS, toggleLabel, 1.5f, special = true))
         add(Key(KeyType.EMOJI, "☺", 1f, special = true))
-        if (multiLanguage) add(Key(KeyType.LANGUAGE, "", 1f, special = true))
-        add(Key(KeyType.CHAR, ",", 0.8f, popups = withBase(",", symbolPopups[","].orEmpty())))
+        if (multiLanguage) add(Key(KeyType.LANGUAGE, layout?.keyLabel.orEmpty(), 1f, special = true))
+        add(punctuation(comma))
         add(Key(KeyType.SPACE, "", if (multiLanguage) 3.2f else 4.2f))
-        add(Key(KeyType.CHAR, ".", 0.8f, popups = withBase(".", symbolPopups["."].orEmpty())))
+        add(punctuation(period))
         add(Key(KeyType.ENTER, "", 1.5f, special = true))
     }
 }

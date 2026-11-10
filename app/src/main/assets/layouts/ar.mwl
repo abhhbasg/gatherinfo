@@ -2,6 +2,7 @@
 id=ar
 name=العربية
 locale=ar
+label=ARA
 apostrophe=join
 row=ض ص ث ق ف غ ع ه خ ح ج د
 row=ش س ي ب ل ا ت ن م ك ط

@@ -1,5 +1,6 @@
 package com.metrowin.keyboard.ui
 
+import com.metrowin.keyboard.layout.KeyboardBuilder
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.Canvas
@@ -31,7 +32,7 @@ class ClipboardPanel(context: Context, private val store: ClipboardStore, privat
     private val list = RecyclerView(context)
     private val adapter = Rows()
     private val empty = TextView(context)
-    private val back = IconButton(context, null, "ABC")
+    private val back = IconButton(context, null, KeyboardBuilder.LETTERS_LABEL)
     private val add = IconButton(context, Icon.IMAGE)
     private val clear = IconButton(context, Icon.TRASH)
     private val title = TextView(context)

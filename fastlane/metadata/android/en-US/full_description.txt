@@ -3,7 +3,7 @@ The Windows Phone keyboard, on Android, made to work together with MetroWin Laun
 • Flat Metro keys with big light type, in three looks: Classic, Modern Glass and Modern Droid, with the 20 Windows Phone colours or your own, or a photo behind the keys
 • Swipe typing, hold a key for accents and symbols, double space for a full stop, slide on the space bar to move the cursor
 • Correction that you can undo with Backspace, next-word and phrase prediction, offensive words blocked, everything learned on your phone only
-• 17 languages included; add any language or dictionary yourself
+• 18 languages included, Simplified Chinese (Pinyin) among them; add any language or dictionary yourself
 • Translate what you wrote, or what you just copied, between languages (Google by default; Google Cloud, DeepL, LibreTranslate or MyMemory if you prefer)
 • Clipboard history with pictures, a quick button on the bar, emoji and classic emoticons, GIFs from the source you choose, voice typing
 • Adjustable key height, width and spacing; sound (Windows Phone style) and vibration with adjustable strength

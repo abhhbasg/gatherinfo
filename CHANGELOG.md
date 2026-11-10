@@ -1,5 +1,15 @@
 # Changelog
 
+## Unreleased
+
+- **Chinese:** a new layout, 简体中文, typed in Pinyin. The letters stay in the field while they are typed and the bar offers the Chinese words for them, in a row that slides sideways: space takes the first, a tap takes any other and the rest of the letters stays to be chosen, Enter keeps the letters. It reads whole sentences ("wojintianhengaoxing"), words from their first letters ("zhongg", or just the initials "zg", offer 中国), `v` for `ü`, and the apostrophe where the syllables must be split ("xi'an"). The comma and full stop keys type `，` and `。` and the symbol pages hold Chinese punctuation (hold a sign for the plain one). The words you choose come first next time and a phrase made of several choices is learned as a word, on the phone only, never in password fields; *Forget everything learned* and the backup cover it. About 60,000 words and every character of GB 2312 are built in (`tools/build_pinyin.py`, from jieba and pypinyin, both MIT). Calibration sentences in Pinyin are included.
+- **The app in Chinese:** settings, set-up, tutorial and panels are translated into Simplified Chinese (`values-zh-rCN`), and there is a Chinese README.
+- **Closer to Windows Phone:**
+  - every letter key has the same width, so the second row of letters is set in by half a key instead of having wider keys, and shift and backspace take the room their row leaves; the room beside a row that is set in still types its first and last letter;
+  - the key to the digits and symbols says `&123` and the one back to the letters `abcd`, as on Windows Phone (it was `?123` / `ABC`, the Android labels);
+  - the symbol pages are in the Windows Phone order: `@ # $ % & ( ) - \` and `! ; : ' " ? /` on the first, the brackets, `+ = * ^` and the rest behind the arrow, which is now drawn as an arrow;
+  - the language key shows the language in three letters (`ENU`, `ITA`, `CHS`…) instead of a globe. A layout file can set them with `label=`.
+
 ## 26.1.2S
 
 - **Landscape:** with the three-button navigation the bottom row of keys is no longer covered by the strip where the system draws its keyboard buttons. The calibration is usable on its side: the title makes room, so the sentence stays above the keyboard.

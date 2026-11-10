@@ -2,6 +2,7 @@
 id=ru
 name=Русский
 locale=ru_RU
+label=RUS
 apostrophe=join
 row=й ц у к е н г ш щ з х
 row=ф ы в а п р о л д ж э

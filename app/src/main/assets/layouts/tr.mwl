@@ -2,6 +2,7 @@
 id=tr
 name=Türkçe
 locale=tr_TR
+label=TRK
 apostrophe=join
 row=q w e r t y u ı o p ğ ü
 row=a s d f g h j k l ş i

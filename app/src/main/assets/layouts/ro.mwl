@@ -2,6 +2,7 @@
 id=ro
 name=Română
 locale=ro_RO
+label=ROM
 apostrophe=join
 row=q w e r t y u i o p ă
 row=a s d f g h j k l ș ț

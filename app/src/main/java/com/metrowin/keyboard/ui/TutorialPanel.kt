@@ -1,5 +1,6 @@
 package com.metrowin.keyboard.ui
 
+import com.metrowin.keyboard.layout.KeyboardBuilder
 import android.content.Context
 import android.view.Gravity
 import android.view.ViewGroup
@@ -16,7 +17,7 @@ class TutorialPanel(context: Context) : LinearLayout(context) {
     var onSeen: (() -> Unit)? = null
     private var index = 0
     private var colors: KeyboardColors? = null
-    private val back = IconButton(context, null, "ABC")
+    private val back = IconButton(context, null, KeyboardBuilder.LETTERS_LABEL)
     private val prev = IconButton(context, Icon.CHEVRON_LEFT)
     private val next = IconButton(context, Icon.CHEVRON_RIGHT)
     private val title = TextView(context)

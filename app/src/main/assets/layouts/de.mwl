@@ -2,6 +2,7 @@
 id=de
 name=Deutsch
 locale=de_DE
+label=DEU
 apostrophe=join
 row=q w e r t z u i o p ü
 row=a s d f g h j k l ö ä

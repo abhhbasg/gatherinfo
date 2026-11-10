@@ -2,6 +2,7 @@
 id=sv
 name=Svenska
 locale=sv_SE
+label=SVE
 apostrophe=join
 row=q w e r t y u i o p å
 row=a s d f g h j k l ö ä

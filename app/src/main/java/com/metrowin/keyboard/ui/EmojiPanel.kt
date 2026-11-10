@@ -1,5 +1,6 @@
 package com.metrowin.keyboard.ui
 
+import com.metrowin.keyboard.layout.KeyboardBuilder
 import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Canvas
@@ -85,7 +86,7 @@ class EmojiPanel(context: Context) : LinearLayout(context) {
     private val starts = HashMap<EmojiCategory, Int>()
     private val tabs = LinearLayout(context).apply { orientation = HORIZONTAL }
     private val tabViews = HashMap<EmojiCategory, IconButton>()
-    private val back = IconButton(context, null, "ABC")
+    private val back = IconButton(context, null, KeyboardBuilder.LETTERS_LABEL)
     private val search = IconButton(context, Icon.SEARCH)
     private val delete = IconButton(context, Icon.BACKSPACE)
     private var popup: PopupWindow? = null

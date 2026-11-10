@@ -33,7 +33,7 @@ class KeyboardApp : Application() {
     fun saveAll() = engines.values.forEach { it.save() }
 
     fun clearLearned() {
-        engines.values.forEach { it.user.clear() }
+        engines.values.forEach { it.user.clear(); it.pinyin?.user?.clear() }
         File(filesDir, "user").listFiles()?.forEach { it.delete() }
     }
 

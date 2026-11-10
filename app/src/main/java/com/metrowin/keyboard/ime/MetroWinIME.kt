@@ -31,6 +31,7 @@ import com.metrowin.keyboard.clipboard.ClipItem
 import com.metrowin.keyboard.emoji.EmojiData
 import com.metrowin.keyboard.emoji.EmojiIndex
 import com.metrowin.keyboard.engine.LanguageEngine
+import com.metrowin.keyboard.engine.PinyinCandidate
 import com.metrowin.keyboard.engine.SuggestOptions
 import com.metrowin.keyboard.engine.SwipePoint
 import com.metrowin.keyboard.engine.Text
@@ -143,6 +144,11 @@ open class MetroWinIME : InputMethodService(), KeyboardListener, SuggestionBar.L
     private var bgStamp = -1L
     private var refreshPending = false
 
+    // Pinyin: what the bar offers for the letters being typed, and what was chosen so far out of them.
+    private var pinyinCandidates: List<PinyinCandidate> = emptyList()
+    private var pinyinFor = ""
+    private val pinyinPicks = ArrayList<PinyinCandidate>()
+
     private val prefsListener = SharedPreferences.OnSharedPreferenceChangeListener { _, key ->
         if (key == K.EMOJI_RECENT) return@OnSharedPreferenceChangeListener
         if (key == K.CUSTOM_BLOCKED) app.reloadEngines()
@@ -230,6 +236,7 @@ open class MetroWinIME : InputMethodService(), KeyboardListener, SuggestionBar.L
     override fun onStartInput(attribute: EditorInfo?, restarting: Boolean) {
         super.onStartInput(attribute, restarting)
         composing.clear(); latest = null; lastCorrection = null; autoSpace = false; lastSwipe = null
+        pinyinPicks.clear(); pinyinCandidates = emptyList()
         classify(attribute)
     }
 
@@ -276,6 +283,7 @@ open class MetroWinIME : InputMethodService(), KeyboardListener, SuggestionBar.L
         if (composing.isNotEmpty() && !ours && (newSelStart != candidatesEnd || newSelEnd != candidatesEnd)) {
             // The cursor left the word being typed: it is a finished word now.
             composing.clear(); currentInputConnection?.finishComposingText(); latest = null
+            pinyinPicks.clear(); pinyinCandidates = emptyList()
         }
         if (composing.isEmpty()) {
             main.removeCallbacks(contextRefresh)
@@ -287,6 +295,7 @@ open class MetroWinIME : InputMethodService(), KeyboardListener, SuggestionBar.L
 
     private fun finishComposingQuietly() {
         if (composing.isNotEmpty()) { composing.clear(); currentInputConnection?.finishComposingText() }
+        pinyinPicks.clear(); pinyinCandidates = emptyList()
     }
 
     // --- field and settings -----------------------------------------------------------------------------------------
@@ -333,6 +342,8 @@ open class MetroWinIME : InputMethodService(), KeyboardListener, SuggestionBar.L
     private fun setLanguage(layout: LanguageLayout) {
         finishWord(autocorrect = false)
         prefs.currentLanguage = layout.id
+        // Pinyin is typed in small letters: a capital would be a Latin letter, not the start of a syllable.
+        if (layout.pinyin && shift == 1) setShift(0)
         engine = null
         loadEngine(layout)
         applyKeyboardPage()
@@ -374,7 +385,7 @@ open class MetroWinIME : InputMethodService(), KeyboardListener, SuggestionBar.L
         val land = resources.configuration.orientation == android.content.res.Configuration.ORIENTATION_LANDSCAPE
         kb.setMetrics(if (land) prefs.keyHeightLand else prefs.keyHeight, prefs.keyGap, prefs.keyboardWidth, prefs.keyboardAlign)
         kb.setBias(prefs.calibBias(land)); kb.setTouchSigma(prefs.calibSigma)
-        kb.setBehavior(prefs.longPressSymbols, prefs.longPressMs, prefs.swipe && field == Field.TEXT, prefs.spaceCursor, prefs.keyHints, prefs.keyPreview)
+        kb.setBehavior(prefs.longPressSymbols, prefs.longPressMs, prefs.swipe && field == Field.TEXT && !currentLayout().pinyin, prefs.spaceCursor, prefs.keyHints, prefs.keyPreview)
         bar?.setQuickTool(Tool.from(prefs.quickTool)); bar?.setBadge(clipBadge && Tool.from(prefs.quickTool) == Tool.CLIPBOARD)
         clipboardPanel?.setImagesEnabled(prefs.clipboardImages)
         feedback.prepare()
@@ -394,7 +405,7 @@ open class MetroWinIME : InputMethodService(), KeyboardListener, SuggestionBar.L
         val multi = (several || (Build.VERSION.SDK_INT >= 28 && shouldOfferSwitchingToNextInputMethod())) && prefs.languageKey
         val p = when (page) {
             Page.LETTERS -> KeyboardBuilder.letters(layout, prefs.numberRow, prefs.keyHints, multi)
-            Page.SYMBOLS_1, Page.SYMBOLS_2 -> KeyboardBuilder.symbols(page, prefs.numberRow)
+            Page.SYMBOLS_1, Page.SYMBOLS_2 -> KeyboardBuilder.symbols(page, prefs.numberRow, layout)
             Page.NUMBERS -> KeyboardBuilder.numbers(field == Field.PHONE)
         }
         kb.setPage(p)
@@ -429,7 +440,7 @@ open class MetroWinIME : InputMethodService(), KeyboardListener, SuggestionBar.L
     }
 
     private fun updateShiftFromCursor() {
-        if (!prefs.autoCaps || field != Field.TEXT || inLauncher || page != Page.LETTERS || shift == 2) return
+        if (!prefs.autoCaps || field != Field.TEXT || inLauncher || page != Page.LETTERS || shift == 2 || currentLayout().pinyin) return
         val info = currentInputEditorInfo ?: return
         val caps = currentInputConnection?.getCursorCapsMode(info.inputType) ?: 0
         setShift(if (caps != 0) 1 else 0)
@@ -502,6 +513,7 @@ open class MetroWinIME : InputMethodService(), KeyboardListener, SuggestionBar.L
         val ic = currentInputConnection ?: return
         lastCorrection = null
         val layout = currentLayout()
+        if (page == Page.LETTERS && pinyinOn()) { typePinyin(ic, text); return }
         val isWord = predictionOn && page == Page.LETTERS &&
             (text.all { Text.isWordChar(it) } || (text.length == 1 && Text.isApostrophe(text[0]) && layout.joinApostrophe && composing.isNotEmpty()))
         if (isWord) {
@@ -532,6 +544,13 @@ open class MetroWinIME : InputMethodService(), KeyboardListener, SuggestionBar.L
         if (emojiSearching) { typeIntoEmojiSearch(" "); return }
         val ic = currentInputConnection ?: return
         val now = SystemClock.uptimeMillis()
+        if (pinyinOn()) {
+            // Space takes the first word the bar offers; with nothing being typed it is a space.
+            if (composing.isNotEmpty()) commitPinyinBest(ic) else ic.commitText(" ", 1)
+            autoSpace = false
+            refreshContext(); updateSuggestions()
+            return
+        }
         if (composing.isNotEmpty()) {
             finishWord(autocorrect = true, delimiter = " ")
             ic.commitText(" ", 1)
@@ -558,6 +577,8 @@ open class MetroWinIME : InputMethodService(), KeyboardListener, SuggestionBar.L
         if (gifSearching) { gifPanel?.run(gifQuery.toString().ifBlank { null }); exitGifSearch(); return }
         if (emojiSearching) { showPanel(Panel.EMOJI); return }
         val ic = currentInputConnection ?: return
+        // Enter on Pinyin being typed keeps the letters as they are (a Latin word in a Chinese sentence) and goes no further.
+        if (pinyinOn() && composing.isNotEmpty()) { commitPinyinRaw(ic); refreshContext(); updateSuggestions(); return }
         finishWord(autocorrect = true, delimiter = "\n")
         val info = currentInputEditorInfo
         val action = (info?.imeOptions ?: 0) and EditorInfo.IME_MASK_ACTION
@@ -579,7 +600,7 @@ open class MetroWinIME : InputMethodService(), KeyboardListener, SuggestionBar.L
         if (composing.isNotEmpty()) {
             composing.setLength(composing.length - 1)
             tapped.removeLastOrNull()
-            if (composing.isEmpty()) ic.commitText("", 1) else ic.setComposingText(composing, 1)
+            if (composing.isEmpty()) { ic.commitText("", 1); pinyinPicks.clear() } else ic.setComposingText(composing, 1)
             updateSuggestions()
             return
         }
@@ -613,6 +634,7 @@ open class MetroWinIME : InputMethodService(), KeyboardListener, SuggestionBar.L
     private fun finishWord(autocorrect: Boolean, delimiter: String = "") {
         if (composing.isEmpty()) return
         val ic = currentInputConnection
+        if (pinyinOn()) { commitPinyinRaw(ic); return }
         val typed = composing.toString()
         var final = typed
         val s = latest
@@ -639,6 +661,7 @@ open class MetroWinIME : InputMethodService(), KeyboardListener, SuggestionBar.L
         // A panel (GIFs, clipboard, translation...) has the place of the keys: the bar must not go on offering the words of what was
         // just typed above it, as if the keys were still there.
         if (panel != Panel.NONE) { latest = null; suggestSeq++; b.setSlots(listOf(null, null, null)); return }
+        if (pinyinOn()) { updatePinyin(b); return }
         // ":dog": the emoji for the word after a colon take the bar (the colon itself is already in the text, the word is being composed).
         val wanted = emojiWanted()
         if (wanted != null) {
@@ -705,6 +728,10 @@ open class MetroWinIME : InputMethodService(), KeyboardListener, SuggestionBar.L
             refreshContext(); updateShiftFromCursor(); updateSuggestions()
             return
         }
+        if (pinyinOn() && composing.isNotEmpty()) {
+            pinyinCandidates.firstOrNull { it.text == slot.text }?.let { pickPinyin(ic, it) }
+            return
+        }
         val swipe = lastSwipe
         if (swipe != null && !slot.literal) {
             // Replace the word just drawn with another reading of the same swipe.
@@ -729,12 +756,102 @@ open class MetroWinIME : InputMethodService(), KeyboardListener, SuggestionBar.L
         refreshContext(); updateShiftFromCursor(); updateSuggestions()
     }
 
+    // --- Pinyin -----------------------------------------------------------------------------------------------------
+
+    /** The layout is a Pinyin one and the field takes text: letters are held as Pinyin and the bar offers the Chinese words. */
+    private fun pinyinOn() = field == Field.TEXT && currentLayout().pinyin
+
+    private fun typePinyin(ic: android.view.inputmethod.InputConnection, text: String) {
+        val letter = text.length == 1 && text[0] in 'a'..'z'
+        // The apostrophe splits two syllables where the letters alone could be read otherwise ("xi'an").
+        val separator = text == "'" && composing.isNotEmpty() && composing.last() != '\''
+        if (letter || separator) {
+            if (composing.length >= PINYIN_MAX) return
+            composing.append(text)
+            ic.setComposingText(composing, 1)
+            autoSpace = false
+            updateSuggestions()
+            return
+        }
+        // Anything else ends the Pinyin: a sign or a digit takes the first word offered, a capital letter leaves the letters as typed.
+        if (composing.isNotEmpty()) { if (text.any { it.isLetter() }) commitPinyinRaw(ic) else commitPinyinBest(ic) }
+        ic.commitText(text, 1)
+        if (shift == 1) setShift(0)
+        refreshContext(); updateSuggestions()
+    }
+
+    private fun updatePinyin(b: SuggestionBar) {
+        val eng = engine?.pinyin
+        val typed = composing.toString()
+        val seq = ++suggestSeq
+        latest = null
+        if (eng == null || typed.isEmpty()) { pinyinCandidates = emptyList(); pinyinFor = ""; b.setSlots(listOf(null, null, null)); return }
+        worker.execute {
+            if (seq != suggestSeq) return@execute
+            val found = eng.candidates(typed)
+            main.post {
+                if (seq != suggestSeq) return@post
+                pinyinCandidates = found; pinyinFor = typed
+                // The first is what space takes.
+                b.setSlots(found.mapIndexed { i, c -> Slot(c.text, best = i == 0) }, row = true)
+            }
+        }
+    }
+
+    /** Leaves the letters in the text as they were typed. */
+    private fun commitPinyinRaw(ic: android.view.inputmethod.InputConnection?) {
+        val raw = composing.toString()
+        composing.setLength(0); pinyinPicks.clear(); pinyinCandidates = emptyList(); pinyinFor = ""
+        ic?.commitText(raw, 1)
+    }
+
+    /** Takes the first word offered, and again for the letters it leaves, until all of them are words. */
+    private fun commitPinyinBest(ic: android.view.inputmethod.InputConnection) {
+        val eng = engine?.pinyin
+        val out = StringBuilder()
+        var rest = composing.toString()
+        var turns = 0
+        while (eng != null && rest.isNotEmpty() && turns++ < PINYIN_MAX) {
+            val c = (if (rest == pinyinFor) pinyinCandidates else eng.candidates(rest, 1)).firstOrNull() ?: break
+            out.append(c.text)
+            pinyinPicks += c
+            rest = rest.substring(minOf(c.consumed, rest.length))
+        }
+        // Letters no word is read as stay letters.
+        out.append(rest)
+        composing.setLength(0)
+        ic.commitText(out, 1)
+        pinyinDone()
+    }
+
+    private fun pickPinyin(ic: android.view.inputmethod.InputConnection, c: PinyinCandidate) {
+        lastEdit = SystemClock.uptimeMillis()
+        val rest = composing.substring(minOf(c.consumed, composing.length))
+        composing.setLength(0)
+        ic.beginBatchEdit()
+        ic.commitText(c.text, 1)
+        pinyinPicks += c
+        if (learningOn) engine?.pinyin?.user?.learn(c.pinyin, c.text)
+        if (rest.isNotEmpty()) { composing.append(rest); ic.setComposingText(composing, 1) } else pinyinDone()
+        ic.endBatchEdit()
+        refreshContext(); updateSuggestions()
+    }
+
+    /** All the letters became words. What was made of several choices is a phrase of the user's: it is learned as a word of its own. */
+    private fun pinyinDone() {
+        if (learningOn && pinyinPicks.size in 2..4) {
+            val word = pinyinPicks.joinToString("") { it.text }
+            if (word.length <= 8) engine?.pinyin?.user?.learn(pinyinPicks.joinToString("'") { it.pinyin }, word)
+        }
+        pinyinPicks.clear(); pinyinCandidates = emptyList(); pinyinFor = ""
+    }
+
     // --- swipe typing -----------------------------------------------------------------------------------------------
 
     override fun onSwipe(path: List<SwipePoint>) {
         val eng = engine ?: return
         val kb = keyboard ?: return
-        if (field != Field.TEXT || page != Page.LETTERS) return
+        if (field != Field.TEXT || page != Page.LETTERS || currentLayout().pinyin) return
         val centers = kb.letterCenters()
         val keyW = kb.keyWidth()
         val shiftOn = shift != 0
@@ -1081,5 +1198,10 @@ open class MetroWinIME : InputMethodService(), KeyboardListener, SuggestionBar.L
     private fun isSentenceStart(): Boolean {
         val info = currentInputEditorInfo ?: return false
         return (currentInputConnection?.getCursorCapsMode(info.inputType) ?: 0) != 0
+    }
+
+    private companion object {
+        /** The longest run of Pinyin letters held at once: a sentence, not a page. */
+        const val PINYIN_MAX = 48
     }
 }

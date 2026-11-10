@@ -38,7 +38,7 @@
     <string name="screen_about">Privacy and about</string>
     <string name="screen_about_summary">What stays on your phone</string>
     <string name="pref_languages_title">Active languages</string>
-    <string name="pref_languages_summary">The globe key switches between them</string>
+    <string name="pref_languages_summary">The language key switches between them</string>
     <string name="cat_dictionaries">Dictionaries and layouts</string>
     <string name="pref_dictionary_sources_title">Where to find dictionaries</string>
     <string name="pref_dictionary_sources_summary">Free word lists to download and then import here</string>
@@ -273,7 +273,7 @@
     <string name="tut_welcome_title">Welcome</string>
     <string name="tut_welcome_body">MetroWin Keyboard brings the Windows Phone keyboard to Android: flat keys, big light type, and the same colours as MetroWin Launcher. This short tour shows what it can do. You can open it again from the three dots in the keyboard (the ? button) or from the settings.</string>
     <string name="tut_basics_title">Typing</string>
-    <string name="tut_basics_body">Tap the arrow for a capital; tap it twice (or hold it) to lock capitals. \"?123\" switches to numbers and symbols, and \"=\&lt;\" to more of them. The smiley opens emoji and the globe changes language (hide the globe in the settings to widen the space bar; then hold the space bar to change language). Press Enter for the action of the field (search, send, next…).</string>
+    <string name="tut_basics_body">Tap the arrow for a capital; tap it twice (or hold it) to lock capitals. \"&amp;123\" switches to numbers and symbols, the arrow there opens more of them, and \"abcd\" comes back to the letters. The smiley opens emoji and the language key, which shows the language in three letters (ENU, ITA…) as on Windows Phone, changes language (hide it in the settings to widen the space bar; then hold the space bar to change language). Press Enter for the action of the field (search, send, next…).</string>
     <string name="tut_hold_title">Hold for more</string>
     <string name="tut_hold_body">Hold a key and a bar appears above it with accents, digits and symbols. Slide your finger to one of them and let go. If you let go without sliding, you get the first one, the accented letter; the plain letter is in the bar. How long to hold is in Settings → Typing (200 ms to start).</string>
     <string name="tut_swipe_title">Swipe to type</string>
@@ -301,7 +301,9 @@
     <string name="tut_size_title">Size and layout</string>
     <string name="tut_size_body">In Settings → Size and layout you can make the keys taller or shorter (separately in landscape), make the keyboard narrower and put it on the left or right for one-handed use, change the space between keys, and show a number row.</string>
     <string name="tut_languages_title">Languages and dictionaries</string>
-    <string name="tut_languages_body">Turn on the languages you write in (Settings → Languages) and switch with the globe key. Seventeen layouts are included; you can import any other layout, and a full dictionary for any language, to get better corrections and predictions.</string>
+    <string name="tut_languages_body">Turn on the languages you write in (Settings → Languages) and switch with the language key. Eighteen layouts are included, Simplified Chinese (Pinyin) among them; you can import any other layout, and a full dictionary for any language, to get better corrections and predictions.</string>
+    <string name="tut_pinyin_title">Chinese (Pinyin)</string>
+    <string name="tut_pinyin_body">With 简体中文 chosen, type Pinyin (v for ü) and the bar shows the Chinese words for it; slide it sideways for more. Space takes the first; tap any other to take it, and go on choosing for the letters that are left. Enter keeps the letters as they are. The first letters of the syllables are enough (\"nh\" offers 你好), and the apostrophe, in the bar you get by holding the comma key, splits syllables (xi\'an). The comma and full stop keys type ， and 。, and the symbol pages hold Chinese punctuation; hold a sign for the plain one. The words you choose come first next time, learned on this phone only.</string>
     <string name="tut_privacy_title">Your privacy</string>
     <string name="tut_privacy_body">No trackers, no analytics. What you type, what the keyboard learns and your clipboard stay on this phone and are left out of backups. Nothing is learned in password fields. The internet is used only for GIFs and translation, when you ask, and the microphone only for voice typing. You can export or erase what was learned in Settings → Suggestions.</string>
     <string name="tut_launcher_title">With MetroWin Launcher</string>
@@ -364,7 +366,7 @@
     <string-array name="translate_provider_values"><item>google</item><item>google_cloud</item><item>deepl</item><item>libre</item><item>mymemory</item></string-array>
     <string-array name="quick_tool_names"><item>Clipboard</item><item>Translate</item><item>GIF</item><item>Emoji</item><item>Voice</item><item>Help</item><item>Settings</item></string-array>
     <string-array name="quick_tool_values"><item>clipboard</item><item>translate</item><item>gif</item><item>emoji</item><item>mic</item><item>help</item><item>settings</item></string-array>
-    <string name="pref_language_key_title">Show the globe key</string>
+    <string name="pref_language_key_title">Show the language key</string>
     <string name="pref_language_key_summary">Hide it to widen the space bar. With several languages, hold the space bar to change language.</string>
     <string name="pref_translate_usage_title">Characters left in your plan</string>
     <string name="pref_translate_usage_summary">Add your key to see it. Only DeepL tells this.</string>

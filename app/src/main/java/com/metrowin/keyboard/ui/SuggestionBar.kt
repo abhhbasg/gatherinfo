@@ -26,7 +26,7 @@ data class Slot(val text: String, val best: Boolean = false, val literal: Boolea
  * The strip above the keys, laid out like an app bar: the three dots on the left open the toolbox, the middle holds three
  * suggestions (or the tools, when the toolbox is open), and on the right a quick button goes straight to one tool (the clipboard
  * by default), with a dot when something new was copied. Also shows a short status text (a GIF search, "listening"). With more than
- * three slots (emoji found by ":dog") the middle is a row that slides sideways.
+ * three slots (emoji found by ":dog", the Chinese words for the Pinyin typed) the middle is a row that slides sideways.
  */
 class SuggestionBar(context: Context) : View(context) {
     interface Listener {
@@ -37,6 +37,8 @@ class SuggestionBar(context: Context) : View(context) {
     var listener: Listener? = null
     private var colors: KeyboardColors? = null
     private var slots: List<Slot?> = listOf(null, null, null)
+    private var row = false
+    private var rowEdges: FloatArray? = null
     private var toolsOpen = false
     private var status: String? = null
     private var voiceActive = false
@@ -55,7 +57,14 @@ class SuggestionBar(context: Context) : View(context) {
     private val tools get() = Tool.entries.filter { it != quick }
 
     fun setColors(c: KeyboardColors) { colors = c; invalidate() }
-    fun setSlots(s: List<Slot?>) { if (s != slots) scroll = 0f; slots = s; if (!toolsOpen) invalidate() }
+    /** [row]: show the slots as a row that slides sideways, each as wide as its text, instead of three places. */
+    fun setSlots(s: List<Slot?>, row: Boolean = s.size > 3) {
+        if (s != slots) scroll = 0f
+        slots = s; this.row = row; rowEdges = null
+        if (!toolsOpen) invalidate()
+    }
+
+    override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) { rowEdges = null }
     internal fun slotsForTest() = slots
     fun setStatus(text: String?) { status = text; invalidate() }
     fun setVoiceActive(on: Boolean) { voiceActive = on; invalidate() }
@@ -113,26 +122,47 @@ class SuggestionBar(context: Context) : View(context) {
         }
     }
 
-    private fun scrolling() = slots.size > 3 && !toolsOpen && status == null
+    private fun scrolling() = row && !toolsOpen && status == null
 
-    private fun rowCell(w: Float) = w / 5f
-    private fun maxScroll(w: Float) = maxOf(0f, slots.size * rowCell(w) - w)
+    private fun rowStyle(s: Slot?) {
+        paint.typeface = if (s?.best == true) Fonts.semibold(context) else Fonts.regular(context)
+        paint.textSkewX = 0f
+        paint.textSize = height * (if (s?.emoji == true) 0.52f else 0.40f)
+    }
 
-    /** The slots as a row of equal cells, five in view, that slides sideways. */
+    /** Left edges of the cells of the row, plus the right end: an emoji takes a fifth of the width, a word what it needs. */
+    private fun rowEdges(w: Float): FloatArray {
+        rowEdges?.let { if (it.size == slots.size + 1) return it }
+        val e = FloatArray(slots.size + 1)
+        slots.forEachIndexed { i, s ->
+            val cell = when {
+                s == null -> 0f
+                s.emoji -> w / 5f
+                else -> { rowStyle(s); maxOf(w / 7f, paint.measureText(s.text) + PAD * 1.6f) }
+            }
+            e[i + 1] = e[i] + cell
+        }
+        rowEdges = e
+        return e
+    }
+
+    private fun maxScroll(w: Float) = maxOf(0f, rowEdges(w).last() - w)
+
+    /** The slots as a row that slides sideways. */
     private fun drawRow(canvas: Canvas, c: KeyboardColors, x0: Float, w: Float) {
-        val cell = rowCell(w)
+        val e = rowEdges(w)
+        val readable = ColorMath.luminance(c.accent).let { kotlin.math.abs(it - ColorMath.luminance(c.bar)) > 0.12 }
         canvas.save()
         canvas.clipRect(x0, 0f, x0 + w, height.toFloat())
-        paint.color = c.text
-        paint.typeface = Fonts.regular(context)
-        paint.textSkewX = 0f
-        paint.textSize = height * 0.52f
-        val m = paint.fontMetrics
         slots.forEachIndexed { i, s ->
-            val left = x0 + i * cell - scroll
-            if (s == null || left + cell < x0 || left > x0 + w) return@forEachIndexed
-            if (pressedIndex == i) highlight(canvas, c, left, left + cell)
-            canvas.drawText(s.text, left + cell / 2f, height / 2f - (m.ascent + m.descent) / 2f, paint)
+            val left = x0 + e[i] - scroll
+            val right = x0 + e[i + 1] - scroll
+            if (s == null || right < x0 || left > x0 + w) return@forEachIndexed
+            if (pressedIndex == i) highlight(canvas, c, left, right)
+            rowStyle(s)
+            paint.color = if (s.best && readable) c.accent else c.text
+            val m = paint.fontMetrics
+            canvas.drawText(s.text, (left + right) / 2f, height / 2f - (m.ascent + m.descent) / 2f, paint)
         }
         canvas.restore()
     }
@@ -183,7 +213,11 @@ class SuggestionBar(context: Context) : View(context) {
         if (x < bw) return LEFT
         if (x > width - bw) return QUICK
         val w = width - 2 * bw
-        if (scrolling()) return ((x - bw + scroll) / rowCell(w)).toInt().coerceIn(0, slots.size - 1)
+        if (scrolling()) {
+            val e = rowEdges(w)
+            val at = x - bw + scroll
+            return (slots.indices.firstOrNull { at < e[it + 1] } ?: slots.size - 1).coerceAtLeast(0)
+        }
         if (toolsOpen && status == null) return ((x - bw) / (w / tools.size)).toInt().coerceIn(0, tools.size - 1)
         val e = edges(w)
         return (0..2).firstOrNull { x - bw < e[it + 1] } ?: 2

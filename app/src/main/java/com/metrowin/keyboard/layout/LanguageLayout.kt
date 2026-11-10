@@ -16,6 +16,10 @@ import java.util.Locale
  * row=a s d f g h j k l
  * row=z x c v b n m
  * long.a=à á â ä
+ * label=ITA               (optional: what the language key shows; default is the three letters of the language)
+ * input=pinyin            (optional: the letters are Pinyin and the bar offers the Chinese words for them)
+ * comma=，                (optional: what the two keys beside the space bar type; default , and .)
+ * period=。
  * ```
  */
 data class LanguageLayout(
@@ -27,11 +31,21 @@ data class LanguageLayout(
     val rows: List<List<String>>,
     val longPress: Map<String, List<String>>,
     val builtIn: Boolean = true,
+    /** What the language key shows, as on Windows Phone: three letters ("ENU", "ITA"). */
+    val keyLabel: String = defaultLabel(locale),
+    /** The letters are Pinyin: they are held as the word being typed and the bar offers the Chinese words read so. */
+    val pinyin: Boolean = false,
+    /** What the keys left and right of the space bar type. */
+    val comma: String = ",",
+    val period: String = ".",
 ) {
     /** Every letter key of the layout, lower case. */
     val letters: Set<String> get() = rows.flatten().toSet()
 
     companion object {
+        fun defaultLabel(locale: Locale): String =
+            runCatching { locale.isO3Language }.getOrDefault("").ifEmpty { locale.language }.uppercase(Locale.ROOT).take(3)
+
         fun parse(text: String, builtIn: Boolean): LanguageLayout? {
             val map = LinkedHashMap<String, String>()
             val rows = ArrayList<List<String>>()
@@ -61,6 +75,10 @@ data class LanguageLayout(
                 rows = rows,
                 longPress = long,
                 builtIn = builtIn,
+                keyLabel = map["label"]?.take(4)?.ifBlank { null } ?: defaultLabel(locale),
+                pinyin = map["input"] == "pinyin",
+                comma = map["comma"]?.ifBlank { null } ?: ",",
+                period = map["period"]?.ifBlank { null } ?: ".",
             )
         }
     }

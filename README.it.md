@@ -9,7 +9,7 @@
 <p align="center"><a href="https://github.com/developerkenshi-coder/MetroWin-Keyboard/releases/latest"><img alt="Ultima release" src="https://img.shields.io/github/v/release/developerkenshi-coder/MetroWin-Keyboard?label=release&color=1ba1e2"></a>
   <a href="https://github.com/developerkenshi-coder/MetroWin-Keyboard/releases"><img alt="Download" src="https://img.shields.io/github/downloads/developerkenshi-coder/MetroWin-Keyboard/total?color=1ba1e2"></a></p>
 
-<p align="center"><a href="README.md">English</a> · <b>Italiano</b></p>
+<p align="center"><a href="README.md">English</a> · <b>Italiano</b> · <a href="README.zh-CN.md">简体中文</a></p>
 
 <p align="center"><img src="docs/screenshots/looks.png" width="92%" alt="Classic, Modern Glass e Modern Droid"></p>
 
@@ -54,7 +54,7 @@ Android 8.0 (API 26) o successivo.
 
 **Backup**: un solo file con tutto ciò che l'app conserva (impostazioni, parole apprese, dizionari, appunti); ripristinalo su un altro telefono o dopo aver reinstallato con un'altra firma.
 
-**Lingue**: 17 layout inclusi (English, Italiano, Español, Français, Deutsch, Português, Nederlands, Polski, Türkçe, Русский, Українська, Ελληνικά, Čeština, Svenska, Română, العربية, עברית). Qualsiasi altro layout è un piccolo file di testo ([docs/LAYOUTS.md](docs/LAYOUTS.md)); si può importare qualsiasi dizionario (liste di parole, di frequenza, Hunspell `.dic`). Sono incluse solo piccole liste di partenza (en, it, es, fr, de, pt): importa un dizionario completo per le previsioni migliori.
+**Lingue**: 18 layout inclusi (English, Italiano, Español, Français, Deutsch, Português, Nederlands, Polski, Türkçe, Русский, Українська, Ελληνικά, Čeština, Svenska, Română, العربية, עברית, 简体中文; il cinese si scrive in Pinyin e la barra propone le parole). Qualsiasi altro layout è un piccolo file di testo ([docs/LAYOUTS.md](docs/LAYOUTS.md)); si può importare qualsiasi dizionario (liste di parole, di frequenza, Hunspell `.dic`). Sono incluse solo piccole liste di partenza (en, it, es, fr, de, pt): importa un dizionario completo per le previsioni migliori.
 
 **Aspetto**: *Classic* (Windows Phone piatto), *Modern Glass*, *Modern Droid* (colori Material You da Android 12), scuro / chiaro / sistema, 20 colori di Windows Phone o uno tuo, nero puro, una foto dietro i tasti (il suo colore diventa l'accento) e, volendo, una tastiera che segue il colore dell'app sotto.
 

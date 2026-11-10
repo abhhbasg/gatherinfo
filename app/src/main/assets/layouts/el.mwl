@@ -2,6 +2,7 @@
 id=el
 name=Ελληνικά
 locale=el_GR
+label=ELL
 apostrophe=join
 row=ε ρ τ υ θ ι ο π
 row=α σ δ φ γ η ξ κ λ

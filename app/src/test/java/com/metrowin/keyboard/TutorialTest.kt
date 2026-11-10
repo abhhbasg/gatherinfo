@@ -27,6 +27,12 @@ class TutorialTest {
         assertNotEquals("Welcome", app.getString(Tutorial.pages[0].title))
     }
 
+    @Config(qualifiers = "zh-rCN") @Test fun everyPageHasItsTextInChinese() {
+        val app = ApplicationProvider.getApplicationContext<KeyboardApp>()
+        check(app)
+        assertEquals("欢迎", app.getString(Tutorial.pages[0].title))
+    }
+
     @Test fun versionMatchesTheNewestPage() {
         assertEquals(Tutorial.pages.maxOf { it.since }, Tutorial.VERSION)
         assertEquals(Tutorial.pages.size, Tutorial.pages.map { it.id }.toSet().size)

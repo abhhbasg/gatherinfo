@@ -1,0 +1,478 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">MetroWin 键盘</string>
+    <string name="subtype_label">MetroWin 键盘</string>
+    <string name="a11y_description">让键盘跟随下方应用的颜色。它不读取任何文字和窗口内容，只查看按键上方的一条屏幕区域并保留一个平均色。不保存也不发送任何内容。</string>
+    <string name="cat_setup">设置向导</string>
+    <string name="cat_settings">设置</string>
+    <string name="setup_enable_title">1. 启用键盘</string>
+    <string name="setup_enable_summary">打开 Android 的键盘列表</string>
+    <string name="setup_select_title">2. 选为当前键盘</string>
+    <string name="setup_select_summary">显示键盘选择器</string>
+    <string name="setup_try_title">试用键盘</string>
+    <string name="setup_try_summary">一个可以输入的文本框</string>
+    <string name="setup_enabled">已启用</string>
+    <string name="setup_disabled">尚未启用</string>
+    <string name="setup_active">当前键盘</string>
+    <string name="setup_inactive">还不是当前键盘</string>
+    <string name="screen_languages">语言和词库</string>
+    <string name="screen_languages_summary">布局、词库、自定义语言</string>
+    <string name="screen_appearance">外观</string>
+    <string name="screen_appearance_summary">主题、颜色、自定义图片</string>
+    <string name="screen_size">大小和布局</string>
+    <string name="screen_size_summary">按键高度和宽度、数字行</string>
+    <string name="screen_typing">输入</string>
+    <string name="screen_typing_summary">双击空格、长按、滑行输入</string>
+    <string name="screen_suggestions">建议和学习</string>
+    <string name="screen_suggestions_summary">纠错、预测、屏蔽词</string>
+    <string name="screen_feedback">声音和振动</string>
+    <string name="screen_feedback_summary">按键音、振动强度</string>
+    <string name="screen_clipboard">剪贴板</string>
+    <string name="screen_clipboard_summary">文字和图片的历史记录</string>
+    <string name="screen_gif">GIF</string>
+    <string name="screen_gif_summary">选择 GIF 的来源</string>
+    <string name="screen_voice">语音输入</string>
+    <string name="screen_voice_summary">听写和转写</string>
+    <string name="screen_launcher">MetroWin Launcher</string>
+    <string name="screen_launcher_summary">跟随桌面的外观</string>
+    <string name="screen_about">隐私和关于</string>
+    <string name="screen_about_summary">哪些内容只留在手机上</string>
+    <string name="pref_languages_title">启用的语言</string>
+    <string name="pref_languages_summary">用语言键在它们之间切换</string>
+    <string name="cat_dictionaries">词库和布局</string>
+    <string name="pref_dictionary_sources_title">去哪里找词库</string>
+    <string name="pref_dictionary_sources_summary">可下载后在此导入的免费词表</string>
+    <string name="dictionary_sources_note">先下载文件，再使用“导入词库”。每个来源有各自的许可证。</string>
+    <string name="pref_import_dictionary_title">导入词库…</string>
+    <string name="pref_import_dictionary_summary">任何词表：每行一个词、“词 次数”的词频表，或 Hunspell .dic 文件</string>
+    <string name="pref_remove_dictionary_title">移除导入的词库…</string>
+    <string name="pref_remove_dictionary_summary">恢复为该语言的内置词表</string>
+    <string name="pref_import_layout_title">导入键盘布局…</string>
+    <string name="pref_import_layout_summary">.mwl 文本文件：添加任何语言或排列</string>
+    <string name="pref_remove_layout_title">移除导入的布局…</string>
+    <string name="pref_remove_layout_summary">只能移除你导入的布局</string>
+    <string name="dialog_pick_language">这是哪种语言的？</string>
+    <string name="dialog_pick_imported">哪一个？</string>
+    <string name="nothing_to_remove">还没有导入任何内容</string>
+    <string name="import_done_words">已导入 %1$d 个词</string>
+    <string name="import_failed">无法使用该文件</string>
+    <string name="import_layout_done">已添加布局“%1$s”</string>
+    <string name="removed">已移除</string>
+    <string name="pref_theme_style_title">风格</string>
+    <string name="pref_theme_mode_title">深色或浅色</string>
+    <string name="pref_accent_title">主题色</string>
+    <string name="pref_accent_summary">20 种 Windows Phone 颜色，或自定义</string>
+    <string name="pref_dynamic_title">取自壁纸的颜色</string>
+    <string name="pref_dynamic_summary">仅 Modern Droid，Android 12 或更高版本：使用系统调色板</string>
+    <string name="pref_oled_title">纯黑</string>
+    <string name="pref_oled_summary">最深的背景，在 OLED 屏幕上更省电</string>
+    <string name="cat_picture">你的图片</string>
+    <string name="pref_image_bg_title">按键后面的图片</string>
+    <string name="pref_image_bg_summary">用一张照片作键盘背景</string>
+    <string name="pref_image_pick_title">选择图片…</string>
+    <string name="pref_image_pick_summary">只保存在手机上</string>
+    <string name="pref_image_remove_title">移除图片</string>
+    <string name="pref_image_dim_title">调暗图片</string>
+    <string name="pref_picture_accent_title">从图片取主题色</string>
+    <string name="pref_picture_accent_summary">取图片中最鲜艳的颜色</string>
+    <string name="cat_adaptive">跟随应用</string>
+    <string name="pref_adaptive_title">键盘颜色跟随下方的应用</string>
+    <string name="pref_adaptive_summary">对按键上方的一条屏幕取色（聊天、网页…）。需要无障碍服务，Android 11 或更高版本。不读取任何文字。</string>
+    <string name="adaptive_dialog_title">开启取色服务</string>
+    <string name="adaptive_dialog_text">Android 需要你在无障碍设置中开启“MetroWin 键盘”。该服务只截取键盘上方的一条区域来选出一种颜色；它不读取文字，也不发送任何内容。</string>
+    <string name="adaptive_open">打开设置</string>
+    <string name="adaptive_old_android">需要 Android 11 或更高版本</string>
+    <string name="accent_dialog_title">主题色</string>
+    <string name="accent_custom">自定义颜色…</string>
+    <string name="accent_custom_hint">颜色，格式 #RRGGBB</string>
+    <string name="accent_invalid">这不是一个颜色</string>
+    <string name="accent_reset">恢复主题颜色</string>
+    <string name="picture_saved">图片已保存</string>
+    <string name="picture_failed">无法使用该图片</string>
+    <string name="pref_key_height_title">按键高度（竖屏，%）</string>
+    <string name="pref_key_height_land_title">按键高度（横屏，%）</string>
+    <string name="pref_width_title">键盘宽度（%）</string>
+    <string name="pref_width_summary">窄一些更方便单手使用</string>
+    <string name="pref_align_title">变窄时的位置</string>
+    <string name="pref_gap_title">按键间距（dp）</string>
+    <string name="pref_number_row_title">数字行</string>
+    <string name="pref_number_row_summary">在字母上方显示数字</string>
+    <string name="pref_hints_title">字母上的数字提示</string>
+    <string name="pref_hints_summary">隐藏数字行时，长按第一行字母可输入数字</string>
+    <string name="pref_double_space_title">双击空格输入句号</string>
+    <string name="pref_double_space_summary">快速按两次空格变成“. ”</string>
+    <string name="pref_long_press_title">长按按键输入符号</string>
+    <string name="pref_long_press_summary">重音字母、数字和符号显示在按键上方</string>
+    <string name="pref_long_press_ms_title">长按时间（毫秒）</string>
+    <string name="pref_long_press_ms_summary">默认 200</string>
+    <string name="pref_auto_caps_title">句首自动大写</string>
+    <string name="pref_auto_caps_summary">Shift 会自动开启</string>
+    <string name="pref_swipe_title">滑行输入</string>
+    <string name="pref_swipe_summary">在字母上滑动来写出一个词</string>
+    <string name="pref_space_cursor_title">在空格键上滑动来移动光标</string>
+    <string name="pref_suggestions_title">建议</string>
+    <string name="pref_suggestions_summary">在按键上方显示候选词</string>
+    <string name="pref_autocorrect_title">自动纠错</string>
+    <string name="pref_autocorrect_summary">在一个词结束时修正拼写错误。按退格键可恢复你输入的内容。</string>
+    <string name="pref_smart_emoji_title">智能表情搜索</string>
+    <string name="pref_smart_emoji_summary">输入冒号加一个词，例如 :dog，相应的表情会出现在候选栏。需要开启建议。</string>
+    <string name="emoji_search_prefix">表情：</string>
+    <string name="emoji_search_none">没有找到表情</string>
+    <string name="emoji_search_button">搜索表情</string>
+    <string name="pref_next_word_title">预测下一个词</string>
+    <string name="pref_next_word_summary">提示你接下来可能要写的词</string>
+    <string name="pref_phrase_title">补全短语</string>
+    <string name="pref_phrase_summary">当你经常连着写几个词时，直接提供后面的几个词</string>
+    <string name="pref_block_title">屏蔽不雅词语</string>
+    <string name="pref_block_summary">不会被建议、纠正成或学习</string>
+    <string name="pref_custom_blocked_title">你的屏蔽词</string>
+    <string name="pref_custom_blocked_summary">添加你不希望被建议的词</string>
+    <string name="pref_custom_blocked_message">每行一个词，或用逗号分隔</string>
+    <string name="cat_learning">学习</string>
+    <string name="pref_learn_title">从我的输入中学习</string>
+    <string name="pref_learn_summary">词语和习惯只保存在这部手机上。密码框中绝不学习。</string>
+    <string name="pref_export_learned_title">导出已学内容…</string>
+    <string name="pref_export_learned_summary">保存为一个可阅读、可留存的文本文件</string>
+    <string name="pref_clear_learned_title">忘记所有已学内容</string>
+    <string name="pref_clear_learned_summary">删除学到的词语和习惯</string>
+    <string name="clear_learned_confirm">删除键盘从你这里学到的所有内容？</string>
+    <string name="cleared">完成</string>
+    <string name="export_done">已保存</string>
+    <string name="pref_sound_title">按键音</string>
+    <string name="pref_sound_pick_title">选择自己的声音…</string>
+    <string name="pref_sound_pick_summary">用于“自己的声音”的一段短音频</string>
+    <string name="pref_sound_volume_title">音量</string>
+    <string name="pref_vibration_title">振动</string>
+    <string name="pref_vibration_summary">按键时轻振一下</string>
+    <string name="pref_vibration_intensity_title">振动强度</string>
+    <string name="sound_saved">声音已保存</string>
+    <string name="pref_clipboard_title">剪贴板历史</string>
+    <string name="pref_clipboard_summary">保留你复制的内容，只在这部手机上</string>
+    <string name="pref_clipboard_max_title">保留多少条</string>
+    <string name="pref_clipboard_max_summary">固定的条目不会被清除</string>
+    <string name="pref_clipboard_images_title">同时保存图片</string>
+    <string name="pref_clipboard_images_summary">复制的照片会出现在剪贴板中并可粘贴</string>
+    <string name="pref_clipboard_clear_title">清空历史</string>
+    <string name="pref_clipboard_clear_summary">固定的条目会保留</string>
+    <string name="clipboard_title">剪贴板</string>
+    <string name="clipboard_empty">还没有复制任何内容</string>
+    <string name="clipboard_no_images">此应用不接受图片</string>
+    <string name="pref_gif_source_title">GIF 的来源</string>
+    <string name="pref_gif_key_title">API 密钥</string>
+    <string name="pref_gif_key_summary">GIPHY、Tenor、Klipy 和 Imgur 需要（Imgur 填 Client ID）。上面的按钮会打开免费获取密钥的页面。</string>
+    <string name="pref_gif_key_message">粘贴密钥。它只保存在这部手机上。</string>
+    <string name="pref_gif_folder_title">GIF 文件夹…</string>
+    <string name="pref_gif_folder_summary">用于“手机上的文件夹”：你保存的 GIF</string>
+    <string name="cat_gif_custom">你自己的服务</string>
+    <string name="pref_gif_custom_url_title">地址</string>
+    <string name="pref_gif_custom_url_summary">https 地址，包含 {query}、{key}、{limit}、{lang} 和 {rating}</string>
+    <string name="pref_gif_custom_list_title">结果在应答中的位置</string>
+    <string name="pref_gif_custom_preview_title">每个结果中的小图</string>
+    <string name="pref_gif_custom_full_title">每个结果中的完整 GIF</string>
+    <string name="pref_gif_link_title">不接受图片时发送链接</string>
+    <string name="pref_gif_link_summary">很多聊天应用会把链接显示成 GIF</string>
+    <string name="gif_needs_key">请在 设置 → GIF 中添加 API 密钥。点这里。</string>
+    <string name="gif_needs_folder">请在 设置 → GIF 中选择 GIF 文件夹。点这里。</string>
+    <string name="gif_needs_url">请在 设置 → GIF 中添加你的服务地址。点这里。</string>
+    <string name="gif_loading">正在加载…</string>
+    <string name="gif_none">没有找到 GIF</string>
+    <string name="gif_error">无法加载 GIF</string>
+    <string name="gif_not_supported">此应用不接受 GIF</string>
+    <string name="gif_search_prefix">GIF：</string>
+    <string name="gif_folder_saved">文件夹已保存</string>
+    <string name="pref_voice_permission_title">允许使用麦克风</string>
+    <string name="pref_voice_permission_summary">语音输入需要</string>
+    <string name="pref_voice_continuous_title">持续聆听</string>
+    <string name="pref_voice_continuous_summary">持续转写长段语音，直到你再次点击麦克风</string>
+    <string name="pref_voice_offline_title">仅在本机识别</string>
+    <string name="pref_voice_offline_summary">如果已下载该语言，优先使用不联网的识别</string>
+    <string name="voice_listening">正在聆听…</string>
+    <string name="voice_permission">请允许使用麦克风以进行语音输入</string>
+    <string name="voice_unavailable">这部手机上没有语音识别器</string>
+    <string name="voice_error">语音错误 %1$d</string>
+    <string name="pref_launcher_status_title">MetroWin Launcher</string>
+    <string name="launcher_found">已在这部手机上找到</string>
+    <string name="launcher_missing">未安装</string>
+    <string name="pref_launcher_sync_title">跟随桌面的外观</string>
+    <string name="pref_launcher_sync_summary">采用桌面发送的风格、深浅色和主题色</string>
+    <string name="pref_launcher_import_title">导入桌面主题文件…</string>
+    <string name="pref_launcher_import_summary">桌面在其设置中导出的“主题”</string>
+    <string name="pref_launcher_open_title">打开 MetroWin Launcher</string>
+    <string name="theme_imported">主题已应用</string>
+    <string name="theme_invalid">这不是 MetroWin 主题文件</string>
+    <string name="about_privacy_title">隐私</string>
+    <string name="about_privacy_text">没有统计分析，没有广告，没有跟踪器。你输入的内容、键盘学到的内容和你的剪贴板都留在这部手机上，并被排除在系统备份之外。只有在你打开 GIF 面板时才会联网，从你选择的来源获取 GIF；麦克风只用于语音输入。</string>
+    <string name="about_version_title">版本</string>
+    <string name="about_license_title">许可证</string>
+    <string name="about_license_text">自由软件，GNU GPL v3 或更高版本。与 Microsoft 无关；Windows Phone 是 Microsoft Corporation 的商标。</string>
+    <string name="test_hint">在这里输入来试用键盘</string>
+    <string name="test_title">试用键盘</string>
+    <string name="ok">确定</string>
+    <string name="cancel">取消</string>
+    <string name="pref_space_cursor_summary">按住空格键并向左或向右滑动</string>
+    <string-array name="theme_style_names">
+        <item>经典（扁平 Windows Phone）</item>
+        <item>Modern Glass</item>
+        <item>Modern Droid</item>
+    </string-array>
+    <string-array name="theme_style_values">
+        <item>classic</item>
+        <item>glass</item>
+        <item>droid</item>
+    </string-array>
+    <string-array name="theme_mode_names">
+        <item>跟随系统</item>
+        <item>深色</item>
+        <item>浅色</item>
+    </string-array>
+    <string-array name="theme_mode_values">
+        <item>system</item>
+        <item>dark</item>
+        <item>light</item>
+    </string-array>
+    <string-array name="align_names">
+        <item>靠左</item>
+        <item>居中</item>
+        <item>靠右</item>
+    </string-array>
+    <string-array name="align_values">
+        <item>left</item>
+        <item>center</item>
+        <item>right</item>
+    </string-array>
+    <string-array name="sound_names">
+        <item>Windows Phone 风格的按键音</item>
+        <item>Android 自带的声音</item>
+        <item>自己的声音</item>
+        <item>关闭</item>
+    </string-array>
+    <string-array name="sound_values">
+        <item>metro</item>
+        <item>system</item>
+        <item>custom</item>
+        <item>off</item>
+    </string-array>
+    <string-array name="gif_chips">
+        <item>热门</item>
+        <item>谢谢</item>
+        <item>哈哈</item>
+        <item>爱</item>
+        <item>哇</item>
+        <item>好的</item>
+        <item>不</item>
+        <item>难过</item>
+        <item>庆祝</item>
+        <item>早上好</item>
+    </string-array>
+    <string name="tutorial_title">教程</string>
+    <string name="tutorial_new">新</string>
+    <string name="tutorial_back">上一步</string>
+    <string name="tutorial_next">下一步</string>
+    <string name="tutorial_done">完成</string>
+    <string name="tutorial_counter">%1$d / %2$d</string>
+    <string name="tut_welcome_title">欢迎</string>
+    <string name="tut_welcome_body">MetroWin 键盘把 Windows Phone 的键盘带到 Android：扁平的按键、又大又细的字体，以及与 MetroWin Launcher 相同的颜色。这段简短的导览会介绍它能做什么。之后可以从键盘里的三个点（? 按钮）或设置中再次打开。</string>
+    <string name="tut_basics_title">输入</string>
+    <string name="tut_basics_body">点箭头输入一个大写字母；点两下（或按住）锁定大写。“&amp;123”切换到数字和符号，那里的箭头打开更多符号，“abcd”回到字母。笑脸打开表情，语言键用三个字母显示当前语言（如 ENU、CHS），点它切换语言（可在设置中隐藏语言键来加宽空格键，此时按住空格键切换语言）。回车执行输入框的操作（搜索、发送、下一项…）。</string>
+    <string name="tut_hold_title">长按更多</string>
+    <string name="tut_hold_body">按住一个键，上方会出现一条，里面有重音字母、数字和符号。把手指滑到其中一个再松开。不滑动就松开，得到的是第一个，即带重音的字母；普通字母也在条里。长按多久可在 设置 → 输入 中调整（初始 200 毫秒）。</string>
+    <string name="tut_swipe_title">滑行输入</string>
+    <string name="tut_swipe_body">把手指放在一个词的第一个字母上，不抬起地滑过其余字母。这个词会连同空格一起出现。如果不是你想要的，在按键上方的栏里点另一个。用的是你当前的语言。</string>
+    <string name="tut_space_title">移动光标</string>
+    <string name="tut_space_body">在空格键上向左或向右滑动手指，可以在文字中逐个字符移动光标。快速按两次空格会输入句号和空格。</string>
+    <string name="tut_suggestions_title">建议和纠错</string>
+    <string name="tut_suggestions_body">输入时按键上方会出现三个词；带颜色的那个是按空格会插入的。一个词结束时会修正拼写错误，如果改错了，马上按退格键就能恢复你输入的内容。一个词之后会提示可能的下一个词，有时是用“…”标出的整个短语。不雅词语不会被建议。一切都只在这部手机上学习。</string>
+    <string name="tut_toolbox_title">三个点和快捷按钮</string>
+    <string name="tut_toolbox_body">栏左侧的三个点打开工具箱：剪贴板、翻译、GIF、表情、语音、帮助和设置。右侧的按钮直接打开一个工具，默认是剪贴板，当你刚复制了内容时它会显示一个圆点。可在 设置 → 输入 中选择它打开哪个工具。</string>
+    <string name="tut_clipboard_title">剪贴板</string>
+    <string name="tut_clipboard_body">你复制的所有内容都会保留，只在这部手机上。点一条即可粘贴，图钉可永久保留，叉号可删除。复制的照片也会保留，在应用允许的地方会作为图片粘贴。保留多少条可在 设置 → 剪贴板 中选择。</string>
+    <string name="tut_smartemoji_title">按名称查找表情</string>
+    <string name="tut_smartemoji_body">输入冒号加一个词，例如 :dog，匹配的表情会出现在候选栏：左右滑动，点一个就会替换你输入的内容。在表情面板中，放大镜可以直接用键盘按名称搜索。名称支持你的语言和英语。智能表情搜索可在 设置 → 建议 中关闭。</string>
+    <string name="tut_emoji_title">表情和经典颜文字</string>
+    <string name="tut_emoji_body">笑脸键按类别打开表情，最近用过的排在最前。按住手或人物可选择肤色。最后两个标签页是经典的表情符号 :-) 等，以及日式颜文字，它们在任何应用中都能用。</string>
+    <string name="tut_gif_title">GIF</string>
+    <string name="tut_gif_body">从工具箱打开 GIF。点一个即可发送。用搜索按钮并用键盘输入来查找其他的。在 设置 → GIF 中选择 GIF 的来源：GIPHY、Tenor、Klipy 或 Imgur（使用你自己的免费密钥；有按钮打开获取页面）、手机上的文件夹，或你自己的服务，以及搜索的内容分级（G 到 R）。</string>
+    <string name="tut_translate_title">翻译</string>
+    <string name="tut_translate_body">从工具箱打开翻译。它会取选中的文字，或输入框中的全部内容，并进行翻译。点语言名称可更改语言，点箭头可互换。“剪贴板”会翻译你刚复制的内容，适合翻译收到的消息。然后可以替换原文、把译文插入其后，或复制译文。默认使用 Google；可在 设置 → 翻译 中更换服务，DeepL 还会显示套餐剩余的字符数。只有在你翻译时文字才会发送给服务。</string>
+    <string name="tut_voice_title">语音输入</string>
+    <string name="tut_voice_body">点工具箱里的麦克风然后说话：文字会随着你说话出现。开启“持续聆听”（设置 → 语音）后，它会一直转写，直到你再次点击麦克风。第一次使用时 Android 会询问是否允许使用麦克风。</string>
+    <string name="tut_looks_title">风格和颜色</string>
+    <string name="tut_looks_body">三种风格：经典（扁平 Windows Phone）、Modern Glass 和 Modern Droid，每种都可选深色、浅色或跟随系统。从 20 种 Windows Phone 颜色中选一种或自定义，或者在按键后面放一张照片：其中最亮的颜色会成为你的主题色。“颜色跟随应用”还能让键盘染上下方应用的颜色（需要一个不读取任何文字的无障碍服务）。</string>
+    <string name="tut_size_title">大小和布局</string>
+    <string name="tut_size_body">在 设置 → 大小和布局 中，可以让按键更高或更矮（横屏单独设置），让键盘变窄并靠左或靠右以便单手使用，调整按键间距，并显示数字行。</string>
+    <string name="tut_languages_title">语言和词库</string>
+    <string name="tut_languages_body">开启你书写用的语言（设置 → 语言），并用语言键切换。内置十八种布局，包括简体中文拼音；你可以导入任何其他布局，以及任何语言的完整词库，以获得更好的纠错和预测。</string>
+    <string name="tut_pinyin_title">中文拼音</string>
+    <string name="tut_pinyin_body">选择“简体中文”后，输入拼音（ü 用 v），候选栏会显示对应的汉字和词语，可左右滑动。空格选第一个；点任意一个候选来选它，剩下的拼音继续选。回车直接输入字母。只打声母也行（“nh”出“你好”），长按逗号键里的撇号可分隔音节（xi\'an）。逗号和句号键输入“，”和“。”，符号页是中文标点，长按得到英文标点。你常选的词会排到前面，全部只在这部手机上学习。</string>
+    <string name="tut_privacy_title">你的隐私</string>
+    <string name="tut_privacy_body">没有跟踪器，没有统计分析。你输入的内容、键盘学到的内容和你的剪贴板都留在这部手机上，并被排除在系统备份之外。密码框中不学习任何内容。只有在你要求时才会为 GIF 和翻译联网，麦克风只用于语音输入。可在 设置 → 建议 中导出或清除已学内容。</string>
+    <string name="tut_launcher_title">搭配 MetroWin Launcher</string>
+    <string name="tut_launcher_body">键盘与桌面共用三种风格和 20 种颜色，可以导入它的主题文件（设置 → MetroWin Launcher），并且在桌面的搜索框中不添乱：那里不纠错，也不学习任何内容。</string>
+    <string name="setup_tutorial_title">教程</string>
+    <string name="setup_tutorial_summary">键盘能做什么</string>
+    <string name="setup_tutorial_new">自你上次查看后有新的章节</string>
+    <string name="setup_guide_title">设置向导</string>
+    <string name="setup_guide_summary">一步一步启用键盘</string>
+    <string name="onb_welcome_title">欢迎</string>
+    <string name="onb_welcome_text">我们来启用你的新键盘。只需一分钟，每一步完成后会自动识别。</string>
+    <string name="onb_enable_title">启用它</string>
+    <string name="onb_enable_text">打开键盘列表并开启 MetroWin 键盘。Android 会对所有键盘显示一条标准警告；这个键盘把一切都留在你的手机上，不向任何地方发送内容。</string>
+    <string name="onb_select_title">选择它</string>
+    <string name="onb_select_text">现在把 MetroWin 键盘选为你输入时使用的键盘。</string>
+    <string name="onb_mic_title">语音输入</string>
+    <string name="onb_mic_text">要听写，键盘需要使用麦克风。你可以跳过这一步，以后再允许。</string>
+    <string name="onb_try_title">试一试</string>
+    <string name="onb_try_text">在这里输入点什么。试试长按一个字母、在空格键上滑动，以及点三个点。</string>
+    <string name="onb_finish_title">全部就绪</string>
+    <string name="onb_finish_text">键盘已准备好。想看一段简短的功能导览吗？之后随时可以在设置中找到它。</string>
+    <string name="onb_done_step">完成</string>
+    <string name="onb_start">开始</string>
+    <string name="onb_open_settings">打开键盘列表</string>
+    <string name="onb_waiting">等待中…</string>
+    <string name="onb_open_picker">选择键盘</string>
+    <string name="onb_allow_mic">允许使用麦克风</string>
+    <string name="onb_skip">跳过</string>
+    <string name="onb_next">下一步</string>
+    <string name="onb_tour">开始导览</string>
+    <string name="onb_finish">完成</string>
+    <string name="screen_translate">翻译</string>
+    <string name="screen_translate_summary">使用哪个翻译服务，以及你的密钥</string>
+    <string name="pref_translate_provider_title">翻译服务</string>
+    <string name="pref_translate_key_title">API 密钥</string>
+    <string name="pref_translate_key_summary">用于 Google Cloud、DeepL，以及需要密钥的 LibreTranslate</string>
+    <string name="pref_translate_url_title">服务器地址</string>
+    <string name="pref_translate_url_summary">你的 LibreTranslate 服务器的 https 地址</string>
+    <string name="pref_translate_note_title">须知</string>
+    <string name="pref_translate_note_text">“Google”使用 Google 翻译的网页服务，不需要密钥，但它不是官方 API：可能会变化或限制使用。Google Cloud、DeepL 和 LibreTranslate 是官方接口，使用你的密钥。你翻译的文字只在翻译时发送给你选择的服务；密码框中绝不发送。</string>
+    <string name="pref_bottom_padding_title">底部额外留白（dp）</string>
+    <string name="pref_bottom_padding_summary">如果有导航条遮住最下面一行，就把键盘抬高</string>
+    <string name="pref_key_preview_title">按键上方的大字</string>
+    <string name="pref_key_preview_summary">用主题色显示你正在按的键</string>
+    <string name="pref_quick_tool_title">快捷按钮</string>
+    <string name="tr_field">输入框</string>
+    <string name="tr_clipboard">剪贴板</string>
+    <string name="tr_replace">替换</string>
+    <string name="tr_insert">插入</string>
+    <string name="tr_copy">复制</string>
+    <string name="tr_empty_field">没有可翻译的内容：请先输入或选中一些文字</string>
+    <string name="tr_empty_clipboard">还没有复制任何内容</string>
+    <string name="tr_needs_key">请在 设置 → 翻译 中添加 API 密钥。点这里。</string>
+    <string name="tr_needs_url">请在 设置 → 翻译 中添加服务器地址。点这里。</string>
+    <string name="tr_working">正在翻译…</string>
+    <string name="tr_error">无法翻译。请检查网络连接以及 设置 → 翻译 中的服务。</string>
+    <string name="tr_private_field">密码框中不提供翻译</string>
+    <string name="tr_copied">已复制</string>
+    <string-array name="translate_provider_names"><item>Google（无需密钥）</item><item>Google Cloud（你的密钥）</item><item>DeepL（你的密钥）</item><item>LibreTranslate（你的服务器）</item><item>MyMemory</item></string-array>
+    <string-array name="translate_provider_values"><item>google</item><item>google_cloud</item><item>deepl</item><item>libre</item><item>mymemory</item></string-array>
+    <string-array name="quick_tool_names"><item>剪贴板</item><item>翻译</item><item>GIF</item><item>表情</item><item>语音</item><item>帮助</item><item>设置</item></string-array>
+    <string-array name="quick_tool_values"><item>clipboard</item><item>translate</item><item>gif</item><item>emoji</item><item>mic</item><item>help</item><item>settings</item></string-array>
+    <string name="pref_language_key_title">显示语言键</string>
+    <string name="pref_language_key_summary">隐藏它可以加宽空格键。启用多种语言时，按住空格键切换语言。</string>
+    <string name="pref_translate_usage_title">套餐剩余字符数</string>
+    <string name="pref_translate_usage_summary">添加密钥后可查看。只有 DeepL 提供此信息。</string>
+    <string name="usage_checking">正在查询…</string>
+    <string name="usage_result">已用 %1$s，共 %2$s · 剩余 %3$s</string>
+    <string name="usage_unlimited">已用 %1$s（此套餐无上限）</string>
+    <string name="usage_bad_key">DeepL 不接受此密钥</string>
+    <string name="usage_error">无法查询。点按重试。</string>
+    <string name="pref_try_title">试用键盘</string>
+    <string name="pref_try_summary">打开一个带键盘的文本框，实际看看改动效果</string>
+    <string name="pref_gif_get_key_title">到服务网站获取密钥</string>
+    <string name="pref_gif_rating_title">内容分级</string>
+    <string-array name="gif_source_names"><item>GIPHY</item><item>Tenor</item><item>Klipy</item><item>Imgur</item><item>手机上的文件夹</item><item>你自己的服务</item></string-array>
+    <string-array name="gif_source_values"><item>giphy</item><item>tenor</item><item>klipy</item><item>imgur</item><item>folder</item><item>custom</item></string-array>
+    <string-array name="gif_rating_names"><item>所有人（G）</item><item>家长指导（PG）</item><item>青少年（PG-13）</item><item>成人（R）：服务允许的全部内容</item></string-array>
+    <string-array name="gif_rating_values"><item>g</item><item>pg</item><item>pg-13</item><item>r</item></string-array>
+    <string name="screen_projects">其他项目</string>
+    <string name="screen_projects_summary">同一作者的更多应用</string>
+    <string name="cat_foss">开源</string>
+    <string name="cat_nonfoss">非开源</string>
+    <string name="project_keyboard_title">MetroWin Keyboard</string>
+    <string name="project_keyboard_desc">Android 上的 Windows Phone 键盘：扁平的 Metro 按键、滑行输入、能学习你手指落点的校准、智能纠错、翻译、GIF 和剪贴板历史。你输入的内容留在手机上。</string>
+    <string name="project_launcher_title">MetroWin Launcher</string>
+    <string name="project_launcher_desc">Android 上的 Windows Phone 开始屏幕：会翻转并显示真实内容的动态磁贴、按字母排序的应用列表、操作中心和 Metro 锁屏。免费，没有广告，没有统计分析。这个键盘跟随的就是它的外观。</string>
+    <string name="project_spesatracker_title">SpesaTracker</string>
+    <string name="project_spesatracker_desc">记录你的购物和开销。数据经过加密，可通过你自己的 Google Drive 在各设备之间同步。可在 Google Play 免费下载。</string>
+    <string name="project_open_github">在 GitHub 上打开</string>
+    <string name="project_open_play">在 Google Play 上打开</string>
+    <string name="no_browser">没有找到可以打开链接的浏览器</string>
+    <string name="pivot_start">开始</string>
+    <string name="pivot_settings">设置</string>
+    <string name="pivot_about">关于</string>
+    <string name="pivot_tab">标签页</string>
+    <string name="calib_title">校准</string>
+    <string name="calib_hint">输入上面的句子</string>
+    <string name="calib_progress">第 %1$d 句，共 %2$d 句 · 误触 %3$d%%</string>
+    <string name="calib_progress_live">第 %1$d 句，共 %2$d 句 · 误触 %3$d%% · %4$.1f 毫米</string>
+    <string name="calib_hold">按住 %1$s 并选择 %2$s</string>
+    <string name="calib_more">更多句子</string>
+    <string name="calib_finish">完成</string>
+    <string name="calib_result_few">点击次数太少，无法学习。请重试并多输入几句。</string>
+    <string name="calib_result_misses">误触：%1$d%% → %2$d%%</string>
+    <string name="calib_result_precision">精度：距按键中心 %1$.1f 毫米 → %2$.1f 毫米</string>
+    <string name="calib_result_offset">你的手指平均落在按键中心%2$s %1$.1f 毫米、%4$s %3$.1f 毫米处。</string>
+    <string name="calib_right">偏右</string>
+    <string name="calib_left">偏左</string>
+    <string name="calib_down">偏下</string>
+    <string name="calib_up">偏上</string>
+    <string name="calib_result_height">按键高度：%1$d%% → %2$d%%</string>
+    <string name="calib_result_gap">按键间距：%1$d → %2$d dp</string>
+    <string name="calib_result_width">键盘宽度：%1$d%% → %2$d%%</string>
+    <string name="calib_result_none">无需更改：键盘已经适合你的手指。</string>
+    <string name="calib_apply">应用</string>
+    <string name="calib_retry">重试</string>
+    <string name="calib_applied">校准已应用</string>
+    <string name="calib_reset_done">校准已移除</string>
+    <string name="pref_calibrate_title">自动校准</string>
+    <string name="pref_calibrate_summary">输入几句话，键盘就能学到你的手指落在哪里、按键该多大</string>
+    <string name="pref_calibrate_on_title">使用校准</string>
+    <string name="pref_calibrate_on_summary">修正你的触摸落点。按键外观不变</string>
+    <string name="pref_calibrate_reset_title">移除校准</string>
+    <string name="tile_calibrate_title">校准键盘</string>
+    <string name="tile_calibrate_body">输入几句话，它就能学到你的手指落在哪里。</string>
+    <string name="pref_smart_correct_title">智能纠错</string>
+    <string name="pref_smart_correct_summary">根据手指的落点、前后的词以及你之前撤销过的纠正来选择修正。还会补上漏掉的空格。</string>
+    <string name="screen_backup">备份和恢复</string>
+    <string name="screen_backup_summary">把一切保存在一个文件里</string>
+    <string name="backup_create_title">创建备份</string>
+    <string name="backup_create_summary">设置、学到的词、词库、剪贴板和图片，都在一个文件里</string>
+    <string name="backup_restore_title">恢复备份</string>
+    <string name="backup_restore_summary">用你选择的文件替换应用中的内容</string>
+    <string name="backup_info_title">请妥善保管该文件</string>
+    <string name="backup_info_text">它包含你输入和学到的内容、你的剪贴板，以及你所用服务（GIF、翻译）的密钥。请把它存放在只有你能访问的地方。可用它迁移到另一部手机，或迁移到用另一个密钥签名、需要重新安装的应用。</string>
+    <string name="backup_done">备份已保存</string>
+    <string name="backup_failed">无法保存备份</string>
+    <string name="backup_restore_confirm">你的设置和已学数据将被文件中的内容替换。之后应用会关闭并重新打开。</string>
+    <string name="backup_restore_go">恢复</string>
+    <string name="backup_invalid">这不是 MetroWin 键盘的备份</string>
+    <string name="backup_restored">已恢复。应用将重新启动。</string>
+    <string name="tut_calibration_title">校准</string>
+    <string name="tut_calibration_body">设置 → 大小和布局 → 自动校准。输入几句话，键盘会测量你的手指落在哪里。它在不移动按键的情况下修正你的触摸，学习你拇指的弧线，如果仍然按偏就把按键放大。修正会在一句和下一句之间生效，所以你能看到键盘在变好。在你点“应用”之前不会保留任何内容，也没有任何内容离开你的手机。</string>
+    <string name="tut_smart_title">智能纠错</string>
+    <string name="tut_smart_body">键盘不只是找最接近的词：它会权衡你的手指落在哪里（点在两个键之间时两者都有可能）、你之前写的词、每个词的常用程度，以及你撤销过哪些纠正。当两种修正同样可能时，它会把两个都显示出来而不做改动。它还会补上漏掉的空格（“thankyou”→“thank you”）。这些全部在手机上运行，只从你的输入中学习；可在 设置 → 建议 中关闭。</string>
+    <string name="tut_backup_title">备份和恢复</string>
+    <string name="tut_backup_body">在 设置 → 备份和恢复 中，可以把应用保存的一切存成一个文件：设置、学到的词、导入的词库和布局、剪贴板和你的图片。可在另一部手机上恢复，或在用另一个签名重新安装应用后恢复。文件中有你的密钥和你输入的内容，请妥善保管。</string>
+    <string name="screen_update">更新</string>
+    <string name="screen_update_summary">查找键盘的新版本</string>
+    <string name="update_auto_title">每 12 小时检查更新</string>
+    <string name="update_auto_summary">只查看键盘在 GitHub 上的发布。不发送任何关于你的信息。</string>
+    <string name="update_check_now">立即检查</string>
+    <string name="update_install">下载并安装</string>
+    <string name="update_notes_title">新增内容</string>
+    <string name="update_no_notes">此版本没有发布说明。</string>
+    <string name="update_never">尚未检查。</string>
+    <string name="update_last">上次检查：%1$s</string>
+    <string name="update_status_latest">你已是最新版本（%1$s）。</string>
+    <string name="update_status_new">有新版本 %1$s。你当前是 %2$s。</string>
+    <string name="update_checking">正在查找更新…</string>
+    <string name="update_failed">无法连接 GitHub。请稍后再试。</string>
+    <string name="update_downloading">正在下载… %1$d%%</string>
+    <string name="update_bad_file">下载的文件与发布不一致，已删除。</string>
+    <string name="update_permission">请在打开的页面中允许此应用安装应用，然后再点一次按钮。</string>
+    <string name="update_privacy">只访问 github.com/%1$s。请求中不带任何关于你或你手机的标识。安装前 Android 会检查新版本是否与当前版本使用同一个密钥签名。</string>
+    <string name="update_tile_title">有可用更新</string>
+    <string name="update_tile_body">版本 %1$s。点按查看新增内容。</string>
+    <string name="tut_update_title">更新</string>
+    <string name="tut_update_body">键盘每 12 小时到它自己在 GitHub 上的仓库（且只到那里）查找新版本。有新版本时，“开始”页顶部会出现一块蓝色磁贴；设置 → 更新 会显示新增内容并下载安装。只有当它与你现有版本使用同一个密钥签名时，Android 才会安装。你可以关闭检查，或点“立即检查”。</string>
+    <string name="update_missing">此版本的文件尚未发布。</string>
+</resources>
