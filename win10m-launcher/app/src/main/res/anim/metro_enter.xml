@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- App opening after the turnstile: quick fade + slight scale up from 0.92 (W10M "continuum" style). -->
+<set xmlns:android="http://schemas.android.com/apk/res/android"
+    android:duration="250"
+    android:interpolator="@android:interpolator/decelerate_cubic">
+    <alpha android:fromAlpha="0" android:toAlpha="1" />
+    <scale android:fromXScale="0.92" android:toXScale="1" android:fromYScale="0.92" android:toYScale="1"
+        android:pivotX="50%" android:pivotY="50%" />
+</set>

@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Start</string>
+    <string name="settings_launcher_label">Start settings</string>
+    <string name="calendar">Calendar</string>
+    <string name="search">Search</string>
+    <string name="recently_added">Recently added</string>
+    <string name="pin_to_start">Pin to Start</string>
+    <string name="app_info">App info</string>
+    <string name="uninstall">Uninstall</string>
+    <string name="settings_title">Personalization</string>
+    <string name="settings_start">Start</string>
+    <string name="theme">Choose your mode</string>
+    <string name="dark">Dark</string>
+    <string name="light">Light</string>
+    <string name="background">Background</string>
+    <string name="bg_solid">None (solid colour)</string>
+    <string name="bg_behind">Picture behind tiles</string>
+    <string name="bg_on_tiles">Picture on tiles</string>
+    <string name="choose_picture">Browse</string>
+    <string name="transparency">Tile transparency</string>
+    <string name="show_more_tiles">Show more tiles</string>
+    <string name="mono_icons">Use monochrome app icons (Android 13+)</string>
+    <string name="accent">Choose your accent color</string>
+    <string name="badges">Tile notification badges</string>
+    <string name="grant_badges">Grant notification access</string>
+    <string name="default_home">Default home app</string>
+    <string name="set_default_home">Set as default home</string>
+    <string name="on">On</string>
+    <string name="off">Off</string>
+</resources>

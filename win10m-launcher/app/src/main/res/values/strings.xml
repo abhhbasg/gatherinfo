@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">开始</string>
+    <string name="settings_launcher_label">开始屏幕设置</string>
+    <string name="calendar">日历</string>
+    <string name="search">搜索</string>
+    <string name="recently_added">最近添加</string>
+    <string name="pin_to_start">固定到"开始"屏幕</string>
+    <string name="app_info">应用信息</string>
+    <string name="uninstall">卸载</string>
+    <string name="settings_title">个性化</string>
+    <string name="settings_start">开始</string>
+    <string name="theme">选择模式</string>
+    <string name="dark">深色</string>
+    <string name="light">浅色</string>
+    <string name="background">背景</string>
+    <string name="bg_solid">无（纯色）</string>
+    <string name="bg_behind">图片在磁贴后面</string>
+    <string name="bg_on_tiles">图片显示在磁贴上</string>
+    <string name="choose_picture">浏览图片</string>
+    <string name="transparency">磁贴透明度</string>
+    <string name="show_more_tiles">显示更多磁贴</string>
+    <string name="mono_icons">使用单色应用图标（Android 13+）</string>
+    <string name="accent">选择你的主题色</string>
+    <string name="badges">磁贴通知角标</string>
+    <string name="grant_badges">授予通知访问权限</string>
+    <string name="default_home">默认桌面</string>
+    <string name="set_default_home">设为默认桌面</string>
+    <string name="on">开</string>
+    <string name="off">关</string>
+</resources>
