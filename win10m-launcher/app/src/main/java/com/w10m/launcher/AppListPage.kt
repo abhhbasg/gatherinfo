@@ -88,6 +88,16 @@ class AppListPage(context: Context, private var palette: Palette, private val lo
 
     fun setApps(a: List<AppEntry>) { apps = a; rebuild() }
 
+    /** Swiping over to the list: rows slide in from the right one after another. */
+    fun playEntrance() {
+        if (jump.visibility == VISIBLE) return
+        list.post { Motion.staggerIn(list, context.dp(80f), 14L) }
+    }
+
+    fun turnstileOut(from: View, done: () -> Unit) = Motion.turnstileOut(list, from, done)
+
+    fun resetRows() { for (i in 0 until list.childCount) list.getChildAt(i).apply { rotationY = 0f; alpha = 1f; translationX = 0f } }
+
     fun resetState() {
         if (search.edit.text.isNotEmpty()) search.edit.setText("")
         hideKeyboard()

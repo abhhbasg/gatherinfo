@@ -37,6 +37,7 @@ class MainActivity : Activity(), StartGrid.Host, AppListPage.Host {
     private var appOrder: List<AppEntry> = emptyList()
     private val ui = Handler(Looper.getMainLooper())
     private var pendingTurnstileIn = false
+    private var hiddenSig: Set<String> = emptySet()
     private var appliedSignature = ""
     private lateinit var shell: Shell
     private var chromeSig = ""
@@ -73,7 +74,7 @@ class MainActivity : Activity(), StartGrid.Host, AppListPage.Host {
 
         pager = Pager(this).apply {
             addView(scroll); addView(appList)
-            onPageChanged = { p -> if (p == 0) appList.hideKeyboard() }
+            onPageChanged = { p -> if (p == 0) appList.hideKeyboard() else appList.playEntrance() }
         }
         root.addView(pager, FrameLayout.LayoutParams(-1, -1))
         chromeSig = "${prefs.navKeys}${prefs.statusBar}${prefs.dark}"
@@ -123,7 +124,7 @@ class MainActivity : Activity(), StartGrid.Host, AppListPage.Host {
     private fun reloadApps() {
         appOrder = AppRepo.load(this)
         apps = appOrder.associateBy { it.key }
-        appList.setApps(appOrder)
+        appList.setApps(appOrder.filter { it.key !in prefs.hidden })
         reloadTiles()
     }
 
@@ -251,11 +252,15 @@ class MainActivity : Activity(), StartGrid.Host, AppListPage.Host {
 
     override fun onPause() { super.onPause(); resumed = false }
 
+    /** Coming back to Start from anywhere (an app, Back, the Start key): the tiles turnstile in. */
+    override fun onRestart() { super.onRestart(); if (pager.page == 0 && !grid.editing) pendingTurnstileIn = true }
+
     override fun onResume() {
         super.onResume()
         resumed = true
         if (chromeSig != "${prefs.navKeys}${prefs.statusBar}${prefs.dark}") { recreate(); return }
         if (tilesStamp != prefs.tilesStamp) { tilesStamp = prefs.tilesStamp; reloadTiles() }
+        if (hiddenSig != prefs.hidden) { hiddenSig = prefs.hidden; appList.setApps(appOrder.filter { it.key !in hiddenSig }) }
         loadPhotos()
         applyLook()
         applyBadges()
@@ -314,8 +319,16 @@ class MainActivity : Activity(), StartGrid.Host, AppListPage.Host {
     }
 
     override fun onAppClick(a: AppEntry, from: View) {
-        if (start(launchIntent(a.component))) @Suppress("DEPRECATION") overridePendingTransition(R.anim.metro_enter, 0)
+        // The list turnstiles away with the tapped row last, then the app comes in.
+        pager.enabledPaging = false
+        appList.turnstileOut(from) {
+            pager.enabledPaging = true
+            if (start(launchIntent(a.component))) @Suppress("DEPRECATION") overridePendingTransition(R.anim.metro_enter, 0)
+            appList.postDelayed({ appList.resetRows() }, 400)
+        }
     }
+
+    override fun onAllApps() { if (!grid.editing) pager.snapTo(1) }
 
     override fun onAppLongClick(a: AppEntry, from: View) {
         val pinned = grid.specs.any { it.component == a.key }
@@ -324,6 +337,10 @@ class MainActivity : Activity(), StartGrid.Host, AppListPage.Host {
         items += getString(R.string.app_info) to {
             start(Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS, Uri.fromParts("package", a.component.packageName, null)))
             Unit
+        }
+        items += getString(R.string.hide_app) to {
+            prefs.hidden = prefs.hidden + a.key; hiddenSig = prefs.hidden
+            appList.setApps(appOrder.filter { it.key !in hiddenSig })
         }
         items += getString(R.string.uninstall) to {
             start(Intent(Intent.ACTION_DELETE, Uri.fromParts("package", a.component.packageName, null)))

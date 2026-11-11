@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- App opening after the turnstile: quick fade + slight scale up from 0.92 (W10M "continuum" style). -->
-<set xmlns:android="http://schemas.android.com/apk/res/android"
-    android:duration="250"
-    android:interpolator="@android:interpolator/decelerate_cubic">
-    <alpha android:fromAlpha="0" android:toAlpha="1" />
-    <scale android:fromXScale="0.92" android:toXScale="1" android:fromYScale="0.92" android:toYScale="1"
-        android:pivotX="50%" android:pivotY="50%" />
+<!-- Page refresh entrance, measured from Microsoft's page-refresh.gif: content rises from +23 % of its
+     height to rest over 300 ms on the decelerate curve while its opacity comes up in 83 ms. -->
+<set xmlns:android="http://schemas.android.com/apk/res/android" android:shareInterpolator="false">
+    <translate android:fromYDelta="23%" android:toYDelta="0" android:duration="300"
+        android:interpolator="@interpolator/metro_decelerate" />
+    <alpha android:fromAlpha="0" android:toAlpha="1" android:duration="83"
+        android:interpolator="@android:interpolator/linear" />
 </set>

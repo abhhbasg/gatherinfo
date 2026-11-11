@@ -270,14 +270,16 @@ class PeopleActivity : Activity() {
             go(Intent(Intent.ACTION_EDIT, ContentUris.withAppendedId(ContactsContract.Contacts.CONTENT_URI, id)))
         }, LinearLayout.LayoutParams(-2, dpi(32f)).apply { setMargins(m, dpi(16f), m, 0) })
         cardScroll.scrollTo(0, 0)
+        val first = cardScroll.visibility != View.VISIBLE
         cardScroll.visibility = View.VISIBLE
+        if (first) cardScroll.post { Motion.drillIn(cardScroll) }
     }
 
     @Deprecated("Deprecated in Java")
     override fun onBackPressed() {
         when {
             shell.handleBack() -> Unit
-            cardScroll.visibility == View.VISIBLE -> cardScroll.visibility = View.GONE
+            cardScroll.visibility == View.VISIBLE -> { Motion.drillOut(cardScroll) { cardScroll.visibility = View.GONE }; Motion.drillBackIn(listPage) }
             search.edit.text.isNotEmpty() -> search.edit.setText("")
             else -> @Suppress("DEPRECATION") super.onBackPressed()
         }

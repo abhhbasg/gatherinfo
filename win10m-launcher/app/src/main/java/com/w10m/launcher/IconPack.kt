@@ -104,6 +104,8 @@ object IconPack {
             cls.endsWith("CalendarActivity") -> "calendar"
             cls.endsWith("CalculatorActivity") -> "calculator"
             cls.endsWith("RecorderActivity") -> "mic"
+            cls.endsWith("ClockActivity") -> "clock"
+            cls.endsWith("PhotosActivity") -> "photos"
             cls.endsWith("MusicActivity") -> "music"
             else -> "settings"
         }]

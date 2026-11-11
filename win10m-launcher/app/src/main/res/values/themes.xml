@@ -10,5 +10,22 @@
         <item name="android:windowLayoutInDisplayCutoutMode">shortEdges</item>
         <item name="android:enforceNavigationBarContrast">false</item>
         <item name="android:enforceStatusBarContrast">false</item>
+        <item name="android:windowAnimationStyle">@style/Metro.Transitions</item>
+    </style>
+
+    <!-- Activity transitions from the measured Fluent page-refresh / drill-back curves (research/W10M_START_SPEC.md §7). -->
+    <style name="Metro.Transitions" parent="@android:style/Animation.Activity">
+        <item name="android:activityOpenEnterAnimation">@anim/metro_enter</item>
+        <item name="android:activityOpenExitAnimation">@anim/metro_hold_fade</item>
+        <item name="android:activityCloseEnterAnimation">@anim/metro_back_enter</item>
+        <item name="android:activityCloseExitAnimation">@anim/metro_back_exit</item>
+        <item name="android:taskOpenEnterAnimation">@anim/metro_enter</item>
+        <item name="android:taskOpenExitAnimation">@anim/metro_hold_fade</item>
+        <item name="android:taskCloseEnterAnimation">@anim/metro_back_enter</item>
+        <item name="android:taskCloseExitAnimation">@anim/metro_back_exit</item>
+        <item name="android:taskToFrontEnterAnimation">@anim/metro_enter</item>
+        <item name="android:taskToFrontExitAnimation">@anim/metro_hold_fade</item>
+        <item name="android:taskToBackEnterAnimation">@anim/metro_back_enter</item>
+        <item name="android:taskToBackExitAnimation">@anim/metro_back_exit</item>
     </style>
 </resources>

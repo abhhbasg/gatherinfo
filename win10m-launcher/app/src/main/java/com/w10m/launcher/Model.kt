@@ -89,6 +89,10 @@ class Prefs(c: Context) {
     var statusBar: Boolean
         get() = sp.getBoolean("statusbar", true)
         set(v) = sp.edit().putBoolean("statusbar", v).apply()
+    /** Apps hidden from the app list (component keys). */
+    var hidden: Set<String>
+        get() = sp.getStringSet("hidden", emptySet())!!.toSet()
+        set(v) = sp.edit().putStringSet("hidden", v).apply()
     var photosAsked: Boolean
         get() = sp.getBoolean("photosasked", false)
         set(v) = sp.edit().putBoolean("photosasked", v).apply()
@@ -161,7 +165,6 @@ object AppRepo {
             Intent(Intent.ACTION_SENDTO, Uri.parse("smsto:")) to TileSize.MEDIUM,
             Intent(Intent.ACTION_VIEW, Uri.parse("https://example.com")) to TileSize.MEDIUM,
             Intent(MediaStore.INTENT_ACTION_STILL_IMAGE_CAMERA) to TileSize.SMALL,
-            Intent(Intent.ACTION_VIEW).setType("image/*") to TileSize.WIDE,
             Intent(Intent.ACTION_MAIN).addCategory(Intent.CATEGORY_APP_EMAIL) to TileSize.MEDIUM,
         )
         val out = mutableListOf<TileSpec>()
@@ -172,7 +175,9 @@ object AppRepo {
         }
         // The built-in phone, people, messaging and browser lead the layout, as on W10M.
         for (cls in listOf("DialerActivity", "PeopleActivity", "MessagingActivity", "BrowserActivity")) own(cls, TileSize.MEDIUM)
+        own("PhotosActivity", TileSize.WIDE)
         own("SystemSettingsActivity", TileSize.SMALL)
+        own("ClockActivity", TileSize.SMALL)
         own("CalculatorActivity", TileSize.SMALL)
         own("MusicActivity", TileSize.MEDIUM)
         for ((intent, size) in wanted) {

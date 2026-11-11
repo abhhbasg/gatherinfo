@@ -138,8 +138,7 @@ class SystemSettingsActivity : Activity() {
         col.addView(pageTitle(this, p, getString(c.title)))
         for (e in c.entries) col.addView(row(null, getString(e.title), getString(e.desc)) { launch(e) })
         scroll.scrollTo(0, 0)
-        col.alpha = 0f; col.translationX = dp(40f)
-        col.animate().alpha(1f).translationX(0f).setDuration(Metro.DUR_NORMAL)
+        col.post { Motion.drillIn(col) }
     }
 
     /** Row: optional 24 epx glyph, title 15, summary 12 at 60 %. */
@@ -174,7 +173,7 @@ class SystemSettingsActivity : Activity() {
     override fun onBackPressed() {
         when {
             shell.handleBack() -> Unit
-            open != null -> showHome()
+            open != null -> { showHome(); Motion.drillBackIn(col) }
             search.edit.text.isNotEmpty() -> search.edit.setText("")
             else -> @Suppress("DEPRECATION") super.onBackPressed()
         }

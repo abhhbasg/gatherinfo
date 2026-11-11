@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Fluent "slow out, fast in": cubic-bezier(1, 0, 1, 1) (timing-and-easing.md). -->
+<pathInterpolator xmlns:android="http://schemas.android.com/apk/res/android"
+    android:controlX1="1" android:controlY1="0" android:controlX2="1" android:controlY2="1" />

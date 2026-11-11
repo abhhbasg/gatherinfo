@@ -26,6 +26,8 @@ class StartGrid(context: Context, val look: TileLook) : ViewGroup(context) {
         fun onTileClick(t: TileView)
         fun onTilesChanged(tiles: List<TileSpec>)
         fun onEditModeChanged(editing: Boolean)
+        /** The "All apps →" link under the tiles. */
+        fun onAllApps() {}
     }
 
     var host: Host? = null
@@ -46,6 +48,9 @@ class StartGrid(context: Context, val look: TileLook) : ViewGroup(context) {
     val editing get() = selected != null
     private val unpinBtn = CircleButton(context, CircleButton.UNPIN)
     private val resizeBtn = CircleButton(context, CircleButton.RESIZE)
+    /** "All apps →" under the last row, right-aligned, as on W10M. */
+    private val allApps = AllAppsLink(context, look)
+    private var floatAnim: android.animation.ValueAnimator? = null
 
     init {
         clipChildren = false
@@ -53,6 +58,7 @@ class StartGrid(context: Context, val look: TileLook) : ViewGroup(context) {
         unpinBtn.setOnClickListener { selected?.let { unpin(it) } }
         resizeBtn.setOnClickListener { selected?.let { resize(it) } }
         setOnClickListener { if (editing) exitEdit() }
+        allApps.setOnClickListener { if (editing) exitEdit() else host?.onAllApps() }
     }
 
     val specs: List<TileSpec> get() = tiles.map { it.spec }
@@ -61,7 +67,7 @@ class StartGrid(context: Context, val look: TileLook) : ViewGroup(context) {
     fun setTiles(list: List<TileView>) {
         removeAllViews(); tiles.clear()
         list.forEach { addTile(it) }
-        addView(unpinBtn); addView(resizeBtn)
+        addView(allApps); addView(unpinBtn); addView(resizeBtn)
         unpinBtn.visibility = GONE; resizeBtn.visibility = GONE
         selected = null
         requestLayout()
@@ -80,8 +86,8 @@ class StartGrid(context: Context, val look: TileLook) : ViewGroup(context) {
     }
 
     fun appendTile(t: TileView) {
-        removeView(unpinBtn); removeView(resizeBtn)
-        addTile(t); addView(unpinBtn); addView(resizeBtn)
+        removeView(allApps); removeView(unpinBtn); removeView(resizeBtn)
+        addTile(t); addView(allApps); addView(unpinBtn); addView(resizeBtn)
         requestLayout(); host?.onTilesChanged(specs)
     }
 
@@ -106,11 +112,15 @@ class StartGrid(context: Context, val look: TileLook) : ViewGroup(context) {
         unpinBtn.measure(MeasureSpec.makeMeasureSpec(b, MeasureSpec.EXACTLY), MeasureSpec.makeMeasureSpec(b, MeasureSpec.EXACTLY))
         resizeBtn.measure(MeasureSpec.makeMeasureSpec(b, MeasureSpec.EXACTLY), MeasureSpec.makeMeasureSpec(b, MeasureSpec.EXACTLY))
         val contentH = topInset + context.dp(Metro.TOP_MARGIN) + rows * cell + maxOf(0, rows - 1) * gutter
+        allApps.measure(MeasureSpec.makeMeasureSpec(w, MeasureSpec.AT_MOST), MeasureSpec.makeMeasureSpec(context.dpi(48f), MeasureSpec.EXACTLY))
+        linkTop = contentH + context.dp(12f)
         // Leave room so the last row can scroll up comfortably (W10M has ~1/3 screen of slack at the bottom).
         val minH = MeasureSpec.getSize(heightMeasureSpec)
-        val h = maxOf(contentH + context.dp(96f) + bottomInset, minH.toFloat())
+        val h = maxOf(linkTop + context.dp(48f) + context.dp(48f) + bottomInset, minH.toFloat())
         setMeasuredDimension(w, h.toInt())
     }
+
+    private var linkTop = 0f
 
     fun cellLeft(c: Int) = side + c * (cell + gutter)
     fun cellTop(r: Int) = topInset + context.dp(Metro.TOP_MARGIN) + r * (cell + gutter)
@@ -122,6 +132,8 @@ class StartGrid(context: Context, val look: TileLook) : ViewGroup(context) {
             v.layout(x, y, x + v.measuredWidth, y + v.measuredHeight)
         }
         dragging?.let { it.layout(it.left, it.top, it.left + it.measuredWidth, it.top + it.measuredHeight) }
+        val lw = allApps.measuredWidth; val lx = (r - l - side).toInt() - lw
+        allApps.layout(lx, linkTop.toInt(), lx + lw, linkTop.toInt() + allApps.measuredHeight)
         placeButtons()
     }
 
@@ -182,16 +194,44 @@ class StartGrid(context: Context, val look: TileLook) : ViewGroup(context) {
         }
         t.bringToFront(); unpinBtn.bringToFront(); resizeBtn.bringToFront()
         unpinBtn.visibility = VISIBLE; resizeBtn.visibility = VISIBLE
+        allApps.animate().alpha(Metro.EDIT_OTHERS_ALPHA).setDuration(Metro.DUR_FAST)
         requestLayout()
+        startFloat(t)
+    }
+
+    /**
+     * The tile being edited drifts freely: a slow 3D sway on two incommensurate periods so it never
+     * looks looped (about ±3° around each axis).
+     */
+    private fun startFloat(t: TileView) {
+        floatAnim?.cancel()
+        floatAnim = android.animation.ValueAnimator.ofFloat(0f, (Math.PI * 2 * 1000).toFloat()).apply {
+            duration = 1000L * 2600
+            interpolator = android.view.animation.LinearInterpolator()
+            addUpdateListener {
+                if (selected !== t || dragging === t) return@addUpdateListener
+                val a = it.animatedValue as Float
+                t.pivotX = t.width / 2f; t.pivotY = t.height / 2f
+                t.rotationX = 3f * kotlin.math.sin(a)
+                t.rotationY = 3f * kotlin.math.sin(a * 0.73f + 1.3f)
+            }
+            start()
+        }
+    }
+
+    private fun stopFloat() {
+        floatAnim?.cancel(); floatAnim = null
     }
 
     fun exitEdit() {
         if (!editing) return
         selected = null
+        stopFloat()
         unpinBtn.visibility = GONE; resizeBtn.visibility = GONE
+        allApps.animate().alpha(1f).setDuration(Metro.DUR_FAST)
         tiles.forEach { v ->
             v.tiltEnabled = true
-            v.animate().scaleX(1f).scaleY(1f).alpha(1f).setDuration(Metro.DUR_FAST)
+            v.animate().scaleX(1f).scaleY(1f).alpha(1f).rotationX(0f).rotationY(0f).setDuration(Metro.DUR_FAST)
         }
         host?.onEditModeChanged(false)
     }
@@ -218,6 +258,7 @@ class StartGrid(context: Context, val look: TileLook) : ViewGroup(context) {
     private var dragging: TileView? = null
     private var downX = 0f; private var downY = 0f
     private var grabDx = 0f; private var grabDy = 0f
+    private var lastX = 0f; private var lastY = 0f; private var lastT = 0L
     private val slop = ViewConfiguration.get(context).scaledTouchSlop
 
     override fun onInterceptTouchEvent(e: MotionEvent): Boolean {
@@ -242,6 +283,8 @@ class StartGrid(context: Context, val look: TileLook) : ViewGroup(context) {
         grabDx = downX - s.left; grabDy = downY - s.top
         parent.requestDisallowInterceptTouchEvent(true)
         unpinBtn.visibility = INVISIBLE; resizeBtn.visibility = INVISIBLE
+        lastX = downX; lastY = downY; lastT = android.os.SystemClock.uptimeMillis()
+        s.pivotX = s.width / 2f; s.pivotY = s.height / 2f
         s.animate().scaleX(1.05f).scaleY(1.05f).setDuration(Metro.DUR_FAST)
     }
 
@@ -252,6 +295,13 @@ class StartGrid(context: Context, val look: TileLook) : ViewGroup(context) {
             MotionEvent.ACTION_MOVE -> {
                 val nl = (e.x - grabDx).toInt(); val nt = (e.y - grabDy).toInt()
                 d.layout(nl, nt, nl + d.measuredWidth, nt + d.measuredHeight)
+                // The tile leans into its motion: velocity (px/ms) mapped to up to 18° and eased toward it.
+                val now = android.os.SystemClock.uptimeMillis(); val dt = (now - lastT).coerceAtLeast(1)
+                val vx = (e.x - lastX) / dt; val vy = (e.y - lastY) / dt
+                val k = 9f / resources.displayMetrics.density
+                val ry = (vx * k * 10).coerceIn(-18f, 18f); val rx = (-vy * k * 10).coerceIn(-18f, 18f)
+                d.rotationY += (ry - d.rotationY) * 0.35f; d.rotationX += (rx - d.rotationX) * 0.35f
+                lastX = e.x; lastY = e.y; lastT = now
                 reorderUnder(d, e.x, e.y)
             }
             MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
@@ -260,7 +310,8 @@ class StartGrid(context: Context, val look: TileLook) : ViewGroup(context) {
                 requestLayout()
                 post {
                     d.translationX = (ol - d.left).toFloat(); d.translationY = (ot - d.top).toFloat()
-                    d.animate().translationX(0f).translationY(0f).scaleX(1f).scaleY(1f).setDuration(Metro.DUR_FAST)
+                    d.animate().translationX(0f).translationY(0f).scaleX(1f).scaleY(1f).rotationX(0f).rotationY(0f)
+                        .setDuration(Metro.DUR_NORMAL).setInterpolator(Motion.DECELERATE)
                         .withEndAction { placeButtons(); unpinBtn.visibility = VISIBLE; resizeBtn.visibility = VISIBLE }
                 }
                 host?.onTilesChanged(specs)
@@ -314,6 +365,42 @@ class StartGrid(context: Context, val look: TileLook) : ViewGroup(context) {
         it.animate().cancel(); it.rotationY = 0f; it.rotationX = 0f; it.alpha = 1f; it.scaleX = 1f; it.scaleY = 1f
         it.pivotX = it.width / 2f; it.pivotY = it.height / 2f
     }
+}
+
+/** "All apps →": 15 epx label with a circled arrow, in the theme foreground (W10M Start, bottom right). */
+@SuppressLint("ViewConstructor")
+class AllAppsLink(context: Context, private val look: TileLook) : View(context) {
+    private val tp = android.text.TextPaint(Paint.ANTI_ALIAS_FLAG).apply { textSize = context.sp(15f); typeface = Metro.regular(context) }
+    private val lp = Paint(Paint.ANTI_ALIAS_FLAG).apply { style = Paint.Style.STROKE; strokeWidth = context.dp(1.5f) }
+    private val path = Path()
+
+    init {
+        isClickable = true
+        contentDescription = context.getString(R.string.all_apps)
+    }
+
+    override fun onMeasure(w: Int, h: Int) {
+        val text = context.getString(R.string.all_apps)
+        setMeasuredDimension((tp.measureText(text) + context.dp(12f + 32f + 4f)).toInt(), MeasureSpec.getSize(h))
+    }
+
+    override fun onDraw(c: Canvas) {
+        val fg = if (isPressed) look.palette.accent else look.palette.fg
+        val text = context.getString(R.string.all_apps)
+        val cy = height / 2f
+        tp.color = fg; lp.color = fg
+        c.drawText(text, context.dp(4f), cy - (tp.ascent() + tp.descent()) / 2, tp)
+        // Circled right arrow, 32 epx.
+        val r = context.dp(15f); val cx = width - r - context.dp(1.5f)
+        c.drawCircle(cx, cy, r, lp)
+        val u = context.dp(1f)
+        path.reset()
+        path.moveTo(cx - 7 * u, cy); path.lineTo(cx + 7 * u, cy)
+        path.moveTo(cx + 1 * u, cy - 6 * u); path.lineTo(cx + 7 * u, cy); path.lineTo(cx + 1 * u, cy + 6 * u)
+        c.drawPath(path, lp)
+    }
+
+    override fun drawableStateChanged() { super.drawableStateChanged(); invalidate() }
 }
 
 /** White circular edit button with an MDL2-style glyph (unpin / resize arrow). */

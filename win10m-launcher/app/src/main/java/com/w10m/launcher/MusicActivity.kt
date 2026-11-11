@@ -121,7 +121,7 @@ class MusicActivity : Activity() {
         val root = FrameLayout(this).apply { setBackgroundColor(p.bg) }
         val col = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL }
         col.addView(pageTitle(this, p, getString(R.string.music)))
-        pivot = PivotHeader(this, p, listOf(getString(R.string.songs), getString(R.string.artists), getString(R.string.albums))) { mode = it; rebuild() }
+        pivot = PivotHeader(this, p, listOf(getString(R.string.songs), getString(R.string.artists), getString(R.string.albums))) { mode = it; rebuild(); Motion.pageRefresh(list) }
         col.addView(pivot)
         val body = FrameLayout(this)
         list = RecyclerView(this).apply { layoutManager = LinearLayoutManager(context); adapter = Adapter(); itemAnimator = null }

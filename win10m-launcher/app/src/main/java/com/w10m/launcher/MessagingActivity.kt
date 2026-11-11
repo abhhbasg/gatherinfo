@@ -254,6 +254,7 @@ class MessagingActivity : Activity() {
         compose.setText("")
         listPage.visibility = View.GONE; threadPage.visibility = View.VISIBLE
         fillThread()
+        threadPage.post { Motion.drillIn(threadPage) }
         // Mark-as-read needs the default-SMS role, so unread state follows the system app.
     }
 
@@ -331,7 +332,8 @@ class MessagingActivity : Activity() {
             shell.handleBack() -> Unit
             threadPage.visibility == View.VISIBLE -> {
                 (getSystemService(Context.INPUT_METHOD_SERVICE) as android.view.inputmethod.InputMethodManager).hideSoftInputFromWindow(compose.windowToken, 0)
-                threadPage.visibility = View.GONE; listPage.visibility = View.VISIBLE
+                Motion.drillOut(threadPage) { threadPage.visibility = View.GONE }
+                listPage.visibility = View.VISIBLE; Motion.drillBackIn(listPage)
             }
             else -> @Suppress("DEPRECATION") super.onBackPressed()
         }

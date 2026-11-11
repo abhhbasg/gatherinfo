@@ -248,7 +248,12 @@ class GlyphButton(context: Context, var color: Int, private val glyph: (Canvas, 
 @SuppressLint("ViewConstructor")
 class PivotHeader(context: Context, private val p: Palette, private val items: List<String>, var onSelect: (Int) -> Unit) : LinearLayout(context) {
     var selected = 0
-        set(v) { field = v; for (i in 0 until childCount) (getChildAt(i) as TextView).setTextColor(if (i == v) p.fg else p.fgMedium) }
+        set(v) {
+            field = v
+            for (i in 0 until childCount) (getChildAt(i) as TextView).setTextColor(if (i == v) p.fg else p.fgMedium)
+            // Like the W10M pivot, the selected header slides to the left edge when the headers overflow.
+            (parent as? android.widget.HorizontalScrollView)?.let { sv -> post { sv.smoothScrollTo(getChildAt(v).left - paddingLeft, 0) } }
+        }
 
     init {
         setPadding(context.dpi(Metro.PAGE_MARGIN), context.dpi(4f), 0, context.dpi(8f))

@@ -158,6 +158,38 @@ E3008C BF0077 C239B3 9A0089 0078D7 0063B1
 | 消息 · 会话列表 | 行高 **68**，40 epx 圆形头像，姓名 20 SemiLight，预览 15（未读为主题色），时间 12 靠右 |
 | 消息 · 气泡 | 直角矩形带 8 epx 三角缺口（收到的在左上、发出的在右下），发出为主题色，收到为 #333333；正文 15，时间 12 / 60% |
 
+## 7. 动画（第五版，逐帧测量官方参考动画）
+来源：MicrosoftDocs/windows-dev-docs 仓库（CC BY 4.0）中的 `motion/images/drill.gif`、`page-refresh.gif`（每帧 20 ms），
+以及 `timing-and-easing.md`、`directionality-and-gravity.md` 正文。帧序列见 `ref-motion-drill-frames.png`、`ref-motion-page-refresh-frames.png`。
+
+| 项目 | 测得 / 文档值 | 来源 |
+|---|---|---|
+| 进入曲线 | cubic-bezier(0, 0, 0, 1)（快出慢入） | 【官方】timing-and-easing |
+| 离开曲线 | cubic-bezier(1, 0, 1, 1)（慢出快入） | 【官方】timing-and-easing |
+| 标准时长 | 250 / 167 / 83 ms | 【官方】timing-and-easing |
+| Drill in | 新页面缩放 0.76 → 1.0，约 300 ms，进入曲线；旧页面约 83 ms 内淡出 | 【测量】drill.gif 第 62–86 帧 |
+| Drill back | 当前页缩到 0.87 并淡出，约 167 ms，离开曲线；返回的页面从 1.2 收回到 1.0，约 280 ms | 【测量】drill.gif 第 178–200 帧 |
+| Page refresh | 新内容从下方 +23% 高度处上滑到位，约 300 ms，进入曲线；不透明度约 83 ms 到 1 | 【测量】page-refresh.gif 第 72–88 帧 |
+| 打开应用 | 磁贴 Turnstile 飞出后，应用窗口按 Page refresh 进入 | 本项目组合 |
+| 返回开始屏幕 | 应用窗口按 Drill back 缩小淡出，磁贴 Turnstile 飞入（每次回到开始屏幕都播放） | 本项目组合 |
+| 所有应用列表 | 滑到列表时各行从右侧 80 epx 处依次滑入（间隔 14 ms）；从列表打开应用时各行 Turnstile 飞出，被点的一行最后 | 【实测】 |
+| 拖动磁贴 | 磁贴放大到 1.05，按拖动速度向运动方向倾斜（最多 18°，平滑跟随），松手后用进入曲线回正 | 【实测】 |
+| 编辑中的磁贴 | 绕 X / Y 轴各 ±3° 缓慢漂浮，两轴周期不同（约 2.6 s / 3.6 s），看起来不循环 | 本项目设计 |
+
+## 8. 照片（第五版，测量官方截图）
+来源：windows-dev-docs `semantic-zoom-photos.png`（Windows 10 照片应用，100% 缩放，与 W10M 照片同一套设计），见 `ref-photos-semantic-zoom.png`。
+
+| 元素 | 测得值 |
+|---|---|
+| 顶栏 | 高 **40 epx**，ChromeMedium（#1F1F1F）；左侧汉堡键，标题 "COLLECTION" 大写 SemiBold，字母高 8 px → 约 **12 epx** |
+| 月份分组标题 | 主题色 Regular，字母高 11 px → 约 **15 epx**，所在行高约 **40 epx** |
+| 缩略图 | 正方形约 **161 epx**，间隙 **2 epx**，约 340 epx 宽时 2 列；左边缘与标题文字对齐 |
+| 语义缩放（月份列表） | 行距约 **38 epx**，有照片的月份为主题色 |
+
+## 9. 闹钟和时钟（第五版）
+没有找到 W10M 闹钟应用的官方截图；仓库里的 `clock-app-dark.png` 是 Windows 11 时钟（秒表页），只借用了"大号数字 + 下方 hr / min / sec 小标注 + 主题色圆形播放键"的结构。
+时间选择器按 W10M LoopingSelector 的样子做：每项高 54 epx，选中项主题色底白字，其余 60% 前景色，可循环滚动。以上均为【实测】估计。
+
 ## 6. Android 适配说明
 - 应用图标：Android 13+ 自适应图标若带 **monochrome（单色）层**，绘制为白色单色图标放在主题色磁贴上——这正是 W10M「白色字形 + 主题色底」的样子；否则绘制原彩色图标。
 - 角标：通过 NotificationListenerService 统计每个应用的通知数（需用户在系统设置里授权）。

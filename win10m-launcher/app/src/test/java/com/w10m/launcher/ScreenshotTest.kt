@@ -226,6 +226,79 @@ class ScreenshotTest {
         render(a.findViewById(android.R.id.content), "settings")
     }
 
+    private fun clockTab(tab: Int, name: String, setup: (android.content.Context) -> Unit = {}) {
+        val app = androidx.test.core.app.ApplicationProvider.getApplicationContext<android.app.Application>()
+        app.getSharedPreferences("w10m_clock", 0).edit().putInt("tab", tab).commit()
+        setup(app)
+        val a = Robolectric.buildActivity(ClockActivity::class.java).setup().get()
+        shadowOf(Looper.getMainLooper()).idleFor(Duration.ofMillis(1500))
+        render(a.findViewById(android.R.id.content), name)
+    }
+
+    @Test fun clockAlarms() = clockTab(0, "clock_alarms") { c ->
+        c.getSharedPreferences("w10m_alarms", 0).edit().putString("list", org.json.JSONArray().apply {
+            put(Alarm(1, 6, 30, "起床", 0b0111110, true).toJson())
+            put(Alarm(2, 8, 0, "", 0b1000001, false).toJson())
+            put(Alarm(3, 22, 45, "吃药", 0b1111111, true).toJson())
+        }.toString()).commit()
+    }
+    @Test fun clockWorld() = clockTab(1, "clock_world") { c ->
+        c.getSharedPreferences("w10m_clock", 0).edit().putString("zones", "Asia/Shanghai,Europe/London,America/New_York,Asia/Tokyo").commit()
+    }
+    @Test fun clockTimer() = clockTab(2, "clock_timer") { c ->
+        c.getSharedPreferences("w10m_clock", 0).edit().putLong("timer_total", 300_000).putLong("timer_left", 187_000).putLong("timer_end", 0).commit()
+    }
+    @Test fun clockStopwatch() = clockTab(3, "clock_stopwatch") { c ->
+        c.getSharedPreferences("w10m_clock", 0).edit().putLong("sw_acc", 83_450).putLong("sw_start", 0).putString("sw_laps", "21300,44120,63900").commit()
+    }
+
+    @Test fun alarmEditor() {
+        val app = androidx.test.core.app.ApplicationProvider.getApplicationContext<android.app.Application>()
+        app.getSharedPreferences("w10m_clock", 0).edit().putInt("tab", 0).commit()
+        val a = Robolectric.buildActivity(ClockActivity::class.java).setup().get()
+        idle()
+        // Tap "+" in the command bar.
+        fun find(v: View): View? {
+            if (v is GlyphButton) return v
+            if (v is android.view.ViewGroup) for (i in v.childCount - 1 downTo 0) find(v.getChildAt(i))?.let { return it }
+            return null
+        }
+        find(a.findViewById(android.R.id.content))!!.performClick(); idle()
+        render(a.findViewById(android.R.id.content), "clock_new_alarm")
+    }
+
+    @Test fun photos() {
+        val app = androidx.test.core.app.ApplicationProvider.getApplicationContext<android.app.Application>()
+        shadowOf(app).grantPermissions(android.Manifest.permission.READ_MEDIA_IMAGES, android.Manifest.permission.READ_MEDIA_VIDEO)
+        val day = 86_400_000L; val now = System.currentTimeMillis()
+        val cursor = org.robolectric.fakes.RoboCursor().apply {
+            setColumnNames(listOf("_id", "date_added", "datetaken", "bucket_display_name"))
+            setResults((0 until 14).map { i -> arrayOf<Any>(i.toLong(), 0L, now - i * 9 * day, if (i % 3 == 0) "Camera" else "Screenshots") }.toTypedArray())
+        }
+        shadowOf(app.contentResolver).setCursor(android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI, cursor)
+        val a = Robolectric.buildActivity(PhotosActivity::class.java).setup().get()
+        shadowOf(Looper.getMainLooper()).idleFor(Duration.ofMillis(800))
+        render(a.findViewById(android.R.id.content), "photos")
+    }
+
+    @Test fun startBottomAndDrag() {
+        val a = Robolectric.buildActivity(Activity::class.java).setup().get()
+        val look = TileLook(Palette(true, Metro.DEFAULT_ACCENT), Background.SOLID, 0, true)
+        val apps = sampleApps(a)
+        val grid = StartGrid(a, look)
+        grid.topInset = a.dpi(24f); grid.bottomInset = a.dpi(NavBar.HEIGHT)
+        val tiles = apps.take(8).mapIndexed { i, x -> TileView(a, TileSpec("t$i", TileKind.APP, x.key, if (i % 3 == 2) TileSize.SMALL else TileSize.MEDIUM), look).also { it.app = x } }
+        grid.setTiles(tiles)
+        val content = FrameLayout(a).apply { setBackgroundColor(Color.BLACK); addView(grid) }
+        val shell = Shell(a, Prefs(a), look.palette, overlay = true)
+        shell.setContent(content)
+        idle()
+        // Edit mode with the selected tile mid-drag: lifted 1.05× and leaning into its motion.
+        grid.enterEdit(tiles[4]); idle()
+        tiles[4].apply { scaleX = 1.05f; scaleY = 1.05f; rotationY = 12f; rotationX = -6f; translationX = a.dp(40f); translationY = -a.dp(30f) }
+        render(shell.root, "start_drag")
+    }
+
     @Test fun dialer() {
         val a = Robolectric.buildActivity(DialerActivity::class.java).setup().get()
         idle()

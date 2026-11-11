@@ -98,6 +98,19 @@ class SettingsActivity : Activity() {
         section(col, R.string.accent)
         col += AccentGrid()
 
+        section(col, R.string.hidden_apps)
+        val hidden = prefs.hidden
+        if (hidden.isEmpty()) col += text(getString(R.string.no_hidden_apps), 15f, Metro.regular(this), p.fgMedium)
+        for (key in hidden.sorted()) {
+            val cn = android.content.ComponentName.unflattenFromString(key) ?: continue
+            val label = try { packageManager.getActivityInfo(cn, 0).loadLabel(packageManager).toString() } catch (_: Exception) { cn.packageName }
+            col += LinearLayout(this).apply {
+                gravity = Gravity.CENTER_VERTICAL
+                addView(text(label, 15f, Metro.regular(context), p.fg), LinearLayout.LayoutParams(0, -2, 1f))
+                addView(button(getString(R.string.unhide)) { prefs.hidden = prefs.hidden - key; recreate() })
+            }.withTopMargin(6f)
+        }
+
         section(col, R.string.badges)
         col += button(getString(R.string.grant_badges)) { go(Intent(Settings.ACTION_NOTIFICATION_LISTENER_SETTINGS)) }
 
