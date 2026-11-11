@@ -43,13 +43,17 @@ class SettingsActivity : Activity() {
             setBackgroundColor(p.bg); addView(col); isFillViewport = true
             overScrollMode = View.OVER_SCROLL_NEVER
         }
-        setContentView(scroll)
+        val shell = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL; setBackgroundColor(p.bg) }
+        shell.addView(scroll, LinearLayout.LayoutParams(-1, 0, 1f))
+        val nav = if (prefs.navKeys) NavBar(this, p.accent).also { NavBar.wire(it, this); shell.addView(it, LinearLayout.LayoutParams(-1, -2)) } else null
+        setContentView(shell)
         WindowCompat.getInsetsController(window, scroll).apply {
             isAppearanceLightStatusBars = !p.dark; isAppearanceLightNavigationBars = !p.dark
         }
         scroll.setOnApplyWindowInsetsListener { _, ins ->
             val b = ins.getInsets(WindowInsets.Type.systemBars())
-            col.setPadding(m, b.top + dpi(12f), m, b.bottom + dpi(24f)); ins
+            col.setPadding(m, b.top + dpi(12f), m, (if (nav == null) b.bottom else 0) + dpi(24f))
+            nav?.bottomInset = b.bottom; ins
         }
 
         col += text(getString(R.string.settings_title).uppercase(), 15f, Metro.semibold(this), p.fg)
@@ -74,8 +78,23 @@ class SettingsActivity : Activity() {
         section(col, R.string.show_more_tiles)
         col += MetroToggle(this, p).apply { checked = prefs.moreTiles; onChange = { prefs.moreTiles = it } }
 
+        section(col, R.string.nav_keys)
+        col += MetroToggle(this, p).apply { checked = prefs.navKeys; onChange = { prefs.navKeys = it; recreate() } }
+
+        section(col, R.string.icon_pack)
+        col += MetroToggle(this, p).apply { checked = prefs.iconPack; onChange = { prefs.iconPack = it } }
+
+        section(col, R.string.brand_colors)
+        col += MetroToggle(this, p).apply { checked = prefs.brandColors; onChange = { prefs.brandColors = it } }
+
         section(col, R.string.mono_icons)
         col += MetroToggle(this, p).apply { checked = prefs.monoIcons; onChange = { prefs.monoIcons = it } }
+
+        section(col, R.string.photo_tile)
+        col += button(getString(R.string.grant_photos)) {
+            requestPermissions(arrayOf(if (Build.VERSION.SDK_INT >= 33) android.Manifest.permission.READ_MEDIA_IMAGES
+            else android.Manifest.permission.READ_EXTERNAL_STORAGE), 9)
+        }
 
         section(col, R.string.accent)
         col += AccentGrid()

@@ -32,9 +32,9 @@ object Metro {
 
     // --- App list ---------------------------------------------------------
     const val PAGE_MARGIN = 12f
-    const val LIST_ROW_H = 52f
+    const val LIST_ROW_H = 44f
     const val LIST_ICON = 40f
-    const val LIST_HEADER_H = 48f
+    const val LIST_HEADER_H = 44f
 
     // --- Accent palette (Windows 10 / W10M, 48 colours) ----------------------
     val ACCENTS = intArrayOf(

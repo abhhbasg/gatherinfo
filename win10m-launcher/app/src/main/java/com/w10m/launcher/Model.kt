@@ -22,21 +22,24 @@ enum class TileSize(val w: Int, val h: Int) {
     fun next() = when (this) { MEDIUM -> SMALL; SMALL -> WIDE; WIDE -> MEDIUM }
 }
 
-enum class TileKind { APP, CALENDAR }
+enum class TileKind { APP, CALENDAR, WEB }
 
 data class TileSpec(
     val id: String,
     val kind: TileKind,
     val component: String?,
     var size: TileSize,
+    /** Title for WEB tiles (component holds the URL). */
+    val label: String? = null,
 ) {
     fun toJson() = JSONObject().put("id", id).put("kind", kind.name)
-        .put("component", component ?: "").put("size", size.name)
+        .put("component", component ?: "").put("size", size.name).put("label", label ?: "")
 
     companion object {
         fun fromJson(o: JSONObject) = TileSpec(
             o.getString("id"), TileKind.valueOf(o.getString("kind")),
             o.optString("component").ifEmpty { null }, TileSize.valueOf(o.getString("size")),
+            o.optString("label").ifEmpty { null },
         )
     }
 }
@@ -48,6 +51,8 @@ class AppEntry(
     /** Monochrome layer of an adaptive icon (Android 13+), drawn white on the tile like MDL2 glyphs. */
     val mono: Drawable?,
     val installTime: Long,
+    /** Icon-pack glyph (brand logo or line glyph), or null when the pack has none for this app. */
+    val glyph: Glyph? = null,
 ) {
     val key: String get() = component.flattenToString()
 }
@@ -76,7 +81,30 @@ class Prefs(c: Context) {
         get() = sp.getBoolean("mono", true)
         set(v) = sp.edit().putBoolean("mono", v).apply()
 
+    /** Show the Windows Phone Back / Start / Search keys at the bottom of the launcher's screens. */
+    var navKeys: Boolean
+        get() = sp.getBoolean("navkeys", true)
+        set(v) = sp.edit().putBoolean("navkeys", v).apply()
+    var iconPack: Boolean
+        get() = sp.getBoolean("iconpack", true)
+        set(v) = sp.edit().putBoolean("iconpack", v).apply()
+    var brandColors: Boolean
+        get() = sp.getBoolean("brandcolors", true)
+        set(v) = sp.edit().putBoolean("brandcolors", v).apply()
+    /** Bumped whenever another screen (e.g. the browser) edits the pinned tiles. */
+    var tilesStamp: Int
+        get() = sp.getInt("stamp", 0)
+        set(v) = sp.edit().putInt("stamp", v).apply()
+
     fun palette() = Palette(dark, accent)
+
+    fun pinWeb(url: String, title: String) {
+        val t = loadTiles() ?: mutableListOf()
+        if (t.none { it.kind == TileKind.WEB && it.component == url }) {
+            t += TileSpec("w:$url", TileKind.WEB, url, TileSize.MEDIUM, title)
+            saveTiles(t); tilesStamp += 1
+        }
+    }
 
     fun loadTiles(): MutableList<TileSpec>? {
         val s = sp.getString("tiles", null) ?: return null
@@ -101,7 +129,8 @@ object AppRepo {
                 val icon = ri.loadIcon(pm)
                 val mono = if (Build.VERSION.SDK_INT >= 33 && icon is AdaptiveIconDrawable) icon.monochrome else null
                 val t = try { pm.getPackageInfo(ai.packageName, 0).firstInstallTime } catch (_: Exception) { 0L }
-                AppEntry(ComponentName(ai.packageName, ai.name), ri.loadLabel(pm).toString(), icon, mono, t)
+                AppEntry(ComponentName(ai.packageName, ai.name), ri.loadLabel(pm).toString(), icon, mono, t,
+                    IconPack.forApp(c, ai.packageName, ai.name))
             }
             .sortedWith { a, b -> collator.compare(a.label, b.label) }
     }
@@ -113,6 +142,7 @@ object AppRepo {
         fun resolve(intent: Intent): String? {
             val ri = pm.resolveActivity(intent, PackageManager.MATCH_DEFAULT_ONLY) ?: return null
             val pkg = ri.activityInfo?.packageName ?: return null
+            if (pkg == c.packageName) return null
             return byPkg[pkg]?.firstOrNull()?.key
         }
         val wanted = listOf(
@@ -128,6 +158,11 @@ object AppRepo {
         )
         val out = mutableListOf<TileSpec>()
         val used = HashSet<String>()
+        // The built-in phone and browser lead the layout, as Phone and Edge do on W10M.
+        for (cls in listOf("DialerActivity", "BrowserActivity")) {
+            val k = apps.firstOrNull { it.component.packageName == c.packageName && it.component.className.endsWith(cls) }?.key ?: continue
+            used += k; out += TileSpec("a:$k", TileKind.APP, k, TileSize.MEDIUM)
+        }
         for ((intent, size) in wanted) {
             val k = try { resolve(intent) } catch (_: Exception) { null } ?: continue
             if (used.add(k)) out += TileSpec("a:$k", TileKind.APP, k, size)

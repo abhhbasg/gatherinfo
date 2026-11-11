@@ -216,3 +216,30 @@ class MetroSlider(context: Context, private val palette: Palette) : View(context
         return true
     }
 }
+
+/** UWP Button: 32 epx high, translucent fill, 12 epx side padding, 15 epx text. */
+fun metroButton(c: Context, p: Palette, label: String, onClick: () -> Unit): TextView = TextView(c).apply {
+    text = label; textSize = 15f; typeface = Metro.regular(c); setTextColor(p.fg)
+    gravity = Gravity.CENTER
+    setPadding(c.dpi(12f), 0, c.dpi(12f), 0)
+    background = GradientDrawable().apply { setColor(if (p.dark) 0x33FFFFFF else 0x33000000) }
+    minHeight = c.dpi(32f)
+    setOnClickListener { onClick() }
+}
+
+/** 48 epx line-glyph button; [glyph] draws around (cx, cy) with u = 1 epx. Pressed state lights the background. */
+@SuppressLint("ViewConstructor")
+class GlyphButton(context: Context, var color: Int, private val glyph: (Canvas, Paint, Float, Float, Float) -> Unit) : View(context) {
+    private val p = Paint(Paint.ANTI_ALIAS_FLAG).apply { style = Paint.Style.STROKE; strokeCap = Paint.Cap.SQUARE }
+    init {
+        isClickable = true
+        background = android.graphics.drawable.StateListDrawable().apply {
+            addState(intArrayOf(android.R.attr.state_pressed), ColorDrawable(0x33808080))
+            addState(intArrayOf(), ColorDrawable(0))
+        }
+    }
+    override fun onDraw(c: Canvas) {
+        p.color = color; p.strokeWidth = context.dp(1.3f); p.style = Paint.Style.STROKE
+        glyph(c, p, width / 2f, height / 2f, context.dp(1f))
+    }
+}

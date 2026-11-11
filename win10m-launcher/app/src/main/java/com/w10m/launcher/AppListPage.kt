@@ -28,7 +28,7 @@ import java.util.Locale
 
 /** "All apps" page: search box, "Recently added", letter groups and the letter jump grid. */
 @SuppressLint("ViewConstructor")
-class AppListPage(context: Context, private var palette: Palette, private val monoIcons: () -> Boolean) : FrameLayout(context) {
+class AppListPage(context: Context, private var palette: Palette, private val look: TileLook) : FrameLayout(context) {
 
     interface Host {
         fun onAppClick(a: AppEntry, from: View)
@@ -49,8 +49,9 @@ class AppListPage(context: Context, private var palette: Palette, private val mo
     }
 
     private var items: List<Item> = emptyList()
-    private val index = AlphabeticIndex<AppEntry>(Locale.getDefault()).addLabels(Locale.ENGLISH)
-        .setMaxLabelCount(300)
+    // Chinese collation buckets Han names under their pinyin initial; Latin names bucket as usual.
+    private val index = AlphabeticIndex<AppEntry>(Locale.CHINA).addLabels(Locale.ENGLISH).addLabels(Locale.getDefault())
+        .setMaxLabelCount(300).buildImmutableIndex()
     private val recentLabel = context.getString(R.string.recently_added)
 
     init {
@@ -79,9 +80,9 @@ class AppListPage(context: Context, private var palette: Palette, private val mo
 
     fun setInsets(top: Int, bottom: Int) {
         topInset = top
-        (search.layoutParams as LayoutParams).topMargin = top + context.dpi(16f)
+        (search.layoutParams as LayoutParams).topMargin = top + context.dpi(8f)
         search.requestLayout()
-        list.setPadding(0, top + context.dpi(16f + 32f + 12f), 0, bottom + context.dpi(24f))
+        list.setPadding(0, top + context.dpi(8f + 32f + 8f), 0, bottom + context.dpi(24f))
         jump.setPadding(0, top, 0, bottom)
     }
 
@@ -101,14 +102,19 @@ class AppListPage(context: Context, private var palette: Palette, private val mo
         return false
     }
 
+    fun focusSearch() {
+        list.scrollToPosition(0)
+        search.edit.requestFocus()
+        (context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager).showSoftInput(search.edit, 0)
+    }
+
     fun hideKeyboard() {
         search.edit.clearFocus()
         (context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager).hideSoftInputFromWindow(windowToken, 0)
     }
 
     private fun bucketOf(label: String): String {
-        val imm = index.buildImmutableIndex()
-        val b = imm.getBucket(imm.getBucketIndex(label))
+        val b = index.getBucket(index.getBucketIndex(label))
         return if (b.labelType == AlphabeticIndex.Bucket.LabelType.NORMAL) b.label else "#"
     }
 
@@ -136,9 +142,8 @@ class AppListPage(context: Context, private var palette: Palette, private val mo
     }
 
     private fun jumpLabels(): List<String> {
-        val imm = index.buildImmutableIndex()
         val l = ArrayList<String>(); l += "#"
-        for (b in imm) if (b.labelType == AlphabeticIndex.Bucket.LabelType.NORMAL && b.label !in l) l += b.label
+        for (b in index) if (b.labelType == AlphabeticIndex.Bucket.LabelType.NORMAL && b.label !in l) l += b.label
         return l
     }
 
@@ -191,6 +196,7 @@ class AppListPage(context: Context, private var palette: Palette, private val mo
     private inner class AppRow(c: Context) : View(c) {
         var app: AppEntry? = null
         private val tile = Paint()
+        private val gp = Paint(Paint.ANTI_ALIAS_FLAG)
         private val p = TextPaint(Paint.ANTI_ALIAS_FLAG).apply { textSize = c.sp(15f); typeface = Metro.regular(c) }
         private val white = PorterDuffColorFilter(Color.WHITE, PorterDuff.Mode.SRC_IN)
         init { isClickable = true; isLongClickable = true; background = pressedBg(c) }
@@ -198,15 +204,21 @@ class AppListPage(context: Context, private var palette: Palette, private val mo
             val a = app ?: return
             val m = context.dp(Metro.PAGE_MARGIN); val s = context.dp(Metro.LIST_ICON)
             val top = (height - s) / 2
-            tile.color = palette.accent
+            val g = if (look.iconPack) a.glyph else null
+            tile.color = IconPack.tileColor(g, palette.accent, look.brandColors)
             cv.drawRect(m, top, m + s, top + s, tile)
-            val mono = if (monoIcons()) a.mono else null
-            val isz = if (mono != null) s * 0.9f else s * 0.75f
-            val ix = m + (s - isz) / 2; val iy = top + (s - isz) / 2
-            val d = mono ?: a.icon
-            d.setBounds(ix.toInt(), iy.toInt(), (ix + isz).toInt(), (iy + isz).toInt())
-            d.colorFilter = if (mono != null) white else null
-            d.draw(cv)
+            if (g != null) {
+                val gs = s * 0.5f
+                g.draw(cv, m + (s - gs) / 2, top + (s - gs) / 2, gs, gp)
+            } else {
+                val mono = if (look.monoIcons) a.mono else null
+                val isz = if (mono != null) s * 0.9f else s * 0.75f
+                val ix = m + (s - isz) / 2; val iy = top + (s - isz) / 2
+                val d = mono ?: a.icon
+                d.setBounds(ix.toInt(), iy.toInt(), (ix + isz).toInt(), (iy + isz).toInt())
+                d.colorFilter = if (mono != null) white else null
+                d.draw(cv)
+            }
             p.color = palette.fg
             val tx = m + s + context.dp(12f)
             val t = TextUtils.ellipsize(a.label, p, width - tx - m, TextUtils.TruncateAt.END)

@@ -38,12 +38,19 @@ class MainActivity : Activity(), StartGrid.Host, AppListPage.Host {
     private val ui = Handler(Looper.getMainLooper())
     private var pendingTurnstileIn = false
     private var appliedSignature = ""
+    private var nav: NavBar? = null
+    private var navShown = false
+    private var tilesStamp = 0
+    private var resumed = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         WindowCompat.setDecorFitsSystemWindows(window, false)
         prefs = Prefs(this)
-        look = TileLook(prefs.palette(), prefs.background, prefs.transparency, prefs.monoIcons)
+        IconPack.load(this)
+        look = TileLook(prefs.palette(), prefs.background, prefs.transparency, prefs.monoIcons,
+            iconPack = prefs.iconPack, brandColors = prefs.brandColors)
+        tilesStamp = prefs.tilesStamp
 
         root = FrameLayout(this)
         wallpaperView = ImageView(this).apply { scaleType = ImageView.ScaleType.CENTER_CROP }
@@ -63,19 +70,30 @@ class MainActivity : Activity(), StartGrid.Host, AppListPage.Host {
         // Long-press on empty Start space opens Start settings.
         grid.setOnLongClickListener { if (!grid.editing) openSettings(); true }
 
-        appList = AppListPage(this, look.palette) { look.monoIcons }.also { it.host = this }
+        appList = AppListPage(this, look.palette, look).also { it.host = this }
 
         pager = Pager(this).apply {
             addView(scroll); addView(appList)
             onPageChanged = { p -> if (p == 0) appList.hideKeyboard() }
         }
         root.addView(pager, FrameLayout.LayoutParams(-1, -1))
+        navShown = prefs.navKeys
+        if (navShown) nav = NavBar(this, look.palette.accent).also { n ->
+            @Suppress("DEPRECATION")
+            n.onBack = { onBackPressed() }
+            n.onStart = { goStart() }
+            n.onSearch = { openSearch() }
+            root.addView(n, FrameLayout.LayoutParams(-1, -2, android.view.Gravity.BOTTOM))
+        }
         setContentView(root)
 
         root.setOnApplyWindowInsetsListener { _, ins ->
             val bars = ins.getInsets(WindowInsets.Type.systemBars())
-            grid.topInset = bars.top; grid.bottomInset = bars.bottom; grid.requestLayout()
-            appList.setInsets(bars.top, bars.bottom)
+            val ime = ins.getInsets(WindowInsets.Type.ime())
+            nav?.bottomInset = bars.bottom
+            val bottom = bars.bottom + if (nav != null) dpi(NavBar.HEIGHT) else 0
+            grid.topInset = bars.top; grid.bottomInset = bottom; grid.requestLayout()
+            appList.setInsets(bars.top, maxOf(bottom, ime.bottom))
             ins
         }
 
@@ -111,6 +129,10 @@ class MainActivity : Activity(), StartGrid.Host, AppListPage.Host {
         appOrder = AppRepo.load(this)
         apps = appOrder.associateBy { it.key }
         appList.setApps(appOrder)
+        reloadTiles()
+    }
+
+    private fun reloadTiles() {
         val specs = (prefs.loadTiles() ?: AppRepo.defaultTiles(this, appOrder).also { prefs.saveTiles(it) })
             .filter { it.kind != TileKind.APP || apps.containsKey(it.component) }
         buildTiles(specs)
@@ -120,18 +142,45 @@ class MainActivity : Activity(), StartGrid.Host, AppListPage.Host {
         ui.removeCallbacksAndMessages(FLIP_TOKEN)
         val views = specs.map { s -> TileView(this, s, look).also { it.app = s.component?.let { k -> apps[k] } } }
         grid.setTiles(views)
-        views.filter { it.isLive }.forEach { scheduleFlip(it) }
+        views.forEach { scheduleLive(it) }
         applyBadges()
     }
 
-    private fun scheduleFlip(t: TileView) {
-        ui.postAtTime({ if (t.parent != null) { if (!grid.editing) t.flip(); scheduleFlip(t) } },
-            FLIP_TOKEN, android.os.SystemClock.uptimeMillis() + t.nextFlipDelay())
+    /** Every tile gets a randomised 5–10 s tick; tiles with live content slide to their next face. */
+    private fun scheduleLive(t: TileView) {
+        ui.postAtTime({ if (t.parent != null) { if (resumed && !grid.editing) t.advance(); scheduleLive(t) } },
+            FLIP_TOKEN, android.os.SystemClock.uptimeMillis() + t.nextLiveDelay())
     }
 
     private fun applyBadges() {
-        val c = BadgeService.counts
-        grid.tileViews.forEach { t -> t.badge = t.app?.component?.packageName?.let { c[it] } ?: 0 }
+        val c = BadgeService.counts; val n = BadgeService.notes
+        grid.tileViews.forEach { t ->
+            val pkg = t.app?.component?.packageName
+            t.badge = pkg?.let { c[it] } ?: 0
+            t.note = pkg?.let { n[it] }
+        }
+    }
+
+    /** Photos live tile: load the newest few pictures as thumbnails once the photos permission is granted. */
+    private fun loadPhotos() {
+        if (android.os.Build.VERSION.SDK_INT < 29) return
+        val perm = if (android.os.Build.VERSION.SDK_INT >= 33) android.Manifest.permission.READ_MEDIA_IMAGES
+        else android.Manifest.permission.READ_EXTERNAL_STORAGE
+        if (checkSelfPermission(perm) != android.content.pm.PackageManager.PERMISSION_GRANTED) return
+        Thread {
+            val out = ArrayList<Bitmap>()
+            try {
+                val base = android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI
+                contentResolver.query(base, arrayOf(android.provider.MediaStore.Images.Media._ID), null, null,
+                    android.provider.MediaStore.Images.Media.DATE_ADDED + " DESC")?.use { c ->
+                    while (c.moveToNext() && out.size < 6) try {
+                        out += contentResolver.loadThumbnail(android.content.ContentUris.withAppendedId(base, c.getLong(0)),
+                            android.util.Size(640, 640), null)
+                    } catch (_: Exception) {}
+                }
+            } catch (_: Exception) {}
+            Live.photos = out
+        }.start()
     }
 
     override fun onTilesChanged(tiles: List<TileSpec>) = prefs.saveTiles(tiles)
@@ -141,11 +190,14 @@ class MainActivity : Activity(), StartGrid.Host, AppListPage.Host {
     // ---------------------------------------------------------------- look
 
     private fun applyLook(force: Boolean = false) {
-        val sig = "${prefs.dark}${prefs.accent}${prefs.background}${prefs.transparency}${prefs.moreTiles}${prefs.monoIcons}${wallpaperFile().lastModified()}"
+        val sig = "${prefs.dark}${prefs.accent}${prefs.background}${prefs.transparency}${prefs.moreTiles}${prefs.monoIcons}" +
+            "${prefs.iconPack}${prefs.brandColors}${wallpaperFile().lastModified()}"
         if (!force && sig == appliedSignature) return
         appliedSignature = sig
         val p = prefs.palette()
         look.palette = p; look.background = prefs.background; look.transparency = prefs.transparency; look.monoIcons = prefs.monoIcons
+        look.iconPack = prefs.iconPack; look.brandColors = prefs.brandColors
+        nav?.setAccent(p.accent)
         grid.columns = if (prefs.moreTiles) Metro.COLUMNS_MORE else Metro.COLUMNS_DEFAULT
         window.statusBarColor = 0; window.navigationBarColor = 0
         WindowCompat.getInsetsController(window, root).apply {
@@ -189,8 +241,14 @@ class MainActivity : Activity(), StartGrid.Host, AppListPage.Host {
 
     // ---------------------------------------------------------------- lifecycle / navigation
 
+    override fun onPause() { super.onPause(); resumed = false }
+
     override fun onResume() {
         super.onResume()
+        resumed = true
+        if (navShown != prefs.navKeys) { recreate(); return }
+        if (tilesStamp != prefs.tilesStamp) { tilesStamp = prefs.tilesStamp; reloadTiles() }
+        loadPhotos()
         applyLook()
         applyBadges()
         if (pendingTurnstileIn) {
@@ -201,12 +259,23 @@ class MainActivity : Activity(), StartGrid.Host, AppListPage.Host {
 
     override fun onNewIntent(intent: Intent?) {
         super.onNewIntent(intent)
-        // Pressing Start while on Start: leave edit mode, return to the tiles, then scroll to top.
+        if (intent?.getBooleanExtra(NavBar.EXTRA_SEARCH, false) == true) openSearch() else goStart()
+    }
+
+    /** Pressing Start while on Start: leave edit mode, return to the tiles, then scroll to top. */
+    private fun goStart() {
         when {
             grid.editing -> grid.exitEdit()
             pager.page != 0 -> { appList.resetState(); pager.snapTo(0) }
             else -> scroll.smoothScrollTo(0, 0)
         }
+    }
+
+    /** The Search key jumps to the app list with the search box focused. */
+    private fun openSearch() {
+        if (grid.editing) grid.exitEdit()
+        pager.snapTo(1)
+        appList.post { appList.focusSearch() }
     }
 
     @Deprecated("Deprecated in Java")
@@ -223,6 +292,7 @@ class MainActivity : Activity(), StartGrid.Host, AppListPage.Host {
         val intent = when (t.spec.kind) {
             TileKind.APP -> t.app?.let { launchIntent(it.component) }
             TileKind.CALENDAR -> Intent(Intent.ACTION_MAIN).addCategory(Intent.CATEGORY_APP_CALENDAR)
+            TileKind.WEB -> Intent(Intent.ACTION_VIEW, Uri.parse(t.spec.component), this, BrowserActivity::class.java)
         } ?: return
         pager.enabledPaging = false
         grid.turnstile(true, t, scroll.scrollY, scroll.scrollY + scroll.height) {
