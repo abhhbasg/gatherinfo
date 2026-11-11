@@ -30,6 +30,8 @@ import android.widget.LinearLayout
 import android.widget.ScrollView
 import android.widget.TextView
 import androidx.core.view.WindowCompat
+import org.json.JSONArray
+import org.json.JSONObject
 import java.net.URLEncoder
 
 /**
@@ -57,13 +59,26 @@ class BrowserActivity : Activity() {
     private var currentTab = -1
     private var loading = false
     private var desktop = false
+    private lateinit var shell: Shell
+    private lateinit var findBar: LinearLayout
+    private lateinit var findBox: EditText
+    private var sheet: View? = null
+    private var customView: View? = null
+    private var customCallback: WebChromeClient.CustomViewCallback? = null
+    private var fileCallback: android.webkit.ValueCallback<Array<Uri>>? = null
+
+    private class Site(val title: String, val url: String)
+    private val engines = linkedMapOf(
+        "bing" to ("必应 Bing" to "https://www.bing.com/search?q="),
+        "baidu" to ("百度" to "https://www.baidu.com/s?wd="),
+        "google" to ("Google" to "https://www.google.com/search?q="),
+    )
 
     @SuppressLint("SetJavaScriptEnabled")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        WindowCompat.setDecorFitsSystemWindows(window, false)
         prefs = Prefs(this); p = prefs.palette()
-        window.statusBarColor = 0; window.navigationBarColor = 0
+        shell = Shell(this, prefs, p)
 
         frame = FrameLayout(this).apply { setBackgroundColor(p.bg) }
         val column = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL }
@@ -81,25 +96,10 @@ class BrowserActivity : Activity() {
             addView(progress, FrameLayout.LayoutParams(-1, -1))
         }, LinearLayout.LayoutParams(-1, dpi(2f)))
         column.addView(buildBar(), LinearLayout.LayoutParams(-1, dpi(48f)))
-        val nav = if (prefs.navKeys) NavBar(this, p.accent).also { NavBar.wire(it, this); column.addView(it, LinearLayout.LayoutParams(-1, -2)) } else null
-
         buildMenu()
         buildTabsOverlay()
-        setContentView(frame)
-        WindowCompat.getInsetsController(window, frame).apply {
-            isAppearanceLightStatusBars = !p.dark; isAppearanceLightNavigationBars = !p.dark && nav == null
-        }
-        frame.setOnApplyWindowInsetsListener { _, ins ->
-            val b = ins.getInsets(WindowInsets.Type.systemBars())
-            val ime = ins.getInsets(WindowInsets.Type.ime())
-            topInset = b.top
-            // With the keyboard up the bar rides on top of it (and the nav keys are covered, as on W10M).
-            val bottom = if (ime.bottom > 0) ime.bottom - (nav?.let { dpi(NavBar.HEIGHT) + b.bottom } ?: 0) else if (nav == null) b.bottom else 0
-            column.setPadding(0, b.top, 0, bottom.coerceAtLeast(0))
-            nav?.bottomInset = b.bottom
-            tabsOverlay.setPadding(0, b.top, 0, b.bottom)
-            ins
-        }
+        buildFindBar()
+        shell.setContent(frame)
         newTab(intent?.takeIf { it.action == Intent.ACTION_VIEW }?.dataString)
         pages.requestFocus()
     }
@@ -113,18 +113,72 @@ class BrowserActivity : Activity() {
 
     // ---------------------------------------------------------------- chrome
 
-    private fun buildStartPage(): View = LinearLayout(this).apply {
-        orientation = LinearLayout.VERTICAL
-        setBackgroundColor(p.bg)
-        setPadding(dpi(Metro.PAGE_MARGIN), dpi(72f), dpi(Metro.PAGE_MARGIN), 0)
-        addView(TextView(context).apply {
+    private lateinit var startFavs: LinearLayout
+
+    private fun buildStartPage(): View = ScrollView(this).apply {
+        setBackgroundColor(p.bg); overScrollMode = View.OVER_SCROLL_NEVER
+        val col = LinearLayout(context).apply { orientation = LinearLayout.VERTICAL; setPadding(0, dpi(48f), 0, dpi(24f)) }
+        val m = dpi(Metro.PAGE_MARGIN)
+        col.addView(TextView(context).apply {
             text = getString(R.string.where_next); textSize = 34f; typeface = Metro.light(context); setTextColor(p.fg); includeFontPadding = false
+            setPadding(m, 0, m, 0)
+        })
+        col.addView(TextView(context).apply {
+            text = getString(R.string.where_next_hint); textSize = 15f; typeface = Metro.regular(context); setTextColor(p.fgMedium)
+            setPadding(m, dpi(12f), m, dpi(16f)); setOnClickListener { focusAddress() }
+        })
+        startFavs = LinearLayout(context).apply { orientation = LinearLayout.VERTICAL }
+        col.addView(startFavs)
+        addView(col)
+    }
+
+    /** Favourites listed on the new-tab page. */
+    private fun fillStartFavs() {
+        startFavs.removeAllViews()
+        val favs = loadSites("favs")
+        if (favs.isEmpty()) return
+        startFavs.addView(sectionLabel(getString(R.string.favorites)))
+        favs.forEach { s -> startFavs.addView(siteRow(s, { go(s.url) }, null), LinearLayout.LayoutParams(-1, dpi(52f))) }
+    }
+
+    // ---------------------------------------------------------------- favourites / history store
+
+    private fun loadSites(key: String): MutableList<Site> = try {
+        val a = JSONArray(prefs.str("browser_$key", "[]"))
+        MutableList(a.length()) { a.getJSONObject(it).let { o -> Site(o.optString("t"), o.getString("u")) } }
+    } catch (_: Exception) { mutableListOf() }
+
+    private fun saveSites(key: String, l: List<Site>) {
+        val a = JSONArray(); l.forEach { a.put(JSONObject().put("t", it.title).put("u", it.url)) }
+        prefs.putStr("browser_$key", a.toString())
+    }
+
+    private fun recordHistory(url: String?, title: String?) {
+        if (url == null || !url.startsWith("http")) return
+        val h = loadSites("history")
+        h.removeAll { it.url == url }
+        h.add(0, Site(title?.takeIf { it.isNotBlank() } ?: displayUrl(url), url))
+        saveSites("history", h.take(200))
+    }
+
+    private fun sectionLabel(t: String) = TextView(this).apply {
+        text = t; textSize = 15f; typeface = Metro.semibold(context); setTextColor(p.fg)
+        setPadding(dpi(Metro.PAGE_MARGIN), dpi(8f), dpi(Metro.PAGE_MARGIN), dpi(4f))
+    }
+
+    private fun siteRow(s: Site, tap: () -> Unit, longTap: (() -> Unit)?): View = LinearLayout(this).apply {
+        orientation = LinearLayout.VERTICAL; gravity = Gravity.CENTER_VERTICAL
+        setPadding(dpi(Metro.PAGE_MARGIN), 0, dpi(Metro.PAGE_MARGIN), 0)
+        addView(TextView(context).apply {
+            text = s.title; textSize = 15f; typeface = Metro.regular(context); setTextColor(p.fg); isSingleLine = true
+            ellipsize = android.text.TextUtils.TruncateAt.END
         })
         addView(TextView(context).apply {
-            text = getString(R.string.where_next_hint); textSize = 15f; typeface = Metro.regular(context); setTextColor(p.fgMedium)
-            setPadding(0, dpi(12f), 0, 0)
+            text = s.url; textSize = 12f; typeface = Metro.regular(context); setTextColor(p.fgMedium); isSingleLine = true
+            ellipsize = android.text.TextUtils.TruncateAt.END
         })
-        setOnClickListener { focusAddress() }
+        setOnClickListener { tap() }
+        if (longTap != null) setOnLongClickListener { longTap(); true }
     }
 
     private fun buildBar(): View {
@@ -210,7 +264,7 @@ class BrowserActivity : Activity() {
         val url = when {
             t.startsWith("http://") || t.startsWith("https://") || t.startsWith("about:") -> t
             !t.contains(' ') && t.contains('.') -> "https://$t"
-            else -> "https://www.bing.com/search?q=" + URLEncoder.encode(t, "UTF-8")
+            else -> (engines[prefs.str("engine", "bing")] ?: engines.getValue("bing")).second + URLEncoder.encode(t, "UTF-8")
         }
         blurAddress()
         tab()?.web?.loadUrl(url)
@@ -226,7 +280,8 @@ class BrowserActivity : Activity() {
             orientation = LinearLayout.VERTICAL; setBackgroundColor(p.flyout); visibility = View.GONE
             setPadding(0, dpi(4f), 0, dpi(4f))
         }
-        frame.addView(menu, FrameLayout.LayoutParams(-1, -2, Gravity.BOTTOM))
+        // The overflow sits right above the 48 epx command bar and its 2 epx progress line.
+        frame.addView(menu, FrameLayout.LayoutParams(-1, -2, Gravity.BOTTOM).apply { bottomMargin = dpi(50f) })
     }
 
     private fun menuItem(label: String, enabled: Boolean = true, action: () -> Unit) {
@@ -239,6 +294,23 @@ class BrowserActivity : Activity() {
         }, LinearLayout.LayoutParams(-1, dpi(44f)))
     }
 
+    /** Icon + caption key for the top row of the overflow (forward / hub / add favourite). */
+    private fun menuKey(glyph: String, label: String, enabled: Boolean, action: () -> Unit): View {
+        val gp = Paint(Paint.ANTI_ALIAS_FLAG)
+        val col = if (enabled) p.fg else p.fgLow
+        return LinearLayout(this).apply {
+            orientation = LinearLayout.VERTICAL; gravity = Gravity.CENTER_HORIZONTAL
+            addView(GlyphButton(context, col) { c, pt, cx, cy, u ->
+                if (glyph == "forward") {
+                    c.drawLine(cx - 8 * u, cy, cx + 8 * u, cy, pt)
+                    c.drawLine(cx + 2 * u, cy - 6 * u, cx + 8 * u, cy, pt); c.drawLine(cx + 8 * u, cy, cx + 2 * u, cy + 6 * u, pt)
+                } else IconPack.glyph(glyph)?.draw(c, cx - 10 * u, cy - 10 * u, 20 * u, gp, col)
+            }.apply { isClickable = false }, LinearLayout.LayoutParams(dpi(48f), dpi(36f)))
+            addView(TextView(context).apply { text = label; textSize = 12f; typeface = Metro.regular(context); setTextColor(col); gravity = Gravity.CENTER })
+            if (enabled) setOnClickListener { toggleMenu(); action() }
+        }
+    }
+
     private fun toggleMenu() {
         if (menu.visibility == View.VISIBLE) {
             scrim.visibility = View.GONE
@@ -249,21 +321,204 @@ class BrowserActivity : Activity() {
         menu.removeAllViews()
         val w = tab()?.web
         val url = w?.url?.takeIf { it.startsWith("http") }
-        menuItem(getString(R.string.forward), w?.canGoForward() == true) { w?.goForward() }
+        val isFav = url != null && loadSites("favs").any { it.url == url }
+        val keys = LinearLayout(this).apply { setPadding(0, dpi(4f), 0, dpi(8f)) }
+        keys.addView(menuKey("forward", getString(R.string.forward), w?.canGoForward() == true) { w?.goForward() }, LinearLayout.LayoutParams(0, -2, 1f))
+        keys.addView(menuKey("history", getString(R.string.hub), true) { showHub(0) }, LinearLayout.LayoutParams(0, -2, 1f))
+        keys.addView(menuKey("star", getString(if (isFav) R.string.remove_favorite else R.string.add_favorite), url != null) {
+            val f = loadSites("favs")
+            if (isFav) f.removeAll { it.url == url } else f.add(Site(w!!.title?.takeIf { it.isNotBlank() } ?: displayUrl(url), url!!))
+            saveSites("favs", f); fillStartFavs()
+        }, LinearLayout.LayoutParams(0, -2, 1f))
+        menu.addView(keys)
         menuItem(getString(R.string.new_tab)) { newTab(null) }
+        menuItem(getString(R.string.find_on_page), url != null) { showFind() }
+        menuItem(getString(if (desktop) R.string.mobile_site else R.string.desktop_site)) { setDesktop(!desktop) }
         menuItem(getString(R.string.share), url != null) {
             startActivity(Intent.createChooser(Intent(Intent.ACTION_SEND).setType("text/plain").putExtra(Intent.EXTRA_TEXT, url), null))
         }
-        menuItem(getString(if (desktop) R.string.mobile_site else R.string.desktop_site)) { setDesktop(!desktop) }
-        menuItem(getString(R.string.pin_page), url != null) { prefs.pinWeb(url!!, w.title?.takeIf { it.isNotBlank() } ?: displayUrl(url)) }
-        // Sit right above the command bar (and the nav keys): the bar starts where the page area ends.
-        val column = pages.parent as View
-        (menu.layoutParams as FrameLayout.LayoutParams).bottomMargin =
-            (frame.height - column.top - pages.bottom - dpi(2f)).coerceAtLeast(0)
-        menu.requestLayout()
+        menuItem(getString(R.string.pin_page), url != null) { prefs.pinWeb(url!!, w!!.title?.takeIf { it.isNotBlank() } ?: displayUrl(url)) }
+        menuItem(getString(R.string.browser_settings)) { showSettings() }
         scrim.visibility = View.VISIBLE; menu.visibility = View.VISIBLE
         menu.translationY = dp(120f); menu.alpha = 0f
         menu.animate().translationY(0f).alpha(1f).setDuration(Metro.DUR_FAST).withEndAction(null)
+    }
+
+    // ---------------------------------------------------------------- find on page
+
+    private fun buildFindBar() {
+        findBar = LinearLayout(this).apply { setBackgroundColor(p.chromeMedium); gravity = Gravity.CENTER_VERTICAL; visibility = View.GONE; isClickable = true }
+        findBox = EditText(this).apply {
+            setTextSize(TypedValue.COMPLEX_UNIT_SP, 15f); typeface = Metro.regular(context); isSingleLine = true
+            setHint(R.string.find_on_page); setTextColor(Color.BLACK); setHintTextColor(0x99000000.toInt())
+            setPadding(dpi(10f), 0, dpi(10f), 0); includeFontPadding = false
+            imeOptions = EditorInfo.IME_ACTION_SEARCH or EditorInfo.IME_FLAG_NO_EXTRACT_UI
+            background = GradientDrawable().apply { setColor(Color.WHITE); setStroke(dpi(2f), p.accent) }
+            addTextChangedListener(object : android.text.TextWatcher {
+                override fun beforeTextChanged(s: CharSequence?, a: Int, b: Int, c: Int) {}
+                override fun onTextChanged(s: CharSequence?, a: Int, b: Int, c: Int) {}
+                override fun afterTextChanged(s: android.text.Editable?) { tab()?.web?.findAllAsync(s.toString()) }
+            })
+            setOnEditorActionListener { _, _, _ -> tab()?.web?.findNext(true); true }
+        }
+        findBar.addView(findBox, LinearLayout.LayoutParams(0, dpi(32f), 1f).apply { marginStart = dpi(8f) })
+        fun arrow(up: Boolean) = GlyphButton(this, p.fg) { c, pt, cx, cy, u ->
+            val d = if (up) -1 else 1
+            c.drawLine(cx - 6 * u, cy - 3 * u * d, cx, cy + 3 * u * d, pt); c.drawLine(cx, cy + 3 * u * d, cx + 6 * u, cy - 3 * u * d, pt)
+        }.apply { setOnClickListener { tab()?.web?.findNext(!up) } }
+        findBar.addView(arrow(true), LinearLayout.LayoutParams(dpi(40f), -1))
+        findBar.addView(arrow(false), LinearLayout.LayoutParams(dpi(40f), -1))
+        findBar.addView(GlyphButton(this, p.fg) { c, pt, cx, cy, u ->
+            c.drawLine(cx - 5 * u, cy - 5 * u, cx + 5 * u, cy + 5 * u, pt); c.drawLine(cx + 5 * u, cy - 5 * u, cx - 5 * u, cy + 5 * u, pt)
+        }.apply { setOnClickListener { hideFind() } }, LinearLayout.LayoutParams(dpi(40f), -1))
+        frame.addView(findBar, FrameLayout.LayoutParams(-1, dpi(48f), Gravity.BOTTOM))
+    }
+
+    private fun showFind() {
+        findBar.visibility = View.VISIBLE; findBox.setText(""); findBox.requestFocus()
+        (getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager).showSoftInput(findBox, 0)
+    }
+
+    private fun hideFind() {
+        tab()?.web?.clearMatches(); findBar.visibility = View.GONE
+        (getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager).hideSoftInputFromWindow(findBox.windowToken, 0)
+        pages.requestFocus()
+    }
+
+    // ---------------------------------------------------------------- hub (favourites / history) and settings
+
+    private fun openSheet(v: View) {
+        closeSheet()
+        sheet = v
+        frame.addView(v, FrameLayout.LayoutParams(-1, -1))
+        v.alpha = 0f; v.animate().alpha(1f).setDuration(Metro.DUR_FAST)
+    }
+
+    private fun closeSheet() { sheet?.let { frame.removeView(it) }; sheet = null }
+
+    private fun sheetBase(): LinearLayout = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL; setBackgroundColor(p.bg); isClickable = true }
+
+    private fun showHub(tabIndex: Int) {
+        blurAddress()
+        val base = sheetBase()
+        val m = dpi(Metro.PAGE_MARGIN)
+        // Pivot header: selected item full strength, the other at 60 %.
+        val pivot = LinearLayout(this).apply { setPadding(m, dpi(8f), m, dpi(8f)) }
+        listOf(R.string.favorites, R.string.history).forEachIndexed { i, res ->
+            pivot.addView(TextView(this).apply {
+                text = getString(res); textSize = 24f; typeface = Metro.semilight(context)
+                setTextColor(if (i == tabIndex) p.fg else p.fgMedium); setPadding(0, 0, dpi(20f), 0)
+                setOnClickListener { showHub(i) }
+            })
+        }
+        base.addView(pivot)
+        val list = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL }
+        val key = if (tabIndex == 0) "favs" else "history"
+        val sites = loadSites(key)
+        if (sites.isEmpty()) list.addView(TextView(this).apply {
+            text = getString(if (tabIndex == 0) R.string.no_favorites else R.string.no_history_web); textSize = 15f
+            typeface = Metro.regular(context); setTextColor(p.fgMedium); setPadding(m, dpi(8f), m, 0)
+        })
+        sites.forEach { s ->
+            lateinit var row: View
+            row = siteRow(s, { closeSheet(); go(s.url) }) {
+                MetroMenu.show(row, p, listOf(
+                    getString(R.string.open_new_tab) to { closeSheet(); newTab(s.url) },
+                    getString(R.string.delete) to { saveSites(key, loadSites(key).filter { it.url != s.url }); fillStartFavs(); showHub(tabIndex) },
+                ))
+            }
+            list.addView(row, LinearLayout.LayoutParams(-1, dpi(52f)))
+        }
+        base.addView(ScrollView(this).apply { addView(list); overScrollMode = View.OVER_SCROLL_NEVER }, LinearLayout.LayoutParams(-1, 0, 1f))
+        if (tabIndex == 1 && sites.isNotEmpty()) base.addView(metroButton(this, p, getString(R.string.clear_history)) {
+            saveSites("history", emptyList()); showHub(1)
+        }, LinearLayout.LayoutParams(-2, dpi(32f)).apply { setMargins(m, dpi(8f), m, dpi(12f)) })
+        openSheet(base)
+    }
+
+    private fun showSettings() {
+        val base = sheetBase()
+        val m = dpi(Metro.PAGE_MARGIN)
+        base.setPadding(m, dpi(12f), m, 0)
+        base.addView(TextView(this).apply { text = getString(R.string.browser_settings); textSize = 34f; typeface = Metro.light(context); setTextColor(p.fg); includeFontPadding = false })
+        fun label(res: Int) = base.addView(TextView(this).apply {
+            text = getString(res); textSize = 15f; typeface = Metro.regular(context); setTextColor(p.fg); setPadding(0, dpi(24f), 0, dpi(8f))
+        })
+        label(R.string.search_engine)
+        val current = prefs.str("engine", "bing")
+        engines.forEach { (id, e) ->
+            base.addView(TextView(this).apply {
+                text = (if (id == current) "● " else "○ ") + e.first; textSize = 15f; typeface = Metro.regular(context); setTextColor(p.fg)
+                gravity = Gravity.CENTER_VERTICAL
+                setOnClickListener { prefs.putStr("engine", id); showSettings() }
+            }, LinearLayout.LayoutParams(-1, dpi(40f)))
+        }
+        label(R.string.clear_data)
+        base.addView(metroButton(this, p, getString(R.string.clear_data_button)) {
+            saveSites("history", emptyList())
+            android.webkit.CookieManager.getInstance().removeAllCookies(null)
+            android.webkit.WebStorage.getInstance().deleteAllData()
+            tabs.forEach { it.web.clearCache(true); it.web.clearHistory(); it.web.clearFormData() }
+            android.widget.Toast.makeText(this, R.string.cleared, android.widget.Toast.LENGTH_SHORT).show()
+        }, LinearLayout.LayoutParams(-2, dpi(32f)))
+        openSheet(base)
+    }
+
+    // ---------------------------------------------------------------- downloads, long-press menu, uploads, full-screen video
+
+    private fun download(url: String, ua: String?, disposition: String?, mime: String?) {
+        try {
+            val name = android.webkit.URLUtil.guessFileName(url, disposition, mime)
+            val req = android.app.DownloadManager.Request(Uri.parse(url)).apply {
+                setMimeType(mime); if (ua != null) addRequestHeader("User-Agent", ua)
+                android.webkit.CookieManager.getInstance().getCookie(url)?.let { addRequestHeader("Cookie", it) }
+                setTitle(name)
+                setNotificationVisibility(android.app.DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED)
+                setDestinationInExternalPublicDir(android.os.Environment.DIRECTORY_DOWNLOADS, name)
+            }
+            (getSystemService(Context.DOWNLOAD_SERVICE) as android.app.DownloadManager).enqueue(req)
+            android.widget.Toast.makeText(this, getString(R.string.downloading, name), android.widget.Toast.LENGTH_SHORT).show()
+        } catch (_: Exception) {
+            // e.g. data:/blob: URLs or no storage access on old Android: let another app try.
+            try { startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url)).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)) } catch (_: Exception) {}
+        }
+    }
+
+    private fun linkMenu(w: WebView): Boolean {
+        val hit = w.hitTestResult
+        val items = ArrayList<Pair<String, () -> Unit>>()
+        val isImage = hit.type == WebView.HitTestResult.IMAGE_TYPE || hit.type == WebView.HitTestResult.SRC_IMAGE_ANCHOR_TYPE
+        val isLink = hit.type == WebView.HitTestResult.SRC_ANCHOR_TYPE
+        val target = hit.extra ?: return false
+        if (isLink) {
+            items += getString(R.string.open_new_tab) to { newTab(target) }
+            items += getString(R.string.copy_link) to {
+                (getSystemService(Context.CLIPBOARD_SERVICE) as android.content.ClipboardManager).setPrimaryClip(android.content.ClipData.newPlainText("url", target))
+            }
+            items += getString(R.string.share) to {
+                startActivity(Intent.createChooser(Intent(Intent.ACTION_SEND).setType("text/plain").putExtra(Intent.EXTRA_TEXT, target), null))
+            }
+        }
+        if (isImage) {
+            items += getString(R.string.open_image) to { newTab(target) }
+            items += getString(R.string.save_image) to { download(target, w.settings.userAgentString, null, null) }
+        }
+        if (items.isEmpty()) return false
+        MetroMenu.show(pages, p, items)
+        return true
+    }
+
+    @Deprecated("Deprecated in Java")
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        @Suppress("DEPRECATION") super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == REQ_FILE) {
+            fileCallback?.onReceiveValue(WebChromeClient.FileChooserParams.parseResult(resultCode, data)); fileCallback = null
+        }
+    }
+
+    private fun exitFullscreen() {
+        customView?.let { frame.removeView(it) }; customView = null
+        customCallback?.onCustomViewHidden(); customCallback = null
     }
 
     private fun setDesktop(on: Boolean) {
@@ -306,6 +561,7 @@ class BrowserActivity : Activity() {
                 if (tab() === t) { loading = true; refresh.invalidate(); if (!address.hasFocus()) address.setText(displayUrl(url)) }
             }
             override fun onPageFinished(view: WebView, url: String?) {
+                recordHistory(url, view.title)
                 if (tab() === t) { loading = false; refresh.invalidate(); if (!address.hasFocus()) address.setText(displayUrl(url)) }
             }
         }
@@ -317,10 +573,21 @@ class BrowserActivity : Activity() {
                 else progress.scaleX = newProgress / 100f
             }
             override fun onReceivedTitle(view: WebView, title: String?) { t.title = title.orEmpty() }
+            override fun onShowFileChooser(view: WebView, cb: android.webkit.ValueCallback<Array<Uri>>, params: FileChooserParams): Boolean {
+                fileCallback?.onReceiveValue(null); fileCallback = cb
+                return try { @Suppress("DEPRECATION") startActivityForResult(params.createIntent(), REQ_FILE); true }
+                catch (_: Exception) { fileCallback = null; false }
+            }
+            override fun onShowCustomView(view: View, callback: CustomViewCallback) {
+                exitFullscreen()
+                customView = view; customCallback = callback
+                view.setBackgroundColor(Color.BLACK)
+                frame.addView(view, FrameLayout.LayoutParams(-1, -1))
+            }
+            override fun onHideCustomView() = exitFullscreen()
         }
-        w.setDownloadListener { u, _, _, _, _ ->
-            try { startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(u)).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)) } catch (_: Exception) {}
-        }
+        w.setDownloadListener { u, ua, disposition, mime, _ -> download(u, ua, disposition, mime) }
+        w.setOnLongClickListener { linkMenu(w) }
         tabs += t
         pages.addView(w, 0, FrameLayout.LayoutParams(-1, -1))
         select(tabs.size - 1)
@@ -332,6 +599,7 @@ class BrowserActivity : Activity() {
         tabs.forEachIndexed { k, t -> t.web.visibility = if (k == i) View.VISIBLE else View.GONE }
         val url = tab()?.web?.url
         startPage.visibility = if (url.isNullOrEmpty() || url == "about:blank") View.VISIBLE else View.GONE
+        if (startPage.visibility == View.VISIBLE) fillStartFavs()
         loading = false; progress.scaleX = 0f; refresh.invalidate()
         if (!address.hasFocus()) address.setText(displayUrl(url))
     }
@@ -419,6 +687,10 @@ class BrowserActivity : Activity() {
     override fun onBackPressed() {
         val w = tab()?.web
         when {
+            shell.handleBack() -> Unit
+            customView != null -> exitFullscreen()
+            sheet != null -> closeSheet()
+            findBar.visibility == View.VISIBLE -> hideFind()
             tabsOverlay.visibility == View.VISIBLE -> hideTabs()
             menu.visibility == View.VISIBLE -> toggleMenu()
             address.hasFocus() -> blurAddress()
@@ -426,4 +698,6 @@ class BrowserActivity : Activity() {
             else -> @Suppress("DEPRECATION") super.onBackPressed()
         }
     }
+
+    companion object { private const val REQ_FILE = 11 }
 }

@@ -85,6 +85,13 @@ class Prefs(c: Context) {
     var navKeys: Boolean
         get() = sp.getBoolean("navkeys", true)
         set(v) = sp.edit().putBoolean("navkeys", v).apply()
+    /** Replace the system status bar with the W10M one (and enable the Action Center) inside the launcher. */
+    var statusBar: Boolean
+        get() = sp.getBoolean("statusbar", true)
+        set(v) = sp.edit().putBoolean("statusbar", v).apply()
+    var photosAsked: Boolean
+        get() = sp.getBoolean("photosasked", false)
+        set(v) = sp.edit().putBoolean("photosasked", v).apply()
     var iconPack: Boolean
         get() = sp.getBoolean("iconpack", true)
         set(v) = sp.edit().putBoolean("iconpack", v).apply()
@@ -97,6 +104,9 @@ class Prefs(c: Context) {
         set(v) = sp.edit().putInt("stamp", v).apply()
 
     fun palette() = Palette(dark, accent)
+
+    fun str(key: String, def: String): String = sp.getString(key, def) ?: def
+    fun putStr(key: String, v: String) = sp.edit().putString(key, v).apply()
 
     fun pinWeb(url: String, title: String) {
         val t = loadTiles() ?: mutableListOf()
@@ -159,7 +169,7 @@ object AppRepo {
         val out = mutableListOf<TileSpec>()
         val used = HashSet<String>()
         // The built-in phone and browser lead the layout, as Phone and Edge do on W10M.
-        for (cls in listOf("DialerActivity", "BrowserActivity")) {
+        for (cls in listOf("DialerActivity", "MessagingActivity", "BrowserActivity")) {
             val k = apps.firstOrNull { it.component.packageName == c.packageName && it.component.className.endsWith(cls) }?.key ?: continue
             used += k; out += TileSpec("a:$k", TileKind.APP, k, TileSize.MEDIUM)
         }

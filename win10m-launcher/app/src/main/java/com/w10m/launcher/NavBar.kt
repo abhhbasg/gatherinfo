@@ -22,6 +22,12 @@ class NavBar(context: Context, private var accent: Int) : View(context) {
     var onBack: (() -> Unit)? = null
     var onStart: (() -> Unit)? = null
     var onSearch: (() -> Unit)? = null
+    /** Long press on Back: the task switcher. */
+    var onBackLong: (() -> Unit)? = null
+    private var longFired = false
+    private val longPress = Runnable {
+        if (pressedKey == 0) { longFired = true; performHapticFeedback(HapticFeedbackConstants.LONG_PRESS); onBackLong?.invoke() }
+    }
     var bottomInset = 0
         set(v) { if (field != v) { field = v; requestLayout() } }
 
@@ -52,18 +58,22 @@ class NavBar(context: Context, private var accent: Int) : View(context) {
                     path.moveTo(cx + 9 * u, cy); path.lineTo(cx - 9 * u, cy)
                     path.moveTo(cx - 2 * u, cy - 7 * u); path.lineTo(cx - 9 * u, cy); path.lineTo(cx - 2 * u, cy + 7 * u)
                 }
-                1 -> { // Start: four hollow panes (original glyph, not the Windows logo)
-                    val g = 1.5f * u; val s = 7.5f * u
-                    path.addRect(cx - g - s, cy - g - s, cx - g, cy - g, Path.Direction.CW)
-                    path.addRect(cx + g, cy - g - s, cx + g + s, cy - g, Path.Direction.CW)
-                    path.addRect(cx - g - s, cy + g, cx - g, cy + g + s, Path.Direction.CW)
-                    path.addRect(cx + g, cy + g, cx + g + s, cy + g + s, Path.Direction.CW)
+                1 -> { // Start: four-pane window drawn in perspective (narrow on the left, wide on the right), filled
+                    fun pane(x0: Float, y0: Float, x1: Float, y1: Float, x2: Float, y2: Float, x3: Float, y3: Float) {
+                        path.moveTo(cx + x0 * u, cy + y0 * u); path.lineTo(cx + x1 * u, cy + y1 * u)
+                        path.lineTo(cx + x2 * u, cy + y2 * u); path.lineTo(cx + x3 * u, cy + y3 * u); path.close()
+                    }
+                    pane(-9f, -6.3f, -1.2f, -7.47f, -1.2f, -0.7f, -9f, -0.7f)
+                    pane(0.2f, -7.68f, 9f, -9f, 9f, -0.7f, 0.2f, -0.7f)
+                    pane(-9f, 0.7f, -1.2f, 0.7f, -1.2f, 7.47f, -9f, 6.3f)
+                    pane(0.2f, 0.7f, 9f, 0.7f, 9f, 9f, 0.2f, 7.68f)
                 }
                 else -> { // Search: magnifier, handle to the bottom-left
                     path.addCircle(cx + 2.5f * u, cy - 2.5f * u, 6.5f * u, Path.Direction.CW)
                     path.moveTo(cx - 2.2f * u, cy + 2.2f * u); path.lineTo(cx - 9 * u, cy + 9 * u)
                 }
             }
+            p.style = if (k == 1) Paint.Style.FILL else Paint.Style.STROKE
             c.drawPath(path, p)
         }
     }
@@ -72,13 +82,17 @@ class NavBar(context: Context, private var accent: Int) : View(context) {
     override fun onTouchEvent(e: MotionEvent): Boolean {
         val k = (e.x / (width / 3f)).toInt().coerceIn(0, 2)
         when (e.actionMasked) {
-            MotionEvent.ACTION_DOWN -> { pressedKey = k; performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY); invalidate() }
+            MotionEvent.ACTION_DOWN -> {
+                pressedKey = k; longFired = false; performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY); invalidate()
+                if (k == 0) postDelayed(longPress, 500)
+            }
             MotionEvent.ACTION_MOVE -> if (k != pressedKey || e.y < 0) { pressedKey = -1; invalidate() }
             MotionEvent.ACTION_UP -> {
-                val hit = pressedKey; pressedKey = -1; invalidate()
+                removeCallbacks(longPress)
+                val hit = if (longFired) -1 else pressedKey; pressedKey = -1; invalidate()
                 when (hit) { 0 -> onBack?.invoke(); 1 -> onStart?.invoke(); 2 -> onSearch?.invoke() }
             }
-            MotionEvent.ACTION_CANCEL -> { pressedKey = -1; invalidate() }
+            MotionEvent.ACTION_CANCEL -> { removeCallbacks(longPress); pressedKey = -1; invalidate() }
         }
         return true
     }
@@ -91,6 +105,7 @@ class NavBar(context: Context, private var accent: Int) : View(context) {
         fun wire(bar: NavBar, a: Activity) {
             @Suppress("DEPRECATION")
             bar.onBack = { a.onBackPressed() }
+            bar.onBackLong = { KeysService.recents(a) }
             bar.onStart = { a.startActivity(Intent(a, MainActivity::class.java).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)) }
             bar.onSearch = {
                 a.startActivity(Intent(a, MainActivity::class.java).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK).putExtra(EXTRA_SEARCH, true))

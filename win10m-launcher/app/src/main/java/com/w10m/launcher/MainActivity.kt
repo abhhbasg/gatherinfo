@@ -38,14 +38,13 @@ class MainActivity : Activity(), StartGrid.Host, AppListPage.Host {
     private val ui = Handler(Looper.getMainLooper())
     private var pendingTurnstileIn = false
     private var appliedSignature = ""
-    private var nav: NavBar? = null
-    private var navShown = false
+    private lateinit var shell: Shell
+    private var chromeSig = ""
     private var tilesStamp = 0
     private var resumed = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        WindowCompat.setDecorFitsSystemWindows(window, false)
         prefs = Prefs(this)
         IconPack.load(this)
         look = TileLook(prefs.palette(), prefs.background, prefs.transparency, prefs.monoIcons,
@@ -77,27 +76,21 @@ class MainActivity : Activity(), StartGrid.Host, AppListPage.Host {
             onPageChanged = { p -> if (p == 0) appList.hideKeyboard() }
         }
         root.addView(pager, FrameLayout.LayoutParams(-1, -1))
-        navShown = prefs.navKeys
-        if (navShown) nav = NavBar(this, look.palette.accent).also { n ->
+        chromeSig = "${prefs.navKeys}${prefs.statusBar}${prefs.dark}"
+        shell = Shell(this, prefs, look.palette, overlay = true)
+        shell.nav?.let { n ->
             @Suppress("DEPRECATION")
             n.onBack = { onBackPressed() }
             n.onStart = { goStart() }
             n.onSearch = { openSearch() }
-            root.addView(n, FrameLayout.LayoutParams(-1, -2, android.view.Gravity.BOTTOM))
         }
-        setContentView(root)
-
-        root.setOnApplyWindowInsetsListener { _, ins ->
-            val bars = ins.getInsets(WindowInsets.Type.systemBars())
-            val ime = ins.getInsets(WindowInsets.Type.ime())
-            nav?.bottomInset = bars.bottom
-            val bottom = bars.bottom + if (nav != null) dpi(NavBar.HEIGHT) else 0
-            grid.topInset = bars.top; grid.bottomInset = bottom; grid.requestLayout()
-            appList.setInsets(bars.top, maxOf(bottom, ime.bottom))
-            ins
+        shell.onInsets = { top, bottom, ime ->
+            grid.topInset = top; grid.bottomInset = bottom; grid.requestLayout()
+            appList.setInsets(top, maxOf(bottom, ime))
         }
+        shell.setContent(root)
 
-        BadgeService.listener = { applyBadges() }
+        BadgeService.addListener(badgeListener)
         reloadApps()
         applyLook(force = true)
         registerReceiver(pkgReceiver, IntentFilter().apply {
@@ -112,11 +105,13 @@ class MainActivity : Activity(), StartGrid.Host, AppListPage.Host {
     override fun onDestroy() {
         super.onDestroy()
         unregisterReceiver(pkgReceiver); unregisterReceiver(timeReceiver)
-        BadgeService.listener = null
+        BadgeService.removeListener(badgeListener)
         ui.removeCallbacksAndMessages(null)
     }
 
     // ---------------------------------------------------------------- data
+
+    private val badgeListener: () -> Unit = { applyBadges() }
 
     private val pkgReceiver = object : BroadcastReceiver() {
         override fun onReceive(c: Context?, i: Intent?) { reloadApps() }
@@ -161,26 +156,43 @@ class MainActivity : Activity(), StartGrid.Host, AppListPage.Host {
         }
     }
 
-    /** Photos live tile: load the newest few pictures as thumbnails once the photos permission is granted. */
-    private fun loadPhotos() {
-        if (android.os.Build.VERSION.SDK_INT < 29) return
-        val perm = if (android.os.Build.VERSION.SDK_INT >= 33) android.Manifest.permission.READ_MEDIA_IMAGES
+    private fun photoPermission() = if (android.os.Build.VERSION.SDK_INT >= 33) android.Manifest.permission.READ_MEDIA_IMAGES
         else android.Manifest.permission.READ_EXTERNAL_STORAGE
-        if (checkSelfPermission(perm) != android.content.pm.PackageManager.PERMISSION_GRANTED) return
+
+    /**
+     * Photos live tile: load the newest pictures as thumbnails. The first time a gallery tile is on Start
+     * the photos permission is requested once; after that it is only asked from Settings.
+     */
+    private fun loadPhotos() {
+        if (Live.photosPkg == null) Live.photosPkg = try {
+            packageManager.resolveActivity(Intent(Intent.ACTION_MAIN).addCategory(Intent.CATEGORY_APP_GALLERY), 0)?.activityInfo?.packageName
+        } catch (_: Exception) { null }
+        if (grid.tileViews.none { it.isPhotosTile }) return
+        if (checkSelfPermission(photoPermission()) != android.content.pm.PackageManager.PERMISSION_GRANTED) {
+            if (!prefs.photosAsked) { prefs.photosAsked = true; requestPermissions(arrayOf(photoPermission()), REQ_PHOTOS) }
+            return
+        }
         Thread {
             val out = ArrayList<Bitmap>()
             try {
                 val base = android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI
                 contentResolver.query(base, arrayOf(android.provider.MediaStore.Images.Media._ID), null, null,
                     android.provider.MediaStore.Images.Media.DATE_ADDED + " DESC")?.use { c ->
-                    while (c.moveToNext() && out.size < 6) try {
-                        out += contentResolver.loadThumbnail(android.content.ContentUris.withAppendedId(base, c.getLong(0)),
-                            android.util.Size(640, 640), null)
+                    while (c.moveToNext() && out.size < 8) try {
+                        val uri = android.content.ContentUris.withAppendedId(base, c.getLong(0))
+                        out += if (android.os.Build.VERSION.SDK_INT >= 29) contentResolver.loadThumbnail(uri, android.util.Size(640, 640), null)
+                        else contentResolver.openInputStream(uri)!!.use {
+                            BitmapFactory.decodeStream(it, null, BitmapFactory.Options().apply { inSampleSize = 8 })!!
+                        }
                     } catch (_: Exception) {}
                 }
             } catch (_: Exception) {}
             Live.photos = out
         }.start()
+    }
+
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+        if (requestCode == REQ_PHOTOS) loadPhotos()
     }
 
     override fun onTilesChanged(tiles: List<TileSpec>) = prefs.saveTiles(tiles)
@@ -197,12 +209,8 @@ class MainActivity : Activity(), StartGrid.Host, AppListPage.Host {
         val p = prefs.palette()
         look.palette = p; look.background = prefs.background; look.transparency = prefs.transparency; look.monoIcons = prefs.monoIcons
         look.iconPack = prefs.iconPack; look.brandColors = prefs.brandColors
-        nav?.setAccent(p.accent)
+        shell.nav?.setAccent(p.accent)
         grid.columns = if (prefs.moreTiles) Metro.COLUMNS_MORE else Metro.COLUMNS_DEFAULT
-        window.statusBarColor = 0; window.navigationBarColor = 0
-        WindowCompat.getInsetsController(window, root).apply {
-            isAppearanceLightStatusBars = !p.dark; isAppearanceLightNavigationBars = !p.dark
-        }
         val wp = loadWallpaper()
         when {
             look.background == Background.BEHIND_TILES && wp != null -> { wallpaperView.setImageBitmap(wp); root.setBackgroundColor(p.bg) }
@@ -246,7 +254,7 @@ class MainActivity : Activity(), StartGrid.Host, AppListPage.Host {
     override fun onResume() {
         super.onResume()
         resumed = true
-        if (navShown != prefs.navKeys) { recreate(); return }
+        if (chromeSig != "${prefs.navKeys}${prefs.statusBar}${prefs.dark}") { recreate(); return }
         if (tilesStamp != prefs.tilesStamp) { tilesStamp = prefs.tilesStamp; reloadTiles() }
         loadPhotos()
         applyLook()
@@ -264,6 +272,7 @@ class MainActivity : Activity(), StartGrid.Host, AppListPage.Host {
 
     /** Pressing Start while on Start: leave edit mode, return to the tiles, then scroll to top. */
     private fun goStart() {
+        shell.closeCenter()
         when {
             grid.editing -> grid.exitEdit()
             pager.page != 0 -> { appList.resetState(); pager.snapTo(0) }
@@ -273,6 +282,7 @@ class MainActivity : Activity(), StartGrid.Host, AppListPage.Host {
 
     /** The Search key jumps to the app list with the search box focused. */
     private fun openSearch() {
+        shell.closeCenter()
         if (grid.editing) grid.exitEdit()
         pager.snapTo(1)
         appList.post { appList.focusSearch() }
@@ -281,6 +291,7 @@ class MainActivity : Activity(), StartGrid.Host, AppListPage.Host {
     @Deprecated("Deprecated in Java")
     override fun onBackPressed() {
         when {
+            shell.handleBack() -> Unit
             grid.editing -> grid.exitEdit()
             pager.page == 1 && appList.handleBack() -> Unit
             pager.page == 1 -> pager.snapTo(0)
@@ -339,5 +350,5 @@ class MainActivity : Activity(), StartGrid.Host, AppListPage.Host {
         startActivity(i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)); true
     } catch (_: Exception) { false }
 
-    companion object { private val FLIP_TOKEN = Any() }
+    companion object { private val FLIP_TOKEN = Any(); private const val REQ_PHOTOS = 3 }
 }

@@ -72,7 +72,7 @@ class ScreenshotTest {
     )
 
     private fun startScreen(name: String, columns: Int, edit: Boolean = false, accent: Int = Metro.DEFAULT_ACCENT,
-                            dark: Boolean = true, nav: Boolean = true, live: Boolean = false) {
+                            dark: Boolean = true, nav: Boolean = true, live: Boolean = false, center: Boolean = false) {
         val a = Robolectric.buildActivity(Activity::class.java).setup().get()
         val look = TileLook(Palette(dark, accent), Background.SOLID, 0, true)
         val apps = sampleApps(a)
@@ -90,9 +90,11 @@ class ScreenshotTest {
         tiles[2].badge = 3
         tiles.add(4, TileView(a, TileSpec("cal", TileKind.CALENDAR, null, TileSize.WIDE), look))
         grid.setTiles(tiles)
-        val root = FrameLayout(a).apply { setBackgroundColor(look.palette.bg); addView(grid) }
-        if (nav) root.addView(NavBar(a, accent), FrameLayout.LayoutParams(-1, -2, Gravity.BOTTOM))
-        a.setContentView(root)
+        val content = FrameLayout(a).apply { setBackgroundColor(look.palette.bg); addView(grid) }
+        Prefs(a).apply { navKeys = nav; this.dark = dark; this.accent = accent }
+        val shell = Shell(a, Prefs(a), look.palette, overlay = true)
+        shell.setContent(content)
+        val root = shell.root
         idle()
         if (live) {
             // Messaging and WeChat tiles slide to their notification face.
@@ -101,7 +103,18 @@ class ScreenshotTest {
             tiles[2].advance(); tiles[8].advance(); idle()
         }
         if (edit) { grid.enterEdit(tiles[1]); idle() }
+        if (center) {
+            BadgeService.connected = true
+            BadgeService.all = listOf(
+                Note("李雷", "晚上七点老地方见，别忘了带上相机。", System.currentTimeMillis(), "k1", "com.android.mms"),
+                Note("家庭群", "妈妈: 周末回家吃饭吗？", System.currentTimeMillis(), "k2", "com.tencent.mm"),
+                Note("系统更新", "新版本已下载完成，点按以安装。", System.currentTimeMillis(), "k3", "com.android.settings"),
+            )
+            shell.center!!.setInsets(a.dpi(24f), a.dpi(NavBar.HEIGHT))
+            shell.center!!.open(); idle()
+        }
         render(root, name)
+        BadgeService.all = emptyList()
     }
 
     @Test fun start6() = startScreen("start_6col", Metro.COLUMNS_DEFAULT)
@@ -109,6 +122,37 @@ class ScreenshotTest {
     @Test fun startEdit() = startScreen("start_edit", Metro.COLUMNS_DEFAULT, edit = true)
     @Test fun startLight() = startScreen("start_light", Metro.COLUMNS_DEFAULT, accent = 0xFF10893E.toInt(), dark = false)
     @Test fun startLive() = startScreen("start_live", Metro.COLUMNS_DEFAULT, live = true)
+    @Test fun actionCenter() = startScreen("action_center", Metro.COLUMNS_DEFAULT, center = true)
+
+    @Test fun messaging() {
+        val app = androidx.test.core.app.ApplicationProvider.getApplicationContext<android.app.Application>()
+        shadowOf(app).grantPermissions(android.Manifest.permission.READ_SMS)
+        val now = System.currentTimeMillis()
+        val cursor = org.robolectric.fakes.RoboCursor().apply {
+            setColumnNames(listOf("thread_id", "address", "body", "date", "type", "read"))
+            setResults(arrayOf(
+                arrayOf<Any>(1L, "13800138000", "好的，那就周六上午十点，在地铁站 B 口见。", now - 60_000, 1, 0),
+                arrayOf<Any>(1L, "13800138000", "周六上午可以吗？我十点以后都有空。", now - 120_000, 2, 1),
+                arrayOf<Any>(1L, "13800138000", "这周末要不要一起去爬山？", now - 300_000, 1, 1),
+                arrayOf<Any>(2L, "10086", "您本月已使用流量 12.5GB，剩余 7.5GB。", now - 3_600_000, 1, 1),
+                arrayOf<Any>(3L, "95588", "您尾号 1234 的账户收入 5,000.00 元。", now - 86_400_000, 1, 1),
+            ))
+        }
+        shadowOf(app.contentResolver).setCursor(android.net.Uri.parse("content://sms"), cursor)
+        val a = Robolectric.buildActivity(MessagingActivity::class.java).setup().get()
+        idle()
+        val content = a.findViewById<View>(android.R.id.content)
+        render(content, "messaging_list")
+        // Open the first conversation.
+        fun firstClickable(v: View): View? {
+            if (v.javaClass.simpleName == "ThreadRow") return v
+            if (v is android.view.ViewGroup) for (i in 0 until v.childCount) firstClickable(v.getChildAt(i))?.let { return it }
+            return null
+        }
+        cursor.moveToPosition(-1)
+        firstClickable(content)!!.performClick(); idle()
+        render(content, "messaging_thread")
+    }
 
     @Test fun appList() {
         val a = Robolectric.buildActivity(Activity::class.java).setup().get()
@@ -116,9 +160,10 @@ class ScreenshotTest {
         val page = AppListPage(a, p, TileLook(p, Background.SOLID, 0, true))
         page.setApps(sampleApps(a).sortedBy { it.label })
         page.setInsets(a.dpi(24f), a.dpi(NavBar.HEIGHT))
-        val root = FrameLayout(a).apply { setBackgroundColor(Color.BLACK); addView(page) }
-        root.addView(NavBar(a, p.accent), FrameLayout.LayoutParams(-1, -2, Gravity.BOTTOM))
-        a.setContentView(root)
+        val content = FrameLayout(a).apply { setBackgroundColor(Color.BLACK); addView(page) }
+        val shell = Shell(a, Prefs(a), p, overlay = true)
+        shell.setContent(content)
+        val root = shell.root
         idle()
         render(root, "app_list")
     }

@@ -28,10 +28,25 @@
 
 重新生成图标包：`python3 tools/gen_icons.py <解压后的 simple-icons npm 包目录>`。
 
+## 第三版新增
+| 模块 | 内容 |
+|---|---|
+| 状态栏 | 在本应用的界面里隐藏系统状态栏，换成 W10M 样式：左侧信号格、WLAN 扇形、飞行 / 振动图标，右侧电池和时间；可在设置里关闭 |
+| 操作中心 | 从状态栏下拉：顶部一行四个快捷操作（可展开到两行），下面是按应用分组的通知，右滑清除，「全部清除」，点通知打开对应应用 |
+| 快捷操作 | 手电筒直接开关；亮度（25/50/75/100% 循环）和旋转锁定需要授予"修改系统设置"权限；WLAN、蓝牙、飞行模式、定位受 Android 限制，只显示状态，点击跳到系统对应的开关页 |
+| 导航键 | 开始键改为透视四格窗图标；长按返回键打开系统的最近任务界面（需要在无障碍设置里开启本应用的服务，只用于这一个动作） |
+| 消息 | 仿 W10M 短信：会话列表（头像、姓名、预览、时间），会话页带缺角气泡（发出的在右侧、主题色），底部输入框和发送键。读取和发送普通短信，不需要设为默认短信应用；不支持彩信 |
+| 浏览器 | 新增收藏夹和历史记录（"中心"）、页内查找、文件下载、长按链接 / 图片菜单、网页上传文件、视频全屏、搜索引擎切换（必应 / 百度 / Google）、清除浏览数据；新标签页会列出收藏 |
+| 照片磁贴 | 系统默认图库应用的磁贴也会识别为照片磁贴；开始屏幕上有照片磁贴时首次会直接询问照片权限；最多轮播最近 8 张 |
+
 ## 截图（Robolectric 离屏渲染，1080×1920）
-| 开始屏幕（动态磁贴） | 所有应用 | 电话 | 浏览器 |
+| 开始屏幕（动态磁贴） | 操作中心 | 所有应用 | 电话 |
 |---|---|---|---|
-| ![](docs/screens/start_live.png) | ![](docs/screens/app_list.png) | ![](docs/screens/dialer.png) | ![](docs/screens/browser.png) |
+| ![](docs/screens/start_live.png) | ![](docs/screens/action_center.png) | ![](docs/screens/app_list.png) | ![](docs/screens/dialer.png) |
+
+| 消息列表 | 会话 | 浏览器 |
+|---|---|---|
+| ![](docs/screens/messaging_list.png) | ![](docs/screens/messaging_thread.png) | ![](docs/screens/browser.png) |
 
 ## 构建
 ```bash
@@ -42,5 +57,5 @@
 
 ## 版权说明
 - 字体：Segoe UI 不能随应用分发，这里改用微软以 SIL OFL 1.1 开源的 **Selawik**（与 Segoe UI 度量兼容），许可证见 `research/SELAWIK-LICENSE.txt`。
-- 图标：没有使用 Segoe MDL2 Assets 和任何微软标志，系统图标都是自绘矢量。
+- 图标：没有使用 Segoe MDL2 Assets，系统图标都是自绘矢量。导航栏的开始键是按要求自绘的透视四格窗图形，外观接近 Windows 标志；Windows 标志是微软的注册商标，个人自用没有问题，公开分发或商用前建议换掉。
 - 品牌图标：来自 Simple Icons（CC0-1.0，许可证见 `research/SIMPLE-ICONS-LICENSE.md`）。图标文件可自由使用，但各品牌的商标权仍属于各自公司；Simple Icons 已按品牌方要求下架的标志（微软、亚马逊、领英等）这里也没有收录，对应应用用自绘的分类图标代替。

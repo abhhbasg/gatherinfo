@@ -46,6 +46,8 @@ class TileLook(
 object Live {
     /** Recent photos for the Photos tile slideshow (empty until the photos permission is granted). */
     @Volatile var photos: List<Bitmap> = emptyList()
+    /** Package of the system's default gallery app; its tile gets the slideshow whatever its icon. */
+    @Volatile var photosPkg: String? = null
 }
 
 @SuppressLint("ViewConstructor")
@@ -82,7 +84,8 @@ class TileView(context: Context, val spec: TileSpec, private val look: TileLook)
     private val bigPaint = TextPaint(Paint.ANTI_ALIAS_FLAG).apply { color = Color.WHITE; typeface = Metro.light(context) }
     private val midPaint = TextPaint(Paint.ANTI_ALIAS_FLAG).apply { color = Color.WHITE; typeface = Metro.regular(context) }
     private val bodyPaint = TextPaint(Paint.ANTI_ALIAS_FLAG).apply {
-        color = 0xCCFFFFFF.toInt(); typeface = Metro.regular(context); textSize = context.sp(12f)
+        // Adaptive-tile "captionSubtle": 12 epx at 60 % opacity.
+        color = 0x99FFFFFF.toInt(); typeface = Metro.regular(context); textSize = context.sp(12f)
     }
     private val whiteFilter = PorterDuffColorFilter(Color.WHITE, PorterDuff.Mode.SRC_IN)
 
@@ -105,7 +108,9 @@ class TileView(context: Context, val spec: TileSpec, private val look: TileLook)
             else -> if (look.iconPack) app?.glyph else null
         }
 
-    private val isPhotosTile get() = app?.glyph?.name.let { it == "photos" || it == "googlephotos" }
+    val isPhotosTile get() = spec.kind == TileKind.APP && app?.let {
+        it.glyph?.name == "photos" || it.glyph?.name == "googlephotos" || it.component.packageName == Live.photosPkg
+    } == true
 
     // ---------------------------------------------------------------- faces
 
@@ -234,12 +239,12 @@ class TileView(context: Context, val spec: TileSpec, private val look: TileLook)
         canvas.drawText(t, 0, t.length, left, h - context.dp(Metro.TILE_LABEL_BOTTOM) - labelPaint.descent(), labelPaint)
     }
 
-    /** Notification face: title (15) + wrapped body (12), app name bottom-left — the W10M adaptive tile layout. */
+    /** Notification face: caption title + wrapped captionSubtle body, app name bottom-left — the adaptive tile layout. */
     private fun drawNote(canvas: Canvas, w: Float, h: Float) {
         val n = note ?: return drawIcon(canvas, w, h)
         val pad = context.dp(Metro.TILE_LABEL_LEFT)
         val tw = (w - 2 * pad).toInt()
-        midPaint.textSize = context.sp(15f)
+        midPaint.textSize = context.sp(12f)
         var y = context.dp(6f)
         if (n.title.isNotEmpty()) {
             val t = TextUtils.ellipsize(n.title, midPaint, tw.toFloat(), TextUtils.TruncateAt.END)

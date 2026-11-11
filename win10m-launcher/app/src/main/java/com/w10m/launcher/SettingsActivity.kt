@@ -26,13 +26,16 @@ class SettingsActivity : Activity() {
 
     private lateinit var prefs: Prefs
     private lateinit var p: Palette
+    private lateinit var shell: Shell
+
+    @Deprecated("Deprecated in Java")
+    override fun onBackPressed() { if (!shell.handleBack()) @Suppress("DEPRECATION") super.onBackPressed() }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        WindowCompat.setDecorFitsSystemWindows(window, false)
         prefs = Prefs(this)
         p = prefs.palette()
-        window.statusBarColor = 0; window.navigationBarColor = 0
+        shell = Shell(this, prefs, p)
         build()
     }
 
@@ -43,18 +46,8 @@ class SettingsActivity : Activity() {
             setBackgroundColor(p.bg); addView(col); isFillViewport = true
             overScrollMode = View.OVER_SCROLL_NEVER
         }
-        val shell = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL; setBackgroundColor(p.bg) }
-        shell.addView(scroll, LinearLayout.LayoutParams(-1, 0, 1f))
-        val nav = if (prefs.navKeys) NavBar(this, p.accent).also { NavBar.wire(it, this); shell.addView(it, LinearLayout.LayoutParams(-1, -2)) } else null
-        setContentView(shell)
-        WindowCompat.getInsetsController(window, scroll).apply {
-            isAppearanceLightStatusBars = !p.dark; isAppearanceLightNavigationBars = !p.dark
-        }
-        scroll.setOnApplyWindowInsetsListener { _, ins ->
-            val b = ins.getInsets(WindowInsets.Type.systemBars())
-            col.setPadding(m, b.top + dpi(12f), m, (if (nav == null) b.bottom else 0) + dpi(24f))
-            nav?.bottomInset = b.bottom; ins
-        }
+        col.setPadding(m, dpi(12f), m, dpi(24f))
+        shell.setContent(scroll)
 
         col += text(getString(R.string.settings_title).uppercase(), 15f, Metro.semibold(this), p.fg)
         col += text(getString(R.string.settings_start), 34f, Metro.light(this), p.fg).withTopMargin(4f)
@@ -77,6 +70,12 @@ class SettingsActivity : Activity() {
 
         section(col, R.string.show_more_tiles)
         col += MetroToggle(this, p).apply { checked = prefs.moreTiles; onChange = { prefs.moreTiles = it } }
+
+        section(col, R.string.status_bar)
+        col += MetroToggle(this, p).apply { checked = prefs.statusBar; onChange = { prefs.statusBar = it; recreate() } }
+
+        section(col, R.string.back_long)
+        col += button(getString(R.string.enable_keys_service)) { go(Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS)) }
 
         section(col, R.string.nav_keys)
         col += MetroToggle(this, p).apply { checked = prefs.navKeys; onChange = { prefs.navKeys = it; recreate() } }

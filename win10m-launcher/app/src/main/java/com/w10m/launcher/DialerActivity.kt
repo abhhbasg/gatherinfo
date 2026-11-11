@@ -45,12 +45,15 @@ class DialerActivity : Activity() {
     private var number = ""
     private var tone: ToneGenerator? = null
     private var pendingCall: String? = null
+    private lateinit var shell: Shell
+
+    @Deprecated("Deprecated in Java")
+    override fun onBackPressed() { if (!shell.handleBack()) @Suppress("DEPRECATION") super.onBackPressed() }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        WindowCompat.setDecorFitsSystemWindows(window, false)
         prefs = Prefs(this); p = prefs.palette()
-        window.statusBarColor = 0; window.navigationBarColor = 0
+        shell = Shell(this, prefs, p)
 
         val root = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL; setBackgroundColor(p.bg) }
         tabs = TabHeader(this)
@@ -68,17 +71,7 @@ class DialerActivity : Activity() {
         content.addView(dialPage, FrameLayout.LayoutParams(-1, -1))
         root.addView(content, LinearLayout.LayoutParams(-1, 0, 1f))
 
-        val nav = if (prefs.navKeys) NavBar(this, p.accent).also { NavBar.wire(it, this); root.addView(it, LinearLayout.LayoutParams(-1, -2)) } else null
-        setContentView(root)
-        WindowCompat.getInsetsController(window, root).apply {
-            isAppearanceLightStatusBars = !p.dark; isAppearanceLightNavigationBars = !p.dark && nav == null
-        }
-        root.setOnApplyWindowInsetsListener { _, ins ->
-            val b = ins.getInsets(WindowInsets.Type.systemBars())
-            root.setPadding(0, b.top, 0, if (nav == null) b.bottom else 0)
-            nav?.bottomInset = b.bottom
-            ins
-        }
+        shell.setContent(root)
 
         intent?.data?.takeIf { it.scheme == "tel" }?.schemeSpecificPart?.let { number = it }
         numberView.invalidate()

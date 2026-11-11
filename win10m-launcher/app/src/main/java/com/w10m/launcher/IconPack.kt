@@ -99,6 +99,7 @@ object IconPack {
         if (pkg == c.packageName) return glyphs[when {
             cls.endsWith("BrowserActivity") -> "browser"
             cls.endsWith("DialerActivity") -> "phone"
+            cls.endsWith("MessagingActivity") -> "message"
             else -> "settings"
         }]
         byPackage[pkg]?.let { id -> return if (id.startsWith("@")) glyphs[id.substring(1)] else brands[id] }
