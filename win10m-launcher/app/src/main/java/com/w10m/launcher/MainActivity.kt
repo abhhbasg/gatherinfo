@@ -302,7 +302,7 @@ class MainActivity : Activity(), StartGrid.Host, AppListPage.Host {
     override fun onTileClick(t: TileView) {
         val intent = when (t.spec.kind) {
             TileKind.APP -> t.app?.let { launchIntent(it.component) }
-            TileKind.CALENDAR -> Intent(Intent.ACTION_MAIN).addCategory(Intent.CATEGORY_APP_CALENDAR)
+            TileKind.CALENDAR -> Intent(this, CalendarActivity::class.java)
             TileKind.WEB -> Intent(Intent.ACTION_VIEW, Uri.parse(t.spec.component), this, BrowserActivity::class.java)
         } ?: return
         pager.enabledPaging = false

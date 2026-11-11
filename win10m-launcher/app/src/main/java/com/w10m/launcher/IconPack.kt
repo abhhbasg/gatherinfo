@@ -100,6 +100,11 @@ object IconPack {
             cls.endsWith("BrowserActivity") -> "browser"
             cls.endsWith("DialerActivity") -> "phone"
             cls.endsWith("MessagingActivity") -> "message"
+            cls.endsWith("PeopleActivity") -> "people"
+            cls.endsWith("CalendarActivity") -> "calendar"
+            cls.endsWith("CalculatorActivity") -> "calculator"
+            cls.endsWith("RecorderActivity") -> "mic"
+            cls.endsWith("MusicActivity") -> "music"
             else -> "settings"
         }]
         byPackage[pkg]?.let { id -> return if (id.startsWith("@")) glyphs[id.substring(1)] else brands[id] }

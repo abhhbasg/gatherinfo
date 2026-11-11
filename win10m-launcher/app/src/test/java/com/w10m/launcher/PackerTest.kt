@@ -29,3 +29,26 @@ class PackerTest {
         assertEquals(228f, 4 * small + 3 * Metro.GUTTER, 0.001f)
     }
 }
+
+class CalcEngineTest {
+    private fun run(keys: String): CalcEngine {
+        val e = CalcEngine()
+        for (k in keys) when (k) {
+            '+', '−', '×', '÷' -> e.operator(k)
+            '=' -> e.equals(); '.' -> e.dot(); '%' -> e.percent(); 'r' -> e.sqrt(); 'n' -> e.negate(); 'q' -> e.square(); 'i' -> e.reciprocal()
+            else -> e.digit(k)
+        }
+        return e
+    }
+
+    @Test fun addition() = assertEquals("3", run("1+2=").entry)
+    @Test fun immediateExecution() = assertEquals("20", run("2+3×4=").entry)
+    @Test fun decimalsAreExact() = assertEquals("0.3", run("0.1+0.2=").entry)
+    @Test fun repeatEquals() = assertEquals("11", run("5+3==").entry)
+    @Test fun percentOfLeftOperand() = assertEquals("220", run("200+10%=").entry)
+    @Test fun squareRoot() = assertEquals("3", run("9r").entry)
+    @Test fun negate() = assertEquals("-5", run("5n").entry)
+    @Test fun divideByZeroIsError() = assertEquals(true, run("1÷0=").error)
+    @Test fun grouping() = assertEquals("1,234,567.5", CalcEngine.format("1234567.5"))
+    @Test fun division() = assertEquals("2.5", run("5÷2=").entry)
+}

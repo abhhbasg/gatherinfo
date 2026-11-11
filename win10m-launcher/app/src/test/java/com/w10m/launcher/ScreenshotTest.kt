@@ -168,6 +168,64 @@ class ScreenshotTest {
         render(root, "app_list")
     }
 
+    @Test fun calculator() {
+        val a = Robolectric.buildActivity(CalculatorActivity::class.java).setup().get()
+        idle()
+        render(a.findViewById(android.R.id.content), "calculator")
+    }
+
+    @Test fun calendar() {
+        val a = Robolectric.buildActivity(CalendarActivity::class.java).setup().get()
+        idle()
+        render(a.findViewById(android.R.id.content), "calendar")
+    }
+
+    @Test fun people() {
+        val app = androidx.test.core.app.ApplicationProvider.getApplicationContext<android.app.Application>()
+        shadowOf(app).grantPermissions(android.Manifest.permission.READ_CONTACTS)
+        val cursor = org.robolectric.fakes.RoboCursor().apply {
+            setColumnNames(listOf("_id", "display_name", "photo_thumb_uri"))
+            setResults(listOf("Alice Chen", "陈晨", "Bob Miller", "韩梅梅", "李雷", "刘洋", "Mom", "王芳", "张伟", "赵敏")
+                .mapIndexed { i, n -> arrayOf<Any?>(i.toLong(), n, null) }.toTypedArray())
+        }
+        shadowOf(app.contentResolver).setCursor(android.provider.ContactsContract.Contacts.CONTENT_URI, cursor)
+        val a = Robolectric.buildActivity(PeopleActivity::class.java).setup().get()
+        idle()
+        render(a.findViewById(android.R.id.content), "people")
+    }
+
+    @Test fun recorder() {
+        val a = Robolectric.buildActivity(RecorderActivity::class.java).setup().get()
+        idle()
+        render(a.findViewById(android.R.id.content), "recorder")
+    }
+
+    @Test fun music() {
+        val app = androidx.test.core.app.ApplicationProvider.getApplicationContext<android.app.Application>()
+        shadowOf(app).grantPermissions(android.Manifest.permission.READ_MEDIA_AUDIO)
+        val cursor = org.robolectric.fakes.RoboCursor().apply {
+            setColumnNames(listOf("_id", "title", "artist", "album", "album_id", "duration"))
+            setResults(arrayOf(
+                arrayOf<Any>(1L, "晴天", "周杰伦", "叶惠美", 1L, 269_000L),
+                arrayOf<Any>(2L, "稻香", "周杰伦", "魔杰座", 2L, 223_000L),
+                arrayOf<Any>(3L, "Viva La Vida", "Coldplay", "Viva La Vida", 3L, 242_000L),
+                arrayOf<Any>(4L, "Yellow", "Coldplay", "Parachutes", 4L, 266_000L),
+                arrayOf<Any>(5L, "后来", "刘若英", "我等你", 5L, 341_000L),
+                arrayOf<Any>(6L, "Shape of You", "Ed Sheeran", "÷", 6L, 233_000L),
+            ))
+        }
+        shadowOf(app.contentResolver).setCursor(android.provider.MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, cursor)
+        val a = Robolectric.buildActivity(MusicActivity::class.java).setup().get()
+        idle()
+        render(a.findViewById(android.R.id.content), "music")
+    }
+
+    @Test fun systemSettings() {
+        val a = Robolectric.buildActivity(SystemSettingsActivity::class.java).setup().get()
+        idle()
+        render(a.findViewById(android.R.id.content), "settings")
+    }
+
     @Test fun dialer() {
         val a = Robolectric.buildActivity(DialerActivity::class.java).setup().get()
         idle()

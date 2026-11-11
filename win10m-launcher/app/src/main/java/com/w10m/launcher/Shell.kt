@@ -497,7 +497,10 @@ class ActionCenter(context: Context, private val p: Palette) : FrameLayout(conte
                     if (id != null) cam.setTorchMode(id, !torchOn)
                 } catch (_: Exception) {}
             },
-            Action("settings", R.string.qa_settings, { false }) { go(Settings.ACTION_SETTINGS) },
+            Action("settings", R.string.qa_settings, { false }) {
+                try { context.startActivity(SystemSettingsActivity.intent(context)) } catch (_: Exception) {}
+                close()
+            },
             // Brightness steps 25 → 50 → 75 → 100 %, like the W10M quick action.
             Action("weather", R.string.qa_brightness, { true }, { "${Math.round(brightness() / 255f * 4) * 25}%" }) {
                 if (!canWrite()) askWrite() else {

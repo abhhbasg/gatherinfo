@@ -243,3 +243,40 @@ class GlyphButton(context: Context, var color: Int, private val glyph: (Canvas, 
         glyph(c, p, width / 2f, height / 2f, context.dp(1f))
     }
 }
+
+/** UWP Pivot header: 24 epx SemiLight items; the selected one at full strength, the rest at 60 %. Tap to switch. */
+@SuppressLint("ViewConstructor")
+class PivotHeader(context: Context, private val p: Palette, private val items: List<String>, var onSelect: (Int) -> Unit) : LinearLayout(context) {
+    var selected = 0
+        set(v) { field = v; for (i in 0 until childCount) (getChildAt(i) as TextView).setTextColor(if (i == v) p.fg else p.fgMedium) }
+
+    init {
+        setPadding(context.dpi(Metro.PAGE_MARGIN), context.dpi(4f), 0, context.dpi(8f))
+        items.forEachIndexed { i, t ->
+            addView(TextView(context).apply {
+                text = t; textSize = 24f; typeface = Metro.semilight(context); isSingleLine = true
+                setPadding(0, 0, context.dpi(20f), 0)
+                setOnClickListener { selected = i; onSelect(i) }
+            })
+        }
+        selected = 0
+    }
+}
+
+/** Uppercase 15 epx SemiBold page title, as W10M apps show above their content. */
+fun pageTitle(c: Context, p: Palette, text: String) = TextView(c).apply {
+    this.text = text; textSize = 15f; typeface = Metro.semibold(c); setTextColor(p.fg); isAllCaps = true
+    setPadding(c.dpi(Metro.PAGE_MARGIN), c.dpi(10f), c.dpi(Metro.PAGE_MARGIN), c.dpi(6f))
+}
+
+/** Bottom command bar with centred 72 epx glyph buttons. */
+fun commandBar(c: Context, p: Palette, vararg buttons: View) = LinearLayout(c).apply {
+    setBackgroundColor(p.chromeMedium); gravity = Gravity.CENTER_HORIZONTAL
+    buttons.forEach { addView(it, LinearLayout.LayoutParams(c.dpi(72f), -1)) }
+}
+
+/** Formats milliseconds as m:ss, or h:mm:ss past an hour. */
+fun clockText(ms: Long): String {
+    val s = (ms / 1000).coerceAtLeast(0)
+    return if (s >= 3600) "%d:%02d:%02d".format(s / 3600, s / 60 % 60, s % 60) else "%d:%02d".format(s / 60, s % 60)
+}

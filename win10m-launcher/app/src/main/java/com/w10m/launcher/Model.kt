@@ -161,18 +161,20 @@ object AppRepo {
             Intent(Intent.ACTION_SENDTO, Uri.parse("smsto:")) to TileSize.MEDIUM,
             Intent(Intent.ACTION_VIEW, Uri.parse("https://example.com")) to TileSize.MEDIUM,
             Intent(MediaStore.INTENT_ACTION_STILL_IMAGE_CAMERA) to TileSize.SMALL,
-            Intent(Settings.ACTION_SETTINGS) to TileSize.SMALL,
             Intent(Intent.ACTION_VIEW).setType("image/*") to TileSize.WIDE,
-            Intent(Intent.ACTION_MAIN).addCategory(Intent.CATEGORY_APP_MUSIC) to TileSize.MEDIUM,
             Intent(Intent.ACTION_MAIN).addCategory(Intent.CATEGORY_APP_EMAIL) to TileSize.MEDIUM,
         )
         val out = mutableListOf<TileSpec>()
         val used = HashSet<String>()
-        // The built-in phone and browser lead the layout, as Phone and Edge do on W10M.
-        for (cls in listOf("DialerActivity", "MessagingActivity", "BrowserActivity")) {
-            val k = apps.firstOrNull { it.component.packageName == c.packageName && it.component.className.endsWith(cls) }?.key ?: continue
-            used += k; out += TileSpec("a:$k", TileKind.APP, k, TileSize.MEDIUM)
+        fun own(cls: String, size: TileSize) {
+            val k = apps.firstOrNull { it.component.packageName == c.packageName && it.component.className.endsWith(cls) }?.key ?: return
+            if (used.add(k)) out += TileSpec("a:$k", TileKind.APP, k, size)
         }
+        // The built-in phone, people, messaging and browser lead the layout, as on W10M.
+        for (cls in listOf("DialerActivity", "PeopleActivity", "MessagingActivity", "BrowserActivity")) own(cls, TileSize.MEDIUM)
+        own("SystemSettingsActivity", TileSize.SMALL)
+        own("CalculatorActivity", TileSize.SMALL)
+        own("MusicActivity", TileSize.MEDIUM)
         for ((intent, size) in wanted) {
             val k = try { resolve(intent) } catch (_: Exception) { null } ?: continue
             if (used.add(k)) out += TileSpec("a:$k", TileKind.APP, k, size)
