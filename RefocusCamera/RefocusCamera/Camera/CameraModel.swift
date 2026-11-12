@@ -20,11 +20,20 @@ enum CaptureState: Equatable {
     case sweeping(done: Int, total: Int)
 }
 
+/// 照片格式
+enum CaptureFormat: String, CaseIterable, Sendable {
+    /// HEIC：系统的计算摄影流程（Deep Fusion / Smart HDR / 降噪 / 语义渲染），可附带深度
+    case processed
+    /// Bayer RAW（DNG）：传感器原始数据，不经过任何计算摄影处理，在 App 内自行显影
+    case raw
+}
+
 enum CameraError: LocalizedError {
     case noCamera
     case cannotConfigure
     case busy
     case captureFailed
+    case rawUnsupported
 
     var errorDescription: String? {
         switch self {
@@ -32,6 +41,7 @@ enum CameraError: LocalizedError {
         case .cannotConfigure: "无法配置相机。"
         case .busy: "相机正忙。"
         case .captureFailed: "拍摄失败，请重试。"
+        case .rawUnsupported: "这台设备不支持 Bayer RAW 拍摄。"
         }
     }
 }
@@ -47,6 +57,8 @@ final class CameraModel {
     private(set) var isConfigured = false
     private(set) var supportsDepth = false
     private(set) var supportsSweep = false
+    private(set) var format: CaptureFormat = .processed
+    private(set) var isSwitchingFormat = false
     private(set) var state: CaptureState = .idle
     var frameCount: Int = 9
     var errorMessage: String?
@@ -55,11 +67,19 @@ final class CameraModel {
     @ObservationIgnored private let sessionQueue = DispatchQueue(label: "refocus.camera.session")
     @ObservationIgnored private let photoOutput = AVCapturePhotoOutput()
     @ObservationIgnored private var device: AVCaptureDevice?
+    @ObservationIgnored private var input: AVCaptureDeviceInput?
+    @ObservationIgnored private var rawPixelFormat: OSType?
+    @ObservationIgnored private var isConfiguredOnQueue = false
     @ObservationIgnored private weak var previewLayer: AVCaptureVideoPreviewLayer?
     @ObservationIgnored private var rotationCoordinator: AVCaptureDevice.RotationCoordinator?
     @ObservationIgnored private var rotationObservation: NSKeyValueObservation?
 
     static let frameCountOptions = [5, 9, 15]
+
+    private struct Capabilities {
+        var depth: Bool
+        var sweep: Bool
+    }
 
     // MARK: - 生命周期
 
@@ -74,16 +94,15 @@ final class CameraModel {
         guard granted else { return }
 
         do {
-            let caps = try await onSessionQueue { () -> (Bool, Bool) in
-                let caps = try self.configureIfNeeded()
+            let format = format
+            let caps = try await onSessionQueue { () -> Capabilities in
+                let caps = try self.configureIfNeeded(format: format)
                 if !self.session.isRunning { self.session.startRunning() }
                 return caps
             }
             await MainActor.run {
-                self.supportsDepth = caps.0
-                self.supportsSweep = caps.1
+                self.apply(caps)
                 self.isConfigured = true
-                self.setUpRotationCoordinator()
             }
         } catch {
             await MainActor.run { self.errorMessage = error.localizedDescription }
@@ -102,29 +121,75 @@ final class CameraModel {
         }
     }
 
-    // MARK: - 配置
-
-    @ObservationIgnored private var isConfiguredOnQueue = false
-
-    /// 返回 (是否支持深度, 是否支持手动镜头位置)
-    private func configureIfNeeded() throws -> (Bool, Bool) {
-        if isConfiguredOnQueue, let device {
-            return (photoOutput.isDepthDataDeliveryEnabled, device.isLockingFocusWithCustomLensPositionSupported)
+    /// 在“计算摄影（HEIC）”与“Bayer RAW”之间切换。
+    /// Bayer RAW 只能由物理镜头输出，所以 RAW 模式会改用广角镜头（同时失去深度数据）。
+    func setFormat(_ newFormat: CaptureFormat) async {
+        guard newFormat != format, isConfigured, state == .idle, !isSwitchingFormat else { return }
+        await MainActor.run { self.isSwitchingFormat = true }
+        do {
+            let caps = try await onSessionQueue { try self.switchDevice(for: newFormat) }
+            await MainActor.run {
+                self.format = newFormat
+                self.apply(caps)
+            }
+        } catch {
+            // 回退到原来的格式
+            let previous = format
+            let caps = try? await onSessionQueue { try self.switchDevice(for: previous) }
+            await MainActor.run {
+                if let caps { self.apply(caps) }
+                self.errorMessage = error.localizedDescription
+            }
         }
-        guard let device = Self.pickDevice() else { throw CameraError.noCamera }
+        await MainActor.run { self.isSwitchingFormat = false }
+    }
 
+    private func apply(_ caps: Capabilities) {
+        supportsDepth = caps.depth
+        supportsSweep = caps.sweep
+        rotationCoordinator = nil
+        rotationObservation = nil
+        setUpRotationCoordinator()
+    }
+
+    // MARK: - 配置（均在 sessionQueue 上执行）
+
+    private func configureIfNeeded(format: CaptureFormat) throws -> Capabilities {
+        if isConfiguredOnQueue { return currentCapabilities() }
         session.beginConfiguration()
         defer { session.commitConfiguration() }
         session.sessionPreset = .photo
-
-        let input = try AVCaptureDeviceInput(device: device)
-        guard session.canAddInput(input) else { throw CameraError.cannotConfigure }
-        session.addInput(input)
         guard session.canAddOutput(photoOutput) else { throw CameraError.cannotConfigure }
         session.addOutput(photoOutput)
+        let caps = try useDevice(for: format)
+        isConfiguredOnQueue = true
+        return caps
+    }
+
+    private func switchDevice(for format: CaptureFormat) throws -> Capabilities {
+        session.beginConfiguration()
+        defer { session.commitConfiguration() }
+        return try useDevice(for: format)
+    }
+
+    /// 替换输入设备并重新设置输出。调用方负责 begin/commitConfiguration。
+    private func useDevice(for format: CaptureFormat) throws -> Capabilities {
+        guard let device = Self.pickDevice(for: format) else { throw CameraError.noCamera }
+
+        if device != self.device {
+            if let input { session.removeInput(input) }
+            let newInput = try AVCaptureDeviceInput(device: device)
+            guard session.canAddInput(newInput) else {
+                if let input, session.canAddInput(input) { session.addInput(input) }
+                throw CameraError.cannotConfigure
+            }
+            session.addInput(newInput)
+            input = newInput
+            self.device = device
+        }
 
         // LiDAR 等设备需要选择带深度格式的 activeFormat 才能输出深度。
-        if device.activeFormat.supportedDepthDataFormats.isEmpty {
+        if format == .processed, device.activeFormat.supportedDepthDataFormats.isEmpty {
             let candidates = device.formats.filter {
                 !$0.supportedDepthDataFormats.isEmpty &&
                     CMFormatDescriptionGetMediaSubType($0.formatDescription) == kCVPixelFormatType_420YpCbCr8BiPlanarFullRange
@@ -136,7 +201,7 @@ final class CameraModel {
             }
         }
 
-        // 每张最多约 1200 万像素，避免一个堆栈占用过多内存。
+        // 每张最多约 1200 万像素，避免一个堆栈占用过多内存（Bayer RAW 本身也是 1200 万像素）。
         let dims = device.activeFormat.supportedMaxPhotoDimensions
         if let chosen = dims.filter({ Self.area($0) <= 12_600_000 }).max(by: { Self.area($0) < Self.area($1) }) ?? dims.first {
             photoOutput.maxPhotoDimensions = chosen
@@ -145,25 +210,45 @@ final class CameraModel {
         // 零延迟快门会使用按下快门之前缓存的画面 —— 那时镜头还没移动到位，必须关闭。
         if photoOutput.isZeroShutterLagSupported { photoOutput.isZeroShutterLagEnabled = false }
         if photoOutput.isResponsiveCaptureSupported { photoOutput.isResponsiveCaptureEnabled = false }
-        photoOutput.isDepthDataDeliveryEnabled = photoOutput.isDepthDataDeliverySupported
+        // 不启用 Apple ProRAW（它是多帧合成的“计算 RAW”），这样可用格式里只剩 Bayer RAW。
+        if photoOutput.isAppleProRAWSupported { photoOutput.isAppleProRAWEnabled = false }
+
+        switch format {
+        case .processed:
+            photoOutput.isDepthDataDeliveryEnabled = photoOutput.isDepthDataDeliverySupported
+            rawPixelFormat = nil
+        case .raw:
+            photoOutput.isDepthDataDeliveryEnabled = false
+            guard let raw = photoOutput.availableRawPhotoPixelFormatTypes.first(where: { AVCapturePhotoOutput.isBayerRAWPixelFormat($0) }) else {
+                throw CameraError.rawUnsupported
+            }
+            rawPixelFormat = raw
+        }
 
         try device.lockForConfiguration()
         if device.isFocusModeSupported(.continuousAutoFocus) { device.focusMode = .continuousAutoFocus }
         if device.isExposureModeSupported(.continuousAutoExposure) { device.exposureMode = .continuousAutoExposure }
         device.unlockForConfiguration()
 
-        self.device = device
-        isConfiguredOnQueue = true
-        return (photoOutput.isDepthDataDeliveryEnabled, device.isLockingFocusWithCustomLensPositionSupported)
+        return currentCapabilities()
     }
 
-    private static func pickDevice() -> AVCaptureDevice? {
-        // 优先使用能输出深度、同时允许手动设置镜头位置的设备。
-        let preferred: [AVCaptureDevice.DeviceType] = [.builtInLiDARDepthCamera, .builtInDualWideCamera, .builtInDualCamera]
-        for type in preferred {
-            if let device = AVCaptureDevice.default(type, for: .video, position: .back),
-               device.isLockingFocusWithCustomLensPositionSupported {
-                return device
+    private func currentCapabilities() -> Capabilities {
+        Capabilities(
+            depth: photoOutput.isDepthDataDeliveryEnabled,
+            sweep: device?.isLockingFocusWithCustomLensPositionSupported ?? false
+        )
+    }
+
+    private static func pickDevice(for format: CaptureFormat) -> AVCaptureDevice? {
+        if format == .processed {
+            // 优先使用能输出深度、同时允许手动设置镜头位置的设备。
+            let preferred: [AVCaptureDevice.DeviceType] = [.builtInLiDARDepthCamera, .builtInDualWideCamera, .builtInDualCamera]
+            for type in preferred {
+                if let device = AVCaptureDevice.default(type, for: .video, position: .back),
+                   device.isLockingFocusWithCustomLensPositionSupported {
+                    return device
+                }
             }
         }
         return AVCaptureDevice.default(.builtInWideAngleCamera, for: .video, position: .back)
@@ -212,7 +297,7 @@ final class CameraModel {
     // MARK: - 焦平面扫描拍摄
 
     func captureStack() async throws -> CaptureResult {
-        guard state == .idle, let device, isConfigured else { throw CameraError.busy }
+        guard state == .idle, !isSwitchingFormat, let device, isConfigured else { throw CameraError.busy }
         let sweep = supportsSweep
         let depth = supportsDepth
         let total = sweep ? frameCount : 1
@@ -222,13 +307,13 @@ final class CameraModel {
         await MainActor.run { self.state = .sweeping(done: 0, total: total) }
 
         do {
-            try await onSessionQueue { try self.prepareForSweep(angle: angle, lockFocus: sweep) }
+            try await onSessionQueue { try self.prepareForSweep(angle: angle) }
             var frames: [CapturedFrame] = []
             for index in 0 ..< total {
                 let position: Float = total > 1 ? Float(index) / Float(total - 1) : device.lensPosition
                 if sweep { await setLensPosition(position) }
-                let data = try await takePhoto(withDepth: depth && index == referenceIndex)
-                frames.append(CapturedFrame(data: data, lensPosition: sweep ? position : device.lensPosition, fileExtension: currentFileExtension))
+                let (data, ext) = try await takePhoto(withDepth: depth && index == referenceIndex)
+                frames.append(CapturedFrame(data: data, lensPosition: sweep ? position : device.lensPosition, fileExtension: ext))
                 await MainActor.run { self.state = .sweeping(done: index + 1, total: total) }
             }
             try? await onSessionQueue { try self.restoreAutomaticModes() }
@@ -241,11 +326,7 @@ final class CameraModel {
         }
     }
 
-    private var currentFileExtension: String {
-        photoOutput.availablePhotoCodecTypes.contains(.hevc) ? "heic" : "jpg"
-    }
-
-    private func prepareForSweep(angle: CGFloat, lockFocus: Bool) throws {
+    private func prepareForSweep(angle: CGFloat) throws {
         if let connection = photoOutput.connection(with: .video), connection.isVideoRotationAngleSupported(angle) {
             connection.videoRotationAngle = angle
         }
@@ -281,24 +362,46 @@ final class CameraModel {
         try? await Task.sleep(for: .milliseconds(40))
     }
 
-    private func takePhoto(withDepth: Bool) async throws -> Data {
+    /// 返回照片数据与文件扩展名
+    private func takePhoto(withDepth: Bool) async throws -> (Data, String) {
         try await withCheckedThrowingContinuation { continuation in
             sessionQueue.async {
                 let output = self.photoOutput
                 let settings: AVCapturePhotoSettings
-                if output.availablePhotoCodecTypes.contains(.hevc) {
-                    settings = AVCapturePhotoSettings(format: [AVVideoCodecKey: AVVideoCodecType.hevc])
+                let ext: String
+
+                if let raw = self.rawPixelFormat {
+                    // 只要 RAW，不要系统处理过的版本
+                    settings = AVCapturePhotoSettings(rawPixelFormatType: raw)
+                    settings.photoQualityPrioritization = .speed
+                    if let codec = settings.availableRawEmbeddedThumbnailPhotoCodecTypes.first {
+                        settings.rawEmbeddedThumbnailPhotoFormat = [
+                            AVVideoCodecKey: codec,
+                            AVVideoWidthKey: 640,
+                            AVVideoHeightKey: 640,
+                        ]
+                    }
+                    ext = "dng"
                 } else {
-                    settings = AVCapturePhotoSettings()
+                    if output.availablePhotoCodecTypes.contains(.hevc) {
+                        settings = AVCapturePhotoSettings(format: [AVVideoCodecKey: AVVideoCodecType.hevc])
+                        ext = "heic"
+                    } else {
+                        settings = AVCapturePhotoSettings()
+                        ext = "jpg"
+                    }
+                    settings.photoQualityPrioritization = .balanced
+                    if withDepth, output.isDepthDataDeliveryEnabled {
+                        settings.isDepthDataDeliveryEnabled = true
+                        settings.embedsDepthDataInPhoto = true
+                        settings.isDepthDataFiltered = true
+                    }
                 }
                 settings.maxPhotoDimensions = output.maxPhotoDimensions
-                settings.photoQualityPrioritization = .balanced
-                if withDepth, output.isDepthDataDeliveryEnabled {
-                    settings.isDepthDataDeliveryEnabled = true
-                    settings.embedsDepthDataInPhoto = true
-                    settings.isDepthDataFiltered = true
+
+                let delegate = PhotoCaptureDelegate { result in
+                    continuation.resume(with: result.map { ($0, ext) })
                 }
-                let delegate = PhotoCaptureDelegate(continuation: continuation)
                 output.capturePhoto(with: settings, delegate: delegate)
             }
         }
@@ -317,11 +420,11 @@ final class CameraModel {
 
 /// AVCapturePhotoOutput 只弱引用 delegate，所以由 delegate 自己持有自己直到拍摄结束。
 private final class PhotoCaptureDelegate: NSObject, AVCapturePhotoCaptureDelegate {
-    private var continuation: CheckedContinuation<Data, Error>?
+    private var completion: ((Result<Data, Error>) -> Void)?
     private var retainedSelf: PhotoCaptureDelegate?
 
-    init(continuation: CheckedContinuation<Data, Error>) {
-        self.continuation = continuation
+    init(completion: @escaping (Result<Data, Error>) -> Void) {
+        self.completion = completion
         super.init()
         retainedSelf = self
     }
@@ -342,8 +445,8 @@ private final class PhotoCaptureDelegate: NSObject, AVCapturePhotoCaptureDelegat
     }
 
     private func finish(_ result: Result<Data, Error>) {
-        guard let continuation else { return }
-        self.continuation = nil
-        continuation.resume(with: result)
+        guard let completion else { return }
+        self.completion = nil
+        completion(result)
     }
 }

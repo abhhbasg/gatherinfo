@@ -93,11 +93,26 @@ struct CameraScreen: View {
         GlassEffectContainer(spacing: 12) {
             HStack(spacing: 10) {
                 if camera.isConfigured {
-                    GlassChip(
-                        title: camera.supportsDepth ? "景深" : "无深度",
-                        systemImage: camera.supportsDepth ? "cube.transparent" : "cube.transparent.fill",
-                        tint: camera.supportsDepth ? .yellow : nil
-                    )
+                    // RAW 开关：关闭全部计算摄影，拍摄 Bayer RAW（DNG）
+                    Button {
+                        Task { await camera.setFormat(camera.format == .raw ? .processed : .raw) }
+                    } label: {
+                        GlassChip(
+                            title: camera.format == .raw ? "RAW" : "计算摄影",
+                            systemImage: camera.format == .raw ? "camera.aperture" : "wand.and.sparkles",
+                            tint: camera.format == .raw ? .yellow : nil
+                        )
+                        .overlay {
+                            if camera.isSwitchingFormat { ProgressView().controlSize(.small) }
+                        }
+                    }
+                    .buttonStyle(.plain)
+                    .disabled(camera.state != .idle || camera.isSwitchingFormat)
+                    .accessibilityHint("切换是否使用系统的计算摄影处理")
+
+                    if camera.supportsDepth {
+                        GlassChip(title: "景深", systemImage: "cube.transparent", tint: .yellow)
+                    }
                 }
                 Spacer()
                 Menu {
@@ -135,7 +150,9 @@ struct CameraScreen: View {
             } else if isSaving {
                 GlassChip(title: "正在存储堆栈…", systemImage: "tray.and.arrow.down")
             } else if camera.isConfigured {
-                Text("请保持稳定 · 拍摄后点按任意位置重新对焦")
+                Text(camera.format == .raw
+                    ? "RAW · 无计算摄影 · 请保持稳定"
+                    : "请保持稳定 · 拍摄后点按任意位置重新对焦")
                     .font(.caption.weight(.medium))
                     .padding(.horizontal, 14)
                     .padding(.vertical, 8)
@@ -173,7 +190,7 @@ struct CameraScreen: View {
 
                 Spacer()
 
-                ShutterButton(progress: sweepProgress, isEnabled: camera.isConfigured && camera.state == .idle && !isSaving) {
+                ShutterButton(progress: sweepProgress, isEnabled: camera.isConfigured && camera.state == .idle && !isSaving && !camera.isSwitchingFormat) {
                     capture()
                 }
 

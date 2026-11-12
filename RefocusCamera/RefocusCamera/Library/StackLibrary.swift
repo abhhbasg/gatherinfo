@@ -17,6 +17,9 @@ struct StackManifest: Codable, Identifiable, Hashable {
     /// 用作对齐基准、并携带深度数据的那一帧
     var referenceIndex: Int
     var hasDepth: Bool
+
+    /// Bayer RAW 堆栈（未经计算摄影处理）
+    var isRAW: Bool { frames.first?.file.lowercased().hasSuffix(".dng") ?? false }
 }
 
 @Observable
@@ -86,10 +89,12 @@ final class StackLibrary {
     func thumbnail(for stack: StackManifest, maxPixelSize: Int = 400) async -> UIImage? {
         guard stack.frames.indices.contains(stack.referenceIndex) else { return nil }
         let url = url(for: stack.frames[stack.referenceIndex], in: stack)
+        // RAW 优先使用拍摄时嵌入的缩略图，避免完整显影
+        let fromImageKey = stack.isRAW ? kCGImageSourceCreateThumbnailFromImageIfAbsent : kCGImageSourceCreateThumbnailFromImageAlways
         return await Task.detached(priority: .utility) { () -> UIImage? in
             guard let source = CGImageSourceCreateWithURL(url as CFURL, nil) else { return nil }
             let options: [CFString: Any] = [
-                kCGImageSourceCreateThumbnailFromImageAlways: true,
+                fromImageKey: true,
                 kCGImageSourceCreateThumbnailWithTransform: true,
                 kCGImageSourceThumbnailMaxPixelSize: maxPixelSize,
             ]

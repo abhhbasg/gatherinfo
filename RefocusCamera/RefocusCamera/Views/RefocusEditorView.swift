@@ -97,7 +97,7 @@ struct RefocusEditorView: View {
 
                 if model.phase == .ready {
                     GlassChip(
-                        title: "\(model.frameCount) 帧" + (model.hasDepth ? " · 景深" : ""),
+                        title: "\(model.frameCount) 帧" + (model.isRAW ? " · RAW" : "") + (model.hasDepth ? " · 景深" : ""),
                         systemImage: "square.3.layers.3d.down.right"
                     )
                     .glassEffectID("info", in: glassNamespace)
@@ -105,23 +105,46 @@ struct RefocusEditorView: View {
 
                 Spacer()
 
-                Button {
-                    Task { await model.save() }
-                } label: {
-                    Group {
-                        if model.isSaving {
-                            ProgressView()
-                        } else {
-                            Label("存储", systemImage: "square.and.arrow.down")
+                if model.isRAW {
+                    // RAW 堆栈：点按存储合成结果，长按可选择存储当前帧的原始 DNG
+                    Menu {
+                        Button("存储合成照片（HEIF）", systemImage: "photo") {
+                            Task { await model.save() }
                         }
+                        Button("存储当前焦平面的原始 DNG", systemImage: "camera.aperture") {
+                            Task { await model.saveOriginalRAW() }
+                        }
+                    } label: {
+                        saveLabel
+                    } primaryAction: {
+                        Task { await model.save() }
                     }
-                    .font(.subheadline.weight(.semibold))
-                    .frame(minWidth: 72, minHeight: 34)
+                    .menuStyle(.button)
+                    .buttonStyle(.glassProminent)
+                    .disabled(model.phase != .ready || model.isSaving)
+                } else {
+                    Button {
+                        Task { await model.save() }
+                    } label: {
+                        saveLabel
+                    }
+                    .buttonStyle(.glassProminent)
+                    .disabled(model.phase != .ready || model.isSaving)
                 }
-                .buttonStyle(.glassProminent)
-                .disabled(model.phase != .ready || model.isSaving)
             }
         }
+    }
+
+    private var saveLabel: some View {
+        Group {
+            if model.isSaving {
+                ProgressView()
+            } else {
+                Label("存储", systemImage: "square.and.arrow.down")
+            }
+        }
+        .font(.subheadline.weight(.semibold))
+        .frame(minWidth: 72, minHeight: 34)
     }
 
     // MARK: - 控制面板
@@ -143,6 +166,10 @@ struct RefocusEditorView: View {
 
                 if model.hasDepth {
                     apertureSlider
+                } else if model.isRAW {
+                    Text("RAW 未经计算摄影处理，没有深度数据，因此不提供光圈虚化。")
+                        .font(.footnote)
+                        .foregroundStyle(.secondary)
                 } else if model.frameCount < 2 {
                     Text("该设备不支持手动镜头位置或深度数据，仅保存了一张照片。")
                         .font(.footnote)

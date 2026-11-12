@@ -21,6 +21,9 @@ final class RefocusEditorModel {
     private(set) var isSaving = false
     var toast: String?
 
+    private(set) var isRAW = false
+
+    @ObservationIgnored private var frameURLs: [URL] = []
     @ObservationIgnored private var renderer: RefocusRenderer?
     @ObservationIgnored private var renderTask: Task<Void, Never>?
     @ObservationIgnored private var toastTask: Task<Void, Never>?
@@ -32,6 +35,8 @@ final class RefocusEditorModel {
     func load(manifest: StackManifest, library: StackLibrary) async {
         guard stack == nil else { return }
         let urls = manifest.frames.map { library.url(for: $0, in: manifest) }
+        frameURLs = urls
+        isRAW = manifest.isRAW
         do {
             let analyzed = try await Task.detached(priority: .userInitiated) {
                 try StackAnalyzer.analyze(manifest: manifest, frameURLs: urls) { value in
@@ -75,26 +80,48 @@ final class RefocusEditorModel {
         }
     }
 
+    /// 存储合成后的全分辨率 HEIF
     func save() async {
         guard let renderer, !isSaving else { return }
         isSaving = true
         defer { isSaving = false }
-
-        let status = await PHPhotoLibrary.requestAuthorization(for: .addOnly)
-        guard status == .authorized || status == .limited else {
-            show(toast: "没有写入照片图库的权限")
-            return
-        }
+        guard await requestPhotosAccess() else { return }
         guard let data = await renderer.exportHEIF(params) else {
             show(toast: "导出失败")
             return
         }
+        await addToPhotos(data, success: "已存储到照片")
+    }
+
+    /// 存储当前焦平面那一帧的原始 DNG（未经任何处理，可在“照片”或 Lightroom 中自行显影）
+    func saveOriginalRAW() async {
+        guard isRAW, !isSaving, frameURLs.indices.contains(params.frameIndex) else { return }
+        isSaving = true
+        defer { isSaving = false }
+        guard await requestPhotosAccess() else { return }
+        guard let data = try? Data(contentsOf: frameURLs[params.frameIndex]) else {
+            show(toast: "读取 DNG 失败")
+            return
+        }
+        await addToPhotos(data, success: "已存储原始 DNG")
+    }
+
+    private func requestPhotosAccess() async -> Bool {
+        let status = await PHPhotoLibrary.requestAuthorization(for: .addOnly)
+        guard status == .authorized || status == .limited else {
+            show(toast: "没有写入照片图库的权限")
+            return false
+        }
+        return true
+    }
+
+    private func addToPhotos(_ data: Data, success: String) async {
         do {
             try await PHPhotoLibrary.shared().performChanges {
                 PHAssetCreationRequest.forAsset().addResource(with: .photo, data: data, options: nil)
             }
             UINotificationFeedbackGenerator().notificationOccurred(.success)
-            show(toast: "已存储到照片")
+            show(toast: success)
         } catch {
             show(toast: "存储失败：\(error.localizedDescription)")
         }

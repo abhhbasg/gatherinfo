@@ -121,9 +121,7 @@ enum StackAnalyzer {
         // 1. 读取（应用 EXIF 方向）
         var originals: [CIImage] = []
         for url in frameURLs {
-            guard let image = CIImage(contentsOf: url, options: [.applyOrientationProperty: true]) else {
-                throw StackAnalyzerError.unreadableFrame
-            }
+            guard let image = loadImage(url) else { throw StackAnalyzerError.unreadableFrame }
             originals.append(image.atOrigin)
         }
         let referenceIndex = min(max(manifest.referenceIndex, 0), count - 1)
@@ -206,6 +204,22 @@ enum StackAnalyzer {
             sharpestIndex: sharpest,
             depth: depth
         )
+    }
+
+    // MARK: - 读取
+
+    /// 读取一帧并应用方向。DNG 用 CIRAWFilter 自行显影：
+    /// 关闭锐化、亮度降噪与局部色调映射，只做去马赛克、白平衡、镜头校正和全局色调曲线。
+    static func loadImage(_ url: URL) -> CIImage? {
+        guard url.pathExtension.lowercased() == "dng" else {
+            return CIImage(contentsOf: url, options: [.applyOrientationProperty: true])
+        }
+        guard let raw = CIRAWFilter(imageURL: url) else { return nil }
+        if raw.isSharpnessSupported { raw.sharpnessAmount = 0 }
+        if raw.isDetailSupported { raw.detailAmount = 0 }
+        if raw.isLuminanceNoiseReductionSupported { raw.luminanceNoiseReductionAmount = 0 }
+        if raw.isLocalToneMapSupported { raw.localToneMapAmount = 0 }
+        return raw.outputImage
     }
 
     // MARK: - 对齐
