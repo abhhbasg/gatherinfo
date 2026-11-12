@@ -14,6 +14,7 @@ struct CaptureResult: Sendable {
     let referenceIndex: Int
     let hasDepth: Bool
     let mode: CaptureMode
+    let metadata: CaptureMetadata?
 }
 
 enum CaptureState: Equatable {
@@ -340,7 +341,7 @@ final class CameraModel {
         await MainActor.run { self.state = .sweeping(done: 0, total: total) }
 
         do {
-            try await onSessionQueue { try self.prepareForSweep(angle: angle) }
+            let metadata = try await onSessionQueue { try self.prepareForSweep(angle: angle) }
             let frames: [CapturedFrame]
             if mode.usesVideo {
                 frames = try await captureVideoSweep(total: total, sweep: sweep, device: device)
@@ -349,7 +350,7 @@ final class CameraModel {
             }
             try? await onSessionQueue { try self.restoreAutomaticModes() }
             await MainActor.run { self.state = .idle }
-            return CaptureResult(frames: frames, referenceIndex: frames.count / 2, hasDepth: depth && !mode.usesVideo, mode: mode)
+            return CaptureResult(frames: frames, referenceIndex: frames.count / 2, hasDepth: depth && !mode.usesVideo, mode: mode, metadata: metadata)
         } catch {
             try? await onSessionQueue { try self.restoreAutomaticModes() }
             await MainActor.run { self.state = .idle }
@@ -384,18 +385,30 @@ final class CameraModel {
         return frames.map { CapturedFrame(data: $0.data, lensPosition: $0.lensPosition, fileExtension: "heic") }
     }
 
-    private func prepareForSweep(angle: CGFloat) throws {
+    /// 锁定曝光与白平衡，并返回锁定后的拍摄参数（用于水印）
+    private func prepareForSweep(angle: CGFloat) throws -> CaptureMetadata? {
         for output in [photoOutput as AVCaptureOutput, videoOutput] {
             if let connection = output.connection(with: .video), connection.isVideoRotationAngleSupported(angle) {
                 connection.videoRotationAngle = angle
             }
         }
-        guard let device else { return }
+        guard let device else { return nil }
         try device.lockForConfiguration()
         // 锁定曝光和白平衡，保证每一帧的亮度与色彩一致，便于后续合成。
         if device.isExposureModeSupported(.locked) { device.exposureMode = .locked }
         if device.isWhiteBalanceModeSupported(.locked) { device.whiteBalanceMode = .locked }
         device.unlockForConfiguration()
+
+        // 由水平视场角换算 35mm 等效焦距（36mm 宽的画幅）
+        let fov = Double(device.activeFormat.videoFieldOfView) * .pi / 180
+        let focal35 = fov > 0 ? Int((18 / tan(fov / 2)).rounded()) : nil
+        let seconds = CMTimeGetSeconds(device.exposureDuration)
+        return CaptureMetadata(
+            iso: device.iso,
+            exposureSeconds: seconds.isFinite ? seconds : nil,
+            aperture: device.lensAperture,
+            focalLength35: focal35
+        )
     }
 
     private func restoreAutomaticModes() throws {

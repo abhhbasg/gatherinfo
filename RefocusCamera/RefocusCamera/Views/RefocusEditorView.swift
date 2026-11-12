@@ -12,6 +12,10 @@ struct RefocusEditorView: View {
     @State private var reticle: (id: UUID, point: CGPoint)?
     /// 分析期间显示的模糊缩略图，让缩放转场落在连续的画面上
     @State private var placeholder: UIImage?
+    @State private var tab: EditorTab = .focus
+    @State private var showingOriginal = false
+    @State private var pressTask: Task<Void, Never>?
+    @State private var controlsHeight: CGFloat = 220
     @Namespace private var glassNamespace
 
     var body: some View {
@@ -36,6 +40,8 @@ struct RefocusEditorView: View {
                 failedView(message)
             case .ready:
                 canvas
+                    .padding(.top, 64)
+                    .padding(.bottom, controlsHeight + 14)
                     .transition(.opacity)
             }
 
@@ -47,6 +53,9 @@ struct RefocusEditorView: View {
                 Spacer()
                 if model.phase == .ready {
                     controls
+                        .onGeometryChange(for: CGFloat.self) { $0.size.height } action: { height in
+                            withAnimation(.glassSpring) { controlsHeight = height }
+                        }
                         .transition(.move(edge: .bottom).combined(with: .opacity))
                 }
             }
@@ -61,7 +70,10 @@ struct RefocusEditorView: View {
         }
         .task { await model.load(manifest: manifest, library: library) }
         .onChange(of: model.params) { old, new in
-            model.render(animated: old.frameIndex != new.frameIndex || old.mode != new.mode)
+            let animated = old.frameIndex != new.frameIndex || old.mode != new.mode
+                || old.preset != new.preset || old.watermark.style != new.watermark.style
+            model.render(animated: animated)
+            if old.watermark != new.watermark { model.watermarkSettingsChanged(old.watermark, new.watermark) }
         }
         .task(id: reticle?.id) {
             guard reticle != nil else { return }
@@ -75,15 +87,38 @@ struct RefocusEditorView: View {
     private var canvas: some View {
         GeometryReader { geo in
             let rect = AVMakeRect(aspectRatio: model.imageSize, insideRect: CGRect(origin: .zero, size: geo.size))
+            let photo = CGRect(
+                x: rect.minX + model.photoRect.minX * rect.width,
+                y: rect.minY + model.photoRect.minY * rect.height,
+                width: model.photoRect.width * rect.width,
+                height: model.photoRect.height * rect.height
+            )
             ZStack(alignment: .topLeading) {
                 if let image = model.displayImage {
                     Image(uiImage: image)
                         .resizable()
                         .interpolation(.high)
                         .frame(width: rect.width, height: rect.height)
+                        .shadow(color: .black.opacity(0.5), radius: 18, y: 8)
                         .position(x: rect.midX, y: rect.midY)
                         .id(model.imageVersion)
                         .transition(RackFocusTransition())
+                }
+                // 长按对比原图
+                if showingOriginal, let original = model.originalImage {
+                    Image(uiImage: original)
+                        .resizable()
+                        .interpolation(.high)
+                        .frame(width: photo.width, height: photo.height)
+                        .position(x: photo.midX, y: photo.midY)
+                        .transition(.opacity)
+                    Text("原图")
+                        .font(.caption.weight(.bold))
+                        .padding(.horizontal, 12)
+                        .padding(.vertical, 6)
+                        .glassEffect(.regular, in: .capsule)
+                        .position(x: photo.midX, y: photo.minY + 26)
+                        .transition(.scale(scale: 0.8).combined(with: .opacity))
                 }
                 if let reticle {
                     FocusReticle()
@@ -94,14 +129,28 @@ struct RefocusEditorView: View {
             .frame(width: geo.size.width, height: geo.size.height)
             .contentShape(.rect)
             .onTapGesture(coordinateSpace: .local) { location in
-                guard rect.contains(location) else { return }
+                guard photo.contains(location) else { return }
                 let u = (location.x - rect.minX) / rect.width
                 let v = (location.y - rect.minY) / rect.height
                 withAnimation { reticle = (UUID(), location) }
                 model.tap(u: u, v: v)
             }
+            .onLongPressGesture(minimumDuration: 0.25, maximumDistance: 30) {
+            } onPressingChanged: { pressing in
+                // 按下 0.25 秒后才显示原图，普通点按不会闪烁
+                pressTask?.cancel()
+                if pressing, model.isEdited {
+                    pressTask = Task {
+                        try? await Task.sleep(for: .milliseconds(250))
+                        guard !Task.isCancelled else { return }
+                        withAnimation(.easeInOut(duration: 0.2)) { showingOriginal = true }
+                    }
+                } else if showingOriginal {
+                    withAnimation(.easeInOut(duration: 0.25)) { showingOriginal = false }
+                }
+            }
+            .sensoryFeedback(.impact(weight: .light), trigger: showingOriginal) { _, new in new }
         }
-        .ignoresSafeArea()
     }
 
     // MARK: - 顶栏
@@ -178,40 +227,63 @@ struct RefocusEditorView: View {
     // MARK: - 控制面板
 
     private var controls: some View {
-        GlassEffectContainer(spacing: 16) {
-            VStack(spacing: 16) {
-                Picker("模式", selection: $model.params.mode) {
-                    Text("单点对焦").tag(RefocusParameters.Mode.focus)
-                    Text("全景深").tag(RefocusParameters.Mode.allInFocus)
+        GlassEffectContainer(spacing: 10) {
+            VStack(spacing: 10) {
+                Group {
+                    switch tab {
+                    case .focus: focusPanel
+                    case .filters: FilterPanel(model: model)
+                    case .adjust: AdjustPanel(model: model)
+                    case .watermark: WatermarkPanel(model: model)
+                    }
                 }
-                .pickerStyle(.segmented)
-                .disabled(model.frameCount < 2)
+                .id(tab)
+                .transition(.asymmetric(
+                    insertion: .opacity.combined(with: .offset(y: 14)).combined(with: .scale(scale: 0.98, anchor: .bottom)),
+                    removal: .opacity
+                ))
+                .padding(16)
+                .frame(maxWidth: .infinity)
+                .glassEffect(.regular, in: .rect(cornerRadius: 30, style: .continuous))
+                .glassEffectID("panel", in: glassNamespace)
 
-                if model.params.mode == .focus, model.frameCount > 1 {
-                    focusPlaneSlider
-                        .transition(.opacity.combined(with: .move(edge: .bottom)))
-                }
-
-                if model.hasDepth {
-                    apertureSlider
-                } else if model.frameCount > 1 {
-                    Text("“\(manifest.captureMode?.title ?? "此")”模式没有深度数据，因此不提供光圈虚化。")
-                        .font(.footnote)
-                        .foregroundStyle(.secondary)
-                } else if model.frameCount < 2 {
-                    Text("该设备不支持手动镜头位置或深度数据，仅保存了一张照片。")
-                        .font(.footnote)
-                        .foregroundStyle(.secondary)
-                }
-
-                Text(hint)
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-                    .contentTransition(.opacity)
+                EditorTabBar(selection: $tab)
+                    .glassEffectID("tabs", in: glassNamespace)
             }
-            .padding(18)
-            .glassEffect(.regular, in: .rect(cornerRadius: 30, style: .continuous))
-            .glassEffectID("controls", in: glassNamespace)
+        }
+        .animation(.glassSpring, value: tab)
+    }
+
+    private var focusPanel: some View {
+        VStack(spacing: 16) {
+            Picker("模式", selection: $model.params.mode) {
+                Text("单点对焦").tag(RefocusParameters.Mode.focus)
+                Text("全景深").tag(RefocusParameters.Mode.allInFocus)
+            }
+            .pickerStyle(.segmented)
+            .disabled(model.frameCount < 2)
+
+            if model.params.mode == .focus, model.frameCount > 1 {
+                focusPlaneSlider
+                    .transition(.opacity.combined(with: .move(edge: .bottom)))
+            }
+
+            if model.hasDepth {
+                apertureSlider
+            } else if model.frameCount > 1 {
+                Text("“\(manifest.captureMode?.title ?? "此")”模式没有深度数据，因此不提供光圈虚化。")
+                    .font(.footnote)
+                    .foregroundStyle(.secondary)
+            } else {
+                Text("该设备不支持手动镜头位置或深度数据，仅保存了一张照片。")
+                    .font(.footnote)
+                    .foregroundStyle(.secondary)
+            }
+
+            Text(hint)
+                .font(.caption)
+                .foregroundStyle(.secondary)
+                .contentTransition(.opacity)
         }
         .animation(.glassSpring, value: model.params.mode)
         .sensoryFeedback(.selection, trigger: model.params.frameIndex)
@@ -241,9 +313,7 @@ struct RefocusEditorView: View {
     private var apertureSlider: some View {
         HStack(spacing: 12) {
             Image(systemName: "camera.aperture")
-            Slider(value: $model.params.blur, in: 0 ... 1) {
-                Text("光圈")
-            }
+            RulerDial(value: $model.params.blur, range: 0 ... 1, defaultValue: 0, tickCount: 30)
             Text(String(format: "ƒ/%.1f", model.params.fNumber))
                 .font(.subheadline.monospacedDigit().weight(.semibold))
                 .frame(width: 56, alignment: .trailing)
@@ -255,7 +325,7 @@ struct RefocusEditorView: View {
     private var hint: String {
         switch model.params.mode {
         case .focus:
-            model.hasDepth ? "点按画面重新对焦 · 调小 ƒ 值增加背景虚化" : "点按画面任意位置重新对焦"
+            model.hasDepth ? "点按画面重新对焦 · 调小 ƒ 值增加背景虚化 · 长按对比原图" : "点按画面任意位置重新对焦 · 长按对比原图"
         case .allInFocus:
             model.hasDepth ? "已合成全景深 · 点按选择虚化的对焦主体" : "已把每个区域最清晰的部分合成在一起"
         }

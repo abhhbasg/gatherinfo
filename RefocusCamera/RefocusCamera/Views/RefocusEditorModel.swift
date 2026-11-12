@@ -15,22 +15,34 @@ final class RefocusEditorModel {
     var phase: Phase = .loading(0)
     var params = RefocusParameters(frameIndex: 0)
     private(set) var displayImage: UIImage?
+    /// 照片在 displayImage 中的位置（归一化，左上为原点）；加边框的水印会让它小于整张图
+    private(set) var photoRect = RenderedFrame.fullRect
     /// 每次画面更新 +1，用来驱动交叉淡化
     private(set) var imageVersion = 0
     private(set) var stack: AnalyzedStack?
     private(set) var isSaving = false
-    var toast: String?
-
     private(set) var isRAW = false
+    private(set) var presetThumbnails: [LookPreset: UIImage] = [:]
+    private(set) var watermarkThumbnails: [WatermarkStyle: UIImage] = [:]
+    var toast: String?
 
     @ObservationIgnored private var frameURLs: [URL] = []
     @ObservationIgnored private var renderer: RefocusRenderer?
-    @ObservationIgnored private var renderTask: Task<Void, Never>?
+    @ObservationIgnored private var isRendering = false
+    @ObservationIgnored private var pendingRender: (params: RefocusParameters, animated: Bool)?
     @ObservationIgnored private var toastTask: Task<Void, Never>?
+    @ObservationIgnored private var watermarkThumbTask: Task<Void, Never>?
 
     var hasDepth: Bool { stack?.depth != nil }
     var frameCount: Int { stack?.frameCount ?? 0 }
-    var imageSize: CGSize { stack?.displayExtent.size ?? .zero }
+    var imageSize: CGSize { displayImage?.size ?? stack?.displayExtent.size ?? .zero }
+    /// 未经滤镜与水印的当前帧（长按对比原图）
+    var originalImage: UIImage? {
+        guard let stack, stack.displayImages.indices.contains(params.frameIndex) else { return nil }
+        return UIImage(cgImage: stack.displayImages[params.frameIndex])
+    }
+
+    var isEdited: Bool { !params.look.isIdentity || params.watermark.style != .none }
 
     func load(manifest: StackManifest, library: StackLibrary) async {
         guard stack == nil else { return }
@@ -38,47 +50,111 @@ final class RefocusEditorModel {
         frameURLs = urls
         isRAW = manifest.isRAW
         do {
-            let analyzed = try await Task.detached(priority: .userInitiated) {
-                try StackAnalyzer.analyze(manifest: manifest, frameURLs: urls) { value in
+            let (analyzed, info) = try await Task.detached(priority: .userInitiated) {
+                let stack = try StackAnalyzer.analyze(manifest: manifest, frameURLs: urls) { value in
                     Task { @MainActor [weak self] in
                         if case .loading = self?.phase { self?.phase = .loading(value) }
                     }
                 }
+                let info = WatermarkInfo.load(manifest: manifest, referenceURL: urls[stack.referenceIndex])
+                return (stack, info)
             }.value
             stack = analyzed
-            renderer = RefocusRenderer(stack: analyzed)
-            params = RefocusParameters(frameIndex: analyzed.referenceIndex)
+            let renderer = RefocusRenderer(stack: analyzed, info: info)
+            self.renderer = renderer
+            var initial = RefocusParameters(frameIndex: analyzed.referenceIndex)
+            initial.watermark = WatermarkSettings.load()
+            initial.watermark.style = .none   // 记住署名与字体，但每张照片默认不加水印
+            params = initial
             displayImage = UIImage(cgImage: analyzed.displayImages[analyzed.referenceIndex])
             imageVersion += 1
             phase = .ready
+
+            let thumbs = await renderer.presetThumbnails()
+            withAnimation(.glassSpring) {
+                presetThumbnails = thumbs.mapValues { UIImage(cgImage: $0) }
+            }
+            refreshWatermarkThumbnails()
         } catch {
             phase = .failed(error.localizedDescription)
         }
     }
 
-    /// 点按画面：u, v 为归一化坐标（左上为原点）
+    // MARK: - 交互
+
+    /// 点按画面：u, v 为整张显示图中的归一化坐标（左上为原点）
     func tap(u: CGFloat, v: CGFloat) {
         guard let stack else { return }
-        params.focusPoint = CGPoint(x: u, y: v)
+        // 换算到照片内部的坐标（去掉水印边框）
+        let pu = (u - photoRect.minX) / photoRect.width
+        let pv = (v - photoRect.minY) / photoRect.height
+        guard (0 ... 1).contains(pu), (0 ... 1).contains(pv) else { return }
+        params.focusPoint = CGPoint(x: pu, y: pv)
         if params.mode == .focus {
-            params.frameIndex = stack.sharpestFrame(u: u, v: v)
+            params.frameIndex = stack.sharpestFrame(u: pu, v: pv)
         }
         UIImpactFeedbackGenerator(style: .light).impactOccurred()
     }
 
-    /// 参数变化后重新渲染。连续拖动滑块时会取消过期的渲染。
-    func render(animated: Bool) {
+    func selectPreset(_ preset: LookPreset) {
+        if params.preset != preset {
+            params.preset = preset
+            params.presetIntensity = 1
+        }
+    }
+
+    func resetAdjustments() {
+        params.adjustments = LookSettings()
+    }
+
+    /// 水印的署名、字体等变化后，重新生成样式缩略图并记住设置
+    func watermarkSettingsChanged(_ old: WatermarkSettings, _ new: WatermarkSettings) {
+        new.save()
+        var a = old, b = new
+        a.style = .none
+        b.style = .none
+        if a != b { refreshWatermarkThumbnails() }
+    }
+
+    private func refreshWatermarkThumbnails() {
         guard let renderer else { return }
-        let params = params
-        renderTask?.cancel()
-        renderTask = Task {
-            guard let cg = await renderer.renderDisplay(params), !Task.isCancelled else { return }
-            withAnimation(animated ? .easeInOut(duration: 0.35) : .linear(duration: 0.08)) {
-                displayImage = UIImage(cgImage: cg)
-                imageVersion += 1
+        let settings = params.watermark
+        watermarkThumbTask?.cancel()
+        watermarkThumbTask = Task {
+            try? await Task.sleep(for: .milliseconds(150))
+            guard !Task.isCancelled else { return }
+            let thumbs = await renderer.watermarkThumbnails(settings)
+            guard !Task.isCancelled else { return }
+            withAnimation(.glassSpring) {
+                watermarkThumbnails = thumbs.mapValues { UIImage(cgImage: $0) }
             }
         }
     }
+
+    // MARK: - 渲染
+
+    /// 参数变化后重新渲染。渲染进行中时只记住最新的参数，完成后再渲染一次，
+    /// 这样拖动滑块时不会堆积过期的渲染任务。
+    func render(animated: Bool) {
+        pendingRender = (params, animated || (pendingRender?.animated ?? false))
+        guard !isRendering, let renderer else { return }
+        isRendering = true
+        Task {
+            while let next = pendingRender {
+                pendingRender = nil
+                guard let frame = await renderer.renderDisplay(next.params) else { continue }
+                let image = UIImage(cgImage: frame.image)
+                withAnimation(next.animated ? .easeInOut(duration: 0.38) : .linear(duration: 0.06)) {
+                    displayImage = image
+                    photoRect = frame.photoRect
+                    imageVersion += 1
+                }
+            }
+            isRendering = false
+        }
+    }
+
+    // MARK: - 存储
 
     /// 存储合成后的全分辨率 HEIF
     func save() async {
@@ -129,11 +205,11 @@ final class RefocusEditorModel {
 
     private func show(toast message: String) {
         toastTask?.cancel()
-        withAnimation(.spring(duration: 0.4)) { toast = message }
+        withAnimation(.glassSpring) { toast = message }
         toastTask = Task {
             try? await Task.sleep(for: .seconds(2))
             guard !Task.isCancelled else { return }
-            withAnimation(.spring(duration: 0.4)) { toast = nil }
+            withAnimation(.glassSpring) { toast = nil }
         }
     }
 }

@@ -19,6 +19,8 @@ struct StackManifest: Codable, Identifiable, Hashable {
     var hasDepth: Bool
     /// 拍摄模式（CaptureMode.rawValue）；旧版本的堆栈没有这个字段
     var mode: String?
+    /// 拍摄参数（水印用）；旧版本的堆栈没有这个字段
+    var metadata: CaptureMetadata?
 
     var captureMode: CaptureMode? { mode.flatMap(CaptureMode.init(rawValue:)) }
 
@@ -75,7 +77,8 @@ final class StackLibrary {
                 frames: frames,
                 referenceIndex: min(max(capture.referenceIndex, 0), frames.count - 1),
                 hasDepth: capture.hasDepth,
-                mode: capture.mode.rawValue
+                mode: capture.mode.rawValue,
+                metadata: capture.metadata
             )
             let encoder = JSONEncoder()
             encoder.outputFormatting = .prettyPrinted
