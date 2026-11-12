@@ -17,6 +17,10 @@ struct StackManifest: Codable, Identifiable, Hashable {
     /// 用作对齐基准、并携带深度数据的那一帧
     var referenceIndex: Int
     var hasDepth: Bool
+    /// 拍摄模式（CaptureMode.rawValue）；旧版本的堆栈没有这个字段
+    var mode: String?
+
+    var captureMode: CaptureMode? { mode.flatMap(CaptureMode.init(rawValue:)) }
 
     /// Bayer RAW 堆栈（未经计算摄影处理）
     var isRAW: Bool { frames.first?.file.lowercased().hasSuffix(".dng") ?? false }
@@ -70,7 +74,8 @@ final class StackLibrary {
                 createdAt: Date(),
                 frames: frames,
                 referenceIndex: min(max(capture.referenceIndex, 0), frames.count - 1),
-                hasDepth: capture.hasDepth
+                hasDepth: capture.hasDepth,
+                mode: capture.mode.rawValue
             )
             let encoder = JSONEncoder()
             encoder.outputFormatting = .prettyPrinted

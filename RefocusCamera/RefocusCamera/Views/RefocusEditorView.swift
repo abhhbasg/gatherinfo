@@ -10,19 +10,33 @@ struct RefocusEditorView: View {
     @Environment(\.dismiss) private var dismiss
     @State private var model = RefocusEditorModel()
     @State private var reticle: (id: UUID, point: CGPoint)?
+    /// 分析期间显示的模糊缩略图，让缩放转场落在连续的画面上
+    @State private var placeholder: UIImage?
     @Namespace private var glassNamespace
 
     var body: some View {
         ZStack {
             Color.black.ignoresSafeArea()
 
+            if model.phase != .ready, let placeholder {
+                Image(uiImage: placeholder)
+                    .resizable()
+                    .scaledToFit()
+                    .blur(radius: 18)
+                    .opacity(0.7)
+                    .ignoresSafeArea()
+                    .transition(.opacity)
+            }
+
             switch model.phase {
             case let .loading(progress):
                 loadingView(progress)
+                    .transition(.blurReplace)
             case let .failed(message):
                 failedView(message)
             case .ready:
                 canvas
+                    .transition(.opacity)
             }
 
             VStack(spacing: 12) {
@@ -40,7 +54,11 @@ struct RefocusEditorView: View {
             .padding(.bottom, 8)
         }
         .statusBarHidden()
-        .animation(.spring(duration: 0.45), value: model.phase)
+        .animation(.glassSpring, value: model.phase)
+        .animation(.glassSpring, value: model.toast)
+        .task {
+            placeholder = await library.thumbnail(for: manifest, maxPixelSize: 600)
+        }
         .task { await model.load(manifest: manifest, library: library) }
         .onChange(of: model.params) { old, new in
             model.render(animated: old.frameIndex != new.frameIndex || old.mode != new.mode)
@@ -65,7 +83,7 @@ struct RefocusEditorView: View {
                         .frame(width: rect.width, height: rect.height)
                         .position(x: rect.midX, y: rect.midY)
                         .id(model.imageVersion)
-                        .transition(.opacity)
+                        .transition(RackFocusTransition())
                 }
                 if let reticle {
                     FocusReticle()
@@ -97,9 +115,11 @@ struct RefocusEditorView: View {
 
                 if model.phase == .ready {
                     GlassChip(
-                        title: "\(model.frameCount) 帧" + (model.isRAW ? " · RAW" : "") + (model.hasDepth ? " · 景深" : ""),
-                        systemImage: "square.3.layers.3d.down.right"
+                        title: infoTitle,
+                        systemImage: manifest.captureMode?.symbol ?? "square.3.layers.3d.down.right",
+                        tint: manifest.captureMode?.isRAW == true ? .yellow : nil
                     )
+                    .transition(.scale(scale: 0.7).combined(with: .opacity))
                     .glassEffectID("info", in: glassNamespace)
                 }
 
@@ -147,6 +167,14 @@ struct RefocusEditorView: View {
         .frame(minWidth: 72, minHeight: 34)
     }
 
+    private var infoTitle: String {
+        var parts: [String] = []
+        if let mode = manifest.captureMode { parts.append(mode.title) }
+        parts.append("\(model.frameCount) 帧")
+        if model.hasDepth { parts.append("景深") }
+        return parts.joined(separator: " · ")
+    }
+
     // MARK: - 控制面板
 
     private var controls: some View {
@@ -166,8 +194,8 @@ struct RefocusEditorView: View {
 
                 if model.hasDepth {
                     apertureSlider
-                } else if model.isRAW {
-                    Text("RAW 未经计算摄影处理，没有深度数据，因此不提供光圈虚化。")
+                } else if model.frameCount > 1 {
+                    Text("“\(manifest.captureMode?.title ?? "此")”模式没有深度数据，因此不提供光圈虚化。")
                         .font(.footnote)
                         .foregroundStyle(.secondary)
                 } else if model.frameCount < 2 {
@@ -185,7 +213,9 @@ struct RefocusEditorView: View {
             .glassEffect(.regular, in: .rect(cornerRadius: 30, style: .continuous))
             .glassEffectID("controls", in: glassNamespace)
         }
-        .animation(.spring(duration: 0.35), value: model.params.mode)
+        .animation(.glassSpring, value: model.params.mode)
+        .sensoryFeedback(.selection, trigger: model.params.frameIndex)
+        .sensoryFeedback(.selection, trigger: model.params.mode)
     }
 
     private var focusPlaneSlider: some View {
@@ -234,14 +264,28 @@ struct RefocusEditorView: View {
     // MARK: - 状态
 
     private func loadingView(_ progress: Double) -> some View {
-        VStack(spacing: 14) {
-            ProgressView(value: progress)
-                .frame(width: 180)
-            Text("正在对齐与分析焦点堆栈…")
+        VStack(spacing: 16) {
+            ZStack {
+                Circle()
+                    .stroke(.white.opacity(0.15), lineWidth: 5)
+                Circle()
+                    .trim(from: 0, to: max(0.02, progress))
+                    .stroke(.yellow, style: StrokeStyle(lineWidth: 5, lineCap: .round))
+                    .rotationEffect(.degrees(-90))
+                    .animation(.glassSpring, value: progress)
+                Text("\(Int(progress * 100))%")
+                    .font(.subheadline.monospacedDigit().weight(.semibold))
+                    .contentTransition(.numericText(value: progress))
+                    .animation(.glassSnappy, value: Int(progress * 100))
+            }
+            .frame(width: 72, height: 72)
+            Text(progress < 0.35 ? "正在对齐焦点堆栈…" : (progress < 0.95 ? "正在分析每个焦平面…" : "即将完成…"))
                 .font(.subheadline.weight(.medium))
+                .contentTransition(.opacity)
+                .animation(.easeInOut, value: progress < 0.35)
         }
-        .padding(24)
-        .glassEffect(.regular, in: .rect(cornerRadius: 26, style: .continuous))
+        .padding(28)
+        .glassEffect(.regular, in: .rect(cornerRadius: 30, style: .continuous))
     }
 
     private func failedView(_ message: String) -> some View {
@@ -255,5 +299,14 @@ struct RefocusEditorView: View {
         }
         .padding(24)
         .glassEffect(.regular, in: .rect(cornerRadius: 26, style: .continuous))
+    }
+}
+
+/// 模仿“拉焦”：离开的画面逐渐失焦，新画面清晰地浮现
+private struct RackFocusTransition: Transition {
+    func body(content: Content, phase: TransitionPhase) -> some View {
+        content
+            .blur(radius: phase == .didDisappear ? 8 : 0)
+            .opacity(phase.isIdentity ? 1 : 0)
     }
 }

@@ -68,7 +68,7 @@ private struct StackThumbnail: View {
             }
             .clipShape(.rect(cornerRadius: 10, style: .continuous))
             .overlay(alignment: .bottomLeading) {
-                Label("\(stack.frames.count)", systemImage: stack.hasDepth ? "cube.transparent" : "square.3.layers.3d")
+                Label("\(stack.frames.count)", systemImage: stack.captureMode?.symbol ?? (stack.hasDepth ? "cube.transparent" : "square.3.layers.3d"))
                     .font(.caption2.weight(.semibold))
                     .padding(.horizontal, 8)
                     .padding(.vertical, 4)

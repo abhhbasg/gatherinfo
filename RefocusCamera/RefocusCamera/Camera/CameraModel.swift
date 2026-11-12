@@ -13,6 +13,7 @@ struct CaptureResult: Sendable {
     let frames: [CapturedFrame]
     let referenceIndex: Int
     let hasDepth: Bool
+    let mode: CaptureMode
 }
 
 enum CaptureState: Equatable {
@@ -20,20 +21,12 @@ enum CaptureState: Equatable {
     case sweeping(done: Int, total: Int)
 }
 
-/// 照片格式
-enum CaptureFormat: String, CaseIterable, Sendable {
-    /// HEIC：系统的计算摄影流程（Deep Fusion / Smart HDR / 降噪 / 语义渲染），可附带深度
-    case processed
-    /// Bayer RAW（DNG）：传感器原始数据，不经过任何计算摄影处理，在 App 内自行显影
-    case raw
-}
-
 enum CameraError: LocalizedError {
     case noCamera
     case cannotConfigure
     case busy
     case captureFailed
-    case rawUnsupported
+    case modeUnsupported(CaptureMode)
 
     var errorDescription: String? {
         switch self {
@@ -41,7 +34,7 @@ enum CameraError: LocalizedError {
         case .cannotConfigure: "无法配置相机。"
         case .busy: "相机正忙。"
         case .captureFailed: "拍摄失败，请重试。"
-        case .rawUnsupported: "这台设备不支持 Bayer RAW 拍摄。"
+        case let .modeUnsupported(mode): "这台设备不支持“\(mode.title)”模式。"
         }
     }
 }
@@ -49,7 +42,7 @@ enum CameraError: LocalizedError {
 /// 负责 AVCaptureSession 与“焦平面扫描”拍摄。
 ///
 /// 一次快门会锁定曝光与白平衡，然后把镜头从最近对焦距离逐步推到最远，
-/// 每个位置拍一张照片；中间那一帧额外携带深度（视差）数据。
+/// 每个位置拍一张照片（或从视频流抓一帧）。
 /// 之后在编辑器里点按任意位置，就能挑出该处最清晰的那一帧 —— 也就是“先拍摄，后对焦”。
 @Observable
 final class CameraModel {
@@ -57,24 +50,32 @@ final class CameraModel {
     private(set) var isConfigured = false
     private(set) var supportsDepth = false
     private(set) var supportsSweep = false
-    private(set) var format: CaptureFormat = .processed
-    private(set) var isSwitchingFormat = false
+    /// 当前生效的模式
+    private(set) var mode: CaptureMode = .computational
+    /// 用户刚刚选择、正在切换中的模式（界面立即响应它）
+    private(set) var pendingMode: CaptureMode?
+    private(set) var unavailableModes: Set<CaptureMode> = []
     private(set) var state: CaptureState = .idle
-    var frameCount: Int = 9
+    var frameCount: Int = CaptureMode.computational.defaultFrameCount
     var errorMessage: String?
+
+    var displayedMode: CaptureMode { pendingMode ?? mode }
+    var isSwitchingMode: Bool { pendingMode != nil }
 
     @ObservationIgnored let session = AVCaptureSession()
     @ObservationIgnored private let sessionQueue = DispatchQueue(label: "refocus.camera.session")
+    @ObservationIgnored private let videoQueue = DispatchQueue(label: "refocus.camera.video", qos: .userInitiated)
     @ObservationIgnored private let photoOutput = AVCapturePhotoOutput()
+    @ObservationIgnored private let videoOutput = AVCaptureVideoDataOutput()
+    @ObservationIgnored private let videoCollector = VideoSweepCollector()
     @ObservationIgnored private var device: AVCaptureDevice?
     @ObservationIgnored private var input: AVCaptureDeviceInput?
+    @ObservationIgnored private var activeMode: CaptureMode = .computational
     @ObservationIgnored private var rawPixelFormat: OSType?
     @ObservationIgnored private var isConfiguredOnQueue = false
     @ObservationIgnored private weak var previewLayer: AVCaptureVideoPreviewLayer?
     @ObservationIgnored private var rotationCoordinator: AVCaptureDevice.RotationCoordinator?
     @ObservationIgnored private var rotationObservation: NSKeyValueObservation?
-
-    static let frameCountOptions = [5, 9, 15]
 
     private struct Capabilities {
         var depth: Bool
@@ -94,9 +95,9 @@ final class CameraModel {
         guard granted else { return }
 
         do {
-            let format = format
+            let mode = mode
             let caps = try await onSessionQueue { () -> Capabilities in
-                let caps = try self.configureIfNeeded(format: format)
+                let caps = try self.configureIfNeeded(mode: mode)
                 if !self.session.isRunning { self.session.startRunning() }
                 return caps
             }
@@ -121,27 +122,28 @@ final class CameraModel {
         }
     }
 
-    /// 在“计算摄影（HEIC）”与“Bayer RAW”之间切换。
-    /// Bayer RAW 只能由物理镜头输出，所以 RAW 模式会改用广角镜头（同时失去深度数据）。
-    func setFormat(_ newFormat: CaptureFormat) async {
-        guard newFormat != format, isConfigured, state == .idle, !isSwitchingFormat else { return }
-        await MainActor.run { self.isSwitchingFormat = true }
+    /// 切换拍摄模式。界面会立即显示新模式（pendingMode），失败时自动回退。
+    func setMode(_ newMode: CaptureMode) async {
+        guard newMode != displayedMode, isConfigured, state == .idle, pendingMode == nil else { return }
+        let previous = mode
+        await MainActor.run { self.pendingMode = newMode }
         do {
-            let caps = try await onSessionQueue { try self.switchDevice(for: newFormat) }
+            let caps = try await onSessionQueue { try self.switchDevice(for: newMode) }
             await MainActor.run {
-                self.format = newFormat
+                self.mode = newMode
+                if !newMode.frameCountOptions.contains(self.frameCount) { self.frameCount = newMode.defaultFrameCount }
                 self.apply(caps)
+                self.pendingMode = nil
             }
         } catch {
-            // 回退到原来的格式
-            let previous = format
             let caps = try? await onSessionQueue { try self.switchDevice(for: previous) }
             await MainActor.run {
                 if let caps { self.apply(caps) }
+                self.unavailableModes.insert(newMode)
+                self.pendingMode = nil
                 self.errorMessage = error.localizedDescription
             }
         }
-        await MainActor.run { self.isSwitchingFormat = false }
     }
 
     private func apply(_ caps: Capabilities) {
@@ -154,27 +156,30 @@ final class CameraModel {
 
     // MARK: - 配置（均在 sessionQueue 上执行）
 
-    private func configureIfNeeded(format: CaptureFormat) throws -> Capabilities {
+    private func configureIfNeeded(mode: CaptureMode) throws -> Capabilities {
         if isConfiguredOnQueue { return currentCapabilities() }
         session.beginConfiguration()
         defer { session.commitConfiguration() }
         session.sessionPreset = .photo
         guard session.canAddOutput(photoOutput) else { throw CameraError.cannotConfigure }
         session.addOutput(photoOutput)
-        let caps = try useDevice(for: format)
+        videoOutput.videoSettings = [kCVPixelBufferPixelFormatTypeKey as String: kCVPixelFormatType_420YpCbCr8BiPlanarFullRange]
+        videoOutput.alwaysDiscardsLateVideoFrames = true
+        videoOutput.setSampleBufferDelegate(videoCollector, queue: videoQueue)
+        let caps = try useDevice(for: mode)
         isConfiguredOnQueue = true
         return caps
     }
 
-    private func switchDevice(for format: CaptureFormat) throws -> Capabilities {
+    private func switchDevice(for mode: CaptureMode) throws -> Capabilities {
         session.beginConfiguration()
         defer { session.commitConfiguration() }
-        return try useDevice(for: format)
+        return try useDevice(for: mode)
     }
 
-    /// 替换输入设备并重新设置输出。调用方负责 begin/commitConfiguration。
-    private func useDevice(for format: CaptureFormat) throws -> Capabilities {
-        guard let device = Self.pickDevice(for: format) else { throw CameraError.noCamera }
+    /// 为模式选择设备并设置输出。调用方负责 begin/commitConfiguration。
+    private func useDevice(for mode: CaptureMode) throws -> Capabilities {
+        guard let device = Self.pickDevice(for: mode) else { throw CameraError.noCamera }
 
         if device != self.device {
             if let input { session.removeInput(input) }
@@ -188,8 +193,17 @@ final class CameraModel {
             self.device = device
         }
 
+        // 视频输出只在“高速”模式下挂到会话上
+        let hasVideoOutput = session.outputs.contains(videoOutput)
+        if mode.usesVideo, !hasVideoOutput {
+            guard session.canAddOutput(videoOutput) else { throw CameraError.modeUnsupported(mode) }
+            session.addOutput(videoOutput)
+        } else if !mode.usesVideo, hasVideoOutput {
+            session.removeOutput(videoOutput)
+        }
+
         // LiDAR 等设备需要选择带深度格式的 activeFormat 才能输出深度。
-        if format == .processed, device.activeFormat.supportedDepthDataFormats.isEmpty {
+        if mode.supportsDepth, device.activeFormat.supportedDepthDataFormats.isEmpty {
             let candidates = device.formats.filter {
                 !$0.supportedDepthDataFormats.isEmpty &&
                     CMFormatDescriptionGetMediaSubType($0.formatDescription) == kCVPixelFormatType_420YpCbCr8BiPlanarFullRange
@@ -201,7 +215,7 @@ final class CameraModel {
             }
         }
 
-        // 每张最多约 1200 万像素，避免一个堆栈占用过多内存（Bayer RAW 本身也是 1200 万像素）。
+        // 每张最多约 1200 万像素，避免一个堆栈占用过多内存（Bayer RAW / ProRAW 也支持 1200 万像素）。
         let dims = device.activeFormat.supportedMaxPhotoDimensions
         if let chosen = dims.filter({ Self.area($0) <= 12_600_000 }).max(by: { Self.area($0) < Self.area($1) }) ?? dims.first {
             photoOutput.maxPhotoDimensions = chosen
@@ -210,26 +224,45 @@ final class CameraModel {
         // 零延迟快门会使用按下快门之前缓存的画面 —— 那时镜头还没移动到位，必须关闭。
         if photoOutput.isZeroShutterLagSupported { photoOutput.isZeroShutterLagEnabled = false }
         if photoOutput.isResponsiveCaptureSupported { photoOutput.isResponsiveCaptureEnabled = false }
-        // 不启用 Apple ProRAW（它是多帧合成的“计算 RAW”），这样可用格式里只剩 Bayer RAW。
-        if photoOutput.isAppleProRAWSupported { photoOutput.isAppleProRAWEnabled = false }
 
-        switch format {
-        case .processed:
-            photoOutput.isDepthDataDeliveryEnabled = photoOutput.isDepthDataDeliverySupported
-            rawPixelFormat = nil
-        case .raw:
-            photoOutput.isDepthDataDeliveryEnabled = false
-            guard let raw = photoOutput.availableRawPhotoPixelFormatTypes.first(where: { AVCapturePhotoOutput.isBayerRAWPixelFormat($0) }) else {
-                throw CameraError.rawUnsupported
-            }
-            rawPixelFormat = raw
+        // RAW 格式：ProRAW 与 Bayer RAW 互斥，取决于 isAppleProRAWEnabled
+        if photoOutput.isAppleProRAWSupported {
+            photoOutput.isAppleProRAWEnabled = mode == .proRAW
+        } else if mode == .proRAW {
+            throw CameraError.modeUnsupported(mode)
         }
+        switch mode {
+        case .proRAW:
+            guard let format = photoOutput.availableRawPhotoPixelFormatTypes.first(where: { AVCapturePhotoOutput.isAppleProRAWPixelFormat($0) }) else {
+                throw CameraError.modeUnsupported(mode)
+            }
+            rawPixelFormat = format
+        case .bayerRAW:
+            guard let format = photoOutput.availableRawPhotoPixelFormatTypes.first(where: { AVCapturePhotoOutput.isBayerRAWPixelFormat($0) }) else {
+                throw CameraError.modeUnsupported(mode)
+            }
+            rawPixelFormat = format
+        default:
+            rawPixelFormat = nil
+        }
+        photoOutput.isDepthDataDeliveryEnabled = mode.supportsDepth && photoOutput.isDepthDataDeliverySupported
 
         try device.lockForConfiguration()
         if device.isFocusModeSupported(.continuousAutoFocus) { device.focusMode = .continuousAutoFocus }
         if device.isExposureModeSupported(.continuousAutoExposure) { device.exposureMode = .continuousAutoExposure }
+        if device.isGeometricDistortionCorrectionSupported {
+            device.isGeometricDistortionCorrectionEnabled = mode != .minimal
+        }
+        if mode.usesVideo,
+           let fastest = device.activeFormat.videoSupportedFrameRateRanges.max(by: { $0.maxFrameRate < $1.maxFrameRate }) {
+            // 只限制最短帧时长，暗光下仍允许自动曝光降低帧率
+            device.activeVideoMinFrameDuration = fastest.minFrameDuration
+        } else {
+            device.activeVideoMinFrameDuration = .invalid
+        }
         device.unlockForConfiguration()
 
+        activeMode = mode
         return currentCapabilities()
     }
 
@@ -240,8 +273,8 @@ final class CameraModel {
         )
     }
 
-    private static func pickDevice(for format: CaptureFormat) -> AVCaptureDevice? {
-        if format == .processed {
+    private static func pickDevice(for mode: CaptureMode) -> AVCaptureDevice? {
+        if mode.prefersDepthDevice {
             // 优先使用能输出深度、同时允许手动设置镜头位置的设备。
             let preferred: [AVCaptureDevice.DeviceType] = [.builtInLiDARDepthCamera, .builtInDualWideCamera, .builtInDualCamera]
             for type in preferred {
@@ -297,28 +330,26 @@ final class CameraModel {
     // MARK: - 焦平面扫描拍摄
 
     func captureStack() async throws -> CaptureResult {
-        guard state == .idle, !isSwitchingFormat, let device, isConfigured else { throw CameraError.busy }
+        guard state == .idle, pendingMode == nil, let device, isConfigured else { throw CameraError.busy }
+        let mode = mode
         let sweep = supportsSweep
         let depth = supportsDepth
         let total = sweep ? frameCount : 1
-        let referenceIndex = total / 2
         let angle = rotationCoordinator?.videoRotationAngleForHorizonLevelCapture ?? 90
 
         await MainActor.run { self.state = .sweeping(done: 0, total: total) }
 
         do {
             try await onSessionQueue { try self.prepareForSweep(angle: angle) }
-            var frames: [CapturedFrame] = []
-            for index in 0 ..< total {
-                let position: Float = total > 1 ? Float(index) / Float(total - 1) : device.lensPosition
-                if sweep { await setLensPosition(position) }
-                let (data, ext) = try await takePhoto(withDepth: depth && index == referenceIndex)
-                frames.append(CapturedFrame(data: data, lensPosition: sweep ? position : device.lensPosition, fileExtension: ext))
-                await MainActor.run { self.state = .sweeping(done: index + 1, total: total) }
+            let frames: [CapturedFrame]
+            if mode.usesVideo {
+                frames = try await captureVideoSweep(total: total, sweep: sweep, device: device)
+            } else {
+                frames = try await capturePhotoSweep(total: total, sweep: sweep, depth: depth, device: device)
             }
             try? await onSessionQueue { try self.restoreAutomaticModes() }
             await MainActor.run { self.state = .idle }
-            return CaptureResult(frames: frames, referenceIndex: referenceIndex, hasDepth: depth)
+            return CaptureResult(frames: frames, referenceIndex: frames.count / 2, hasDepth: depth && !mode.usesVideo, mode: mode)
         } catch {
             try? await onSessionQueue { try self.restoreAutomaticModes() }
             await MainActor.run { self.state = .idle }
@@ -326,9 +357,38 @@ final class CameraModel {
         }
     }
 
+    private func capturePhotoSweep(total: Int, sweep: Bool, depth: Bool, device: AVCaptureDevice) async throws -> [CapturedFrame] {
+        let referenceIndex = total / 2
+        var frames: [CapturedFrame] = []
+        for index in 0 ..< total {
+            let position: Float = total > 1 ? Float(index) / Float(total - 1) : device.lensPosition
+            if sweep { await setLensPosition(position) }
+            let (data, ext) = try await takePhoto(withDepth: depth && index == referenceIndex)
+            frames.append(CapturedFrame(data: data, lensPosition: sweep ? position : device.lensPosition, fileExtension: ext))
+            await MainActor.run { self.state = .sweeping(done: index + 1, total: total) }
+        }
+        return frames
+    }
+
+    private func captureVideoSweep(total: Int, sweep: Bool, device: AVCaptureDevice) async throws -> [CapturedFrame] {
+        if sweep { await setLensPosition(0) }
+        let collector = videoCollector
+        let timeout = Task {
+            try await Task.sleep(for: .seconds(Double(total) / 10 + 4))
+            collector.cancel(with: CameraError.captureFailed)
+        }
+        defer { timeout.cancel() }
+        let frames = try await collector.collect(count: sweep ? total : 1, device: device) { [weak self] done in
+            Task { @MainActor in self?.state = .sweeping(done: done, total: total) }
+        }
+        return frames.map { CapturedFrame(data: $0.data, lensPosition: $0.lensPosition, fileExtension: "heic") }
+    }
+
     private func prepareForSweep(angle: CGFloat) throws {
-        if let connection = photoOutput.connection(with: .video), connection.isVideoRotationAngleSupported(angle) {
-            connection.videoRotationAngle = angle
+        for output in [photoOutput as AVCaptureOutput, videoOutput] {
+            if let connection = output.connection(with: .video), connection.isVideoRotationAngleSupported(angle) {
+                connection.videoRotationAngle = angle
+            }
         }
         guard let device else { return }
         try device.lockForConfiguration()
@@ -367,13 +427,14 @@ final class CameraModel {
         try await withCheckedThrowingContinuation { continuation in
             sessionQueue.async {
                 let output = self.photoOutput
+                let mode = self.activeMode
                 let settings: AVCapturePhotoSettings
                 let ext: String
 
                 if let raw = self.rawPixelFormat {
                     // 只要 RAW，不要系统处理过的版本
                     settings = AVCapturePhotoSettings(rawPixelFormatType: raw)
-                    settings.photoQualityPrioritization = .speed
+                    settings.photoQualityPrioritization = mode == .bayerRAW ? .speed : .balanced
                     if let codec = settings.availableRawEmbeddedThumbnailPhotoCodecTypes.first {
                         settings.rawEmbeddedThumbnailPhotoFormat = [
                             AVVideoCodecKey: codec,
@@ -390,7 +451,14 @@ final class CameraModel {
                         settings = AVCapturePhotoSettings()
                         ext = "jpg"
                     }
-                    settings.photoQualityPrioritization = .balanced
+                    if mode == .minimal {
+                        // 速度优先 = 不做 Deep Fusion 之类的多帧合成；同时不融合多颗镜头的画面
+                        settings.photoQualityPrioritization = .speed
+                        // （带深度的那一帧保持默认，避免与深度输出的约束冲突）
+                        if output.isVirtualDeviceFusionSupported, !withDepth { settings.isAutoVirtualDeviceFusionEnabled = false }
+                    } else {
+                        settings.photoQualityPrioritization = .balanced
+                    }
                     if withDepth, output.isDepthDataDeliveryEnabled {
                         settings.isDepthDataDeliveryEnabled = true
                         settings.embedsDepthDataInPhoto = true
