@@ -1,2 +1,6 @@
 data/reddit.log
 __pycache__/
+xcuserdata/
+*.xcuserstate
+DerivedData/
+.DS_Store
