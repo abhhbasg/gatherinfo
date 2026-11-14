@@ -14,11 +14,12 @@ struct MemoryDetailView: View {
             VStack(alignment: .leading, spacing: 16) {
                 if let data = memory.imageData, let ui = UIImage(data: data) {
                     Button { showImage = true } label: {
-                        Image(uiImage: ui)
-                            .resizable()
-                            .scaledToFill()
+                        Color.clear
                             .frame(maxWidth: .infinity)
                             .frame(height: 260)
+                            .overlay(alignment: .top) {
+                                Image(uiImage: ui).resizable().scaledToFill()
+                            }
                             .clipShape(.rect(cornerRadius: 28))
                             .overlay(alignment: .bottomTrailing) {
                                 Image(systemName: "arrow.up.left.and.arrow.down.right")
