@@ -1,2 +1,5 @@
 data/reddit.log
 __pycache__/
+iphone-memory/app/*.xcodeproj
+iphone-memory/app/build*/
+iphone-memory/app/out/

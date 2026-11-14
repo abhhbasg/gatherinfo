@@ -1,0 +1,77 @@
+name: iOS build
+
+on:
+  push:
+    branches: [claude/youthful-lovelace-toxzkr]
+    paths: ["iphone-memory/app/**", ".github/workflows/ios.yml"]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: macos-26
+    timeout-minutes: 45
+    defaults:
+      run:
+        working-directory: iphone-memory/app
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Select latest Xcode
+        run: |
+          ls -d /Applications/Xcode*.app
+          XC=$(ls -d /Applications/Xcode_26*.app | sort -V | tail -1)
+          sudo xcode-select -s "$XC"
+          xcodebuild -version
+
+      - name: Generate project
+        run: |
+          brew install xcodegen
+          xcodegen generate
+
+      - name: Build unsigned IPA
+        run: |
+          set -o pipefail
+          xcodebuild -project Pingyi.xcodeproj -scheme Pingyi -configuration Release \
+            -sdk iphoneos -destination 'generic/platform=iOS' -derivedDataPath build \
+            CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO CODE_SIGN_IDENTITY="" \
+            build | tee build.log | xcbeautify || (grep -E "error:" build.log | head -50; exit 1)
+          mkdir -p out/Payload
+          cp -R build/Build/Products/Release-iphoneos/Pingyi.app out/Payload/
+          (cd out && zip -qry Pingyi.ipa Payload)
+          ls -lh out/Pingyi.ipa
+
+      - name: Simulator screenshots
+        continue-on-error: true
+        run: |
+          set -x
+          UDID=$(xcrun simctl list devices available -j | jq -r '[.devices | to_entries[] | select(.key | test("iOS-26")) | .value[] | select(.name | test("iPhone 1[67] Pro$"))] | last | .udid')
+          echo "Simulator: $UDID"
+          xcodebuild -project Pingyi.xcodeproj -scheme Pingyi -configuration Debug \
+            -sdk iphonesimulator -destination "id=$UDID" -derivedDataPath build-sim \
+            CODE_SIGN_IDENTITY=- build | xcbeautify
+          xcrun simctl boot "$UDID" || true
+          xcrun simctl bootstatus "$UDID" -b
+          xcrun simctl install "$UDID" build-sim/Build/Products/Debug-iphonesimulator/Pingyi.app
+          xcrun simctl status_bar "$UDID" override --time 9:41 --batteryState charged --batteryLevel 100 --cellularBars 4
+          mkdir -p out/screens
+          for mode in light dark; do
+            xcrun simctl ui "$UDID" appearance $mode
+            for tab in timeline detail agenda search settings; do
+              xcrun simctl launch --terminate-running-process "$UDID" com.gatherinfo.pingyi -seedDemo YES -tab $tab
+              sleep 7
+              xcrun simctl io "$UDID" screenshot "out/screens/${mode}-${tab}.png"
+            done
+          done
+          ls out/screens
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Pingyi-ipa
+          path: iphone-memory/app/out/Pingyi.ipa
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: screenshots
+          path: iphone-memory/app/out/screens
+          if-no-files-found: ignore

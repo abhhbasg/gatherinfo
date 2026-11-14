@@ -1,0 +1,35 @@
+name: Pingyi
+options:
+  bundleIdPrefix: com.gatherinfo
+  deploymentTarget:
+    iOS: "26.0"
+  developmentLanguage: zh-Hans
+settings:
+  base:
+    SWIFT_VERSION: "5.0"
+    MARKETING_VERSION: "1.0"
+    CURRENT_PROJECT_VERSION: "1"
+targets:
+  Pingyi:
+    type: application
+    platform: iOS
+    sources:
+      - path: Pingyi
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.gatherinfo.pingyi
+        PRODUCT_NAME: Pingyi
+        INFOPLIST_FILE: Pingyi/Info.plist
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+        TARGETED_DEVICE_FAMILY: "1"
+        CODE_SIGN_STYLE: Automatic
+        ENABLE_PREVIEWS: YES
+schemes:
+  Pingyi:
+    build:
+      targets:
+        Pingyi: all
+    run:
+      config: Debug
+    archive:
+      config: Release
